@@ -5,13 +5,7 @@ from pydantic import BaseModel, Field
 
 class NewGameRequest(BaseModel):
     human_player: Literal[0, 1] = 0
-    ai_time_limit: float = Field(default=5.0, gt=0, le=60)
-    ai_max_depth: int = Field(default=4, ge=1, le=20)
-
-class CreateGameRequest(BaseModel):
-    human_player: Literal[0, 1] = 0
     first_player: Literal["human", "ai"] = "human"
-
 
 class MoveRequest(BaseModel):
     destination: tuple[int, int]

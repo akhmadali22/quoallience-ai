@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 
-defineProps({
+const props = defineProps({
     loading: {
         type: Boolean,
         default: false,
@@ -15,14 +15,12 @@ defineProps({
 const emit = defineEmits(['new-game', 'update:action-mode'])
 
 const humanPlayer = ref(0)
-const aiTimeLimit = ref(5)
-const aiMaxDepth = ref(4)
+const firstPlayer = ref('human')
 
 function startNewGame() {
     emit('new-game', {
         humanPlayer: humanPlayer.value,
-        aiTimeLimit: aiTimeLimit.value,
-        aiMaxDepth: aiMaxDepth.value,
+        firstPlayer: firstPlayer.value,
     })
 }
 </script>
@@ -31,24 +29,25 @@ function startNewGame() {
     <section class="controls-panel">
         <h2>Kontrol permainan</h2>
 
+        <!-- Posisi manusia -->
         <label>
-            Posisi pemain
+            Posisi pemain manusia
             <select v-model.number="humanPlayer" :disabled="loading">
                 <option :value="0">Pemain 0 · Bawah</option>
                 <option :value="1">Pemain 1 · Atas</option>
             </select>
         </label>
 
+        <!-- Pemain pertama -->
         <label>
-            Batas waktu AI (detik)
-            <input v-model.number="aiTimeLimit" type="number" min="1" max="60" :disabled="loading" />
+            Pemain pertama
+            <select v-model="firstPlayer" :disabled="loading">
+                <option value="human">Manusia mulai</option>
+                <option value="ai">AI mulai</option>
+            </select>
         </label>
 
-        <label>
-            Kedalaman maksimum AI
-            <input v-model.number="aiMaxDepth" type="number" min="1" max="20" :disabled="loading" />
-        </label>
-
+        <!-- Mode aksi -->
         <div class="action-selector">
             <span>Mode aksi</span>
 
@@ -64,9 +63,10 @@ function startNewGame() {
                 </button>
             </div>
 
-            <small>Mode dinding belum aktif pada tahap ini.</small>
+            <small>Gunakan mode aksi untuk menentukan tindakan pada papan.</small>
         </div>
 
+        <!-- Tombol permainan baru -->
         <button class="new-game-button" :disabled="loading" @click="startNewGame">
             {{ loading ? 'Memproses...' : 'Permainan baru' }}
         </button>

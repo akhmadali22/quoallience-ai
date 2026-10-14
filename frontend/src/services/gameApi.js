@@ -8,11 +8,10 @@ const api = axios.create({
   },
 });
 
-export async function createGame({ humanPlayer = 0, aiTimeLimit = 5, aiMaxDepth = 4 } = {}) {
+export async function createGame({ humanPlayer = 0, firstPlayer = "human" } = {}) {
   const { data } = await api.post("/games", {
     human_player: humanPlayer,
-    ai_time_limit: aiTimeLimit,
-    ai_max_depth: aiMaxDepth,
+    first_player: firstPlayer,
   });
 
   return data;
@@ -32,13 +31,13 @@ export async function makeMove(gameId, destination) {
 }
 
 export async function placeWall(gameId, orientation, x, y) {
-    const { data } = await api.post(`/games/${gameId}/wall`, {
-        orientation,
-        x,
-        y,
-    })
+  const { data } = await api.post(`/games/${gameId}/wall`, {
+    orientation,
+    x,
+    y,
+  });
 
-    return data
+  return data;
 }
 
 export async function makeAIMove(gameId) {
