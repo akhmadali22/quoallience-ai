@@ -48,26 +48,140 @@ function pawnAt(x, y) {
     )
 }
 
-function isAdjacent(x, y) {
-    const pawn = props.game.pawns[props.game.current_player]
+function isBlockedBetween(x1, y1, x2, y2) {
+    const walls = props.game.walls ?? []
 
-    if (!pawn) return false
+    if (x1 === x2) {
+        const boundaryY = Math.min(y1, y2)
 
-    const distance =
-        Math.abs(pawn.x - x) + Math.abs(pawn.y - y)
+        return walls.some(
+            (wall) =>
+                wall.orientation === 'H' &&
+                wall.y === boundaryY &&
+                wall.x <= x1 &&
+                x1 <= wall.x + 1,
+        )
+    }
 
-    return distance === 1
+    if (y1 === y2) {
+        const boundaryX = Math.min(x1, x2)
+
+        return walls.some(
+            (wall) =>
+                wall.orientation === 'V' &&
+                wall.x === boundaryX &&
+                wall.y <= y1 &&
+                y1 <= wall.y + 1,
+        )
+    }
+
+    return true
+}
+
+function isInsideBoard(x, y) {
+    return x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE
+}
+
+function isLegalMove(x, y) {
+    return getLegalPawnMoves().some(
+        (move) => move.x === x && move.y === y,
+    )
+}
+
+function getLegalPawnMoves() {
+    const pawns = props.game.pawns ?? []
+    const player = props.game.current_player
+
+    const own = pawns[player]
+    const opponent = pawns[1 - player]
+
+    if (!own || !opponent || props.game.status !== 'in_progress') {
+        return []
+    }
+
+    const moves = new Set()
+    const directions = [
+        [0, -1],
+        [1, 0],
+        [0, 1],
+        [-1, 0],
+    ]
+
+    for (const [dx, dy] of directions) {
+        const nx = own.x + dx
+        const ny = own.y + dy
+
+        if (!isInsideBoard(nx, ny)) continue
+
+        if (isBlockedBetween(own.x, own.y, nx, ny)) continue
+
+        // Petak di depan bukan posisi pion lawan.
+        if (nx !== opponent.x || ny !== opponent.y) {
+            moves.add(`${nx},${ny}`)
+            continue
+        }
+
+        // Pion lawan bersebelahan. Coba melompat lurus.
+        const jumpX = opponent.x + dx
+        const jumpY = opponent.y + dy
+
+        if (
+            isInsideBoard(jumpX, jumpY) &&
+            !isBlockedBetween(
+                opponent.x,
+                opponent.y,
+                jumpX,
+                jumpY,
+            )
+        ) {
+            moves.add(`${jumpX},${jumpY}`)
+            continue
+        }
+
+        // Lompatan lurus tidak tersedia.
+        // Coba bergerak diagonal di samping pion lawan.
+        for (const [sx, sy] of [
+            [-dy, dx],
+            [dy, -dx],
+        ]) {
+            const diagonalX = opponent.x + sx
+            const diagonalY = opponent.y + sy
+
+            if (!isInsideBoard(diagonalX, diagonalY)) continue
+
+            if (
+                isBlockedBetween(
+                    opponent.x,
+                    opponent.y,
+                    diagonalX,
+                    diagonalY,
+                )
+            ) {
+                continue
+            }
+
+            moves.add(`${diagonalX},${diagonalY}`)
+        }
+    }
+
+    return [...moves].map((position) => {
+        const [x, y] = position.split(',').map(Number)
+        return { x, y }
+    })
 }
 
 function selectCell(x, y) {
     if (props.disabled) return
-
-    // Klik petak hanya digunakan untuk menggerakkan pion.
-    // Pemasangan dinding dilakukan melalui drag-and-drop.
     if (props.actionMode !== 'move') return
-
     if (pawnAt(x, y) !== -1) return
-    if (!isAdjacent(x, y)) return
+
+    const legalMoves = getLegalPawnMoves()
+
+    const isLegal = legalMoves.some(
+        (move) => move.x === x && move.y === y,
+    )
+
+    if (!isLegal) return
 
     emit('move', [x, y])
 }
@@ -430,7 +544,7 @@ onUnmounted(() => {
                     !disabled &&
                     actionMode === 'move' &&
                     pawnAt(cell.x, cell.y) === -1 &&
-                    isAdjacent(cell.x, cell.y),
+                    isLegalMove(cell.x, cell.y),
             }" :disabled="disabled" :aria-label="`Petak ${cell.x}, ${cell.y}`" @click="selectCell(cell.x, cell.y)">
                 <span v-if="pawnAt(cell.x, cell.y) === game.human_player" class="pawn human">
                     P
@@ -443,14 +557,14 @@ onUnmounted(() => {
 
             <!-- Dinding yang sudah terpasang -->
             <div v-for="(wall, index) in game.walls" :key="`wall-${index}`" class="wall" :class="wall.orientation === 'H'
-                    ? 'wall-horizontal'
-                    : 'wall-vertical'
+                ? 'wall-horizontal'
+                : 'wall-vertical'
                 " :style="getWallStyle(wall)"></div>
 
             <!-- Pratinjau dinding saat drag -->
             <div v-if="isDraggingWall && dragTarget" class="wall wall-preview" :class="dragTarget.orientation === 'H'
-                    ? 'wall-horizontal'
-                    : 'wall-vertical'
+                ? 'wall-horizontal'
+                : 'wall-vertical'
                 " :style="wallPreviewStyle"></div>
 
             <div v-if="isDraggingWall && !dragTarget" class="drag-outside-hint">

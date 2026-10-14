@@ -5,8 +5,8 @@ from quoridor.advanced_ai import AIConfig, QuoridorAI
 class AIService:
     def __init__(
         self,
-        time_limit: float = 5.0,
-        max_depth: int = 4,
+        time_limit: float = 55,
+        max_depth: int = 5,
     ):
         self.config = AIConfig(
             time_limit=time_limit,

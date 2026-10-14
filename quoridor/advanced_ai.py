@@ -51,8 +51,8 @@ class Action:
 
 @dataclass(frozen=True)
 class AIConfig:
-    time_limit: float = 60
-    max_depth: int = 4
+    time_limit: float = 55
+    max_depth: int = 5
 
     progress_weight: float = 2.0
     wall_resource_weight: float = 0.25
