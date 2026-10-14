@@ -436,9 +436,13 @@ function finishWallDrag(event) {
     })
 }
 
-function startWallDrag(event) {
-    if (props.disabled) return
-    if (props.actionMode !== 'wall') return
+function startWallDrag(event, orientation) {
+    if (props.disabled || isDraggingWall.value) return
+
+    if (orientation !== 'H' && orientation !== 'V') return
+
+    wallOrientation.value = orientation
+    isDraggingWall.value = true
 
     // Hanya gunakan tombol utama mouse.
     if (event.pointerType === 'mouse' && event.button !== 0) {
@@ -507,22 +511,15 @@ onUnmounted(() => {
             <span>Orientasi dinding:</span>
 
             <button type="button" :class="{ active: wallOrientation === 'H' }" :disabled="disabled || isDraggingWall"
-                @click="wallOrientation = 'H'">
+                @pointerdown="startWallDrag($event, 'H')">
+                <span class="wall-drag-icon icon-horizontal"></span>
                 Horizontal
             </button>
 
             <button type="button" :class="{ active: wallOrientation === 'V' }" :disabled="disabled || isDraggingWall"
-                @click="wallOrientation = 'V'">
+                @pointerdown="startWallDrag($event, 'V')">
+                <span class="wall-drag-icon icon-vertical"></span>
                 Vertikal
-            </button>
-
-            <button type="button" class="wall-drag-handle" :disabled="disabled" @pointerdown="startWallDrag">
-                <span class="wall-drag-icon" :class="{
-                    'icon-horizontal': wallOrientation === 'H',
-                    'icon-vertical': wallOrientation === 'V',
-                }"></span>
-
-                Seret dinding ke papan
             </button>
 
             <span class="wall-hint">
