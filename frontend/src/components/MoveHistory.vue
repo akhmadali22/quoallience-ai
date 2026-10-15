@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps({
     history: {
@@ -7,6 +7,10 @@ const props = defineProps({
         default: () => [],
     },
 })
+
+const copied = ref(false)
+const copyError = ref('')
+let copiedTimeout = null
 
 const formattedHistory = computed(() => {
     return props.history.map((item, index) => {
@@ -22,7 +26,7 @@ const formattedHistory = computed(() => {
         }
 
         return {
-            id: `${item.ply ?? index}-${item.player ?? 'unknown'}`,
+            id: `${item.ply ?? index + 1}-${item.player ?? 'unknown'}`,
             ply: item.ply ?? index + 1,
             player: item.player,
             description,
@@ -30,6 +34,55 @@ const formattedHistory = computed(() => {
         }
     })
 })
+
+const exportHistory = computed(() => {
+    return {
+        total_act: formattedHistory.value.length,
+        act_list: formattedHistory.value.map((item) => {
+            const playerLabel =
+                item.player === 0 || item.player === 1
+                    ? `Pemain ${item.player}`
+                    : 'Pemain'
+
+            let entry = `${item.ply}. ${playerLabel} ${item.description}`
+
+            if (item.analysis) {
+                const depth = item.analysis.depth ?? '-'
+                const elapsed = item.analysis.elapsed_ms ?? 0
+
+                entry += ` Depth ${depth} · ${elapsed} ms`
+            }
+
+            return entry
+        }),
+    }
+})
+
+async function copyHistoryToClipboard() {
+    copyError.value = ''
+
+    try {
+        const json = JSON.stringify(exportHistory.value, null, 2)
+
+        await navigator.clipboard.writeText(json)
+
+        copied.value = true
+
+        if (copiedTimeout) {
+            clearTimeout(copiedTimeout)
+        }
+
+        copiedTimeout = setTimeout(() => {
+            copied.value = false
+            copiedTimeout = null
+        }, 2000)
+    } catch (error) {
+        console.error('Gagal menyalin riwayat pertandingan:', error)
+
+        copyError.value =
+            'Gagal menyalin. Pastikan browser mengizinkan akses clipboard.'
+    }
+}
 </script>
 
 <template>
@@ -39,8 +92,13 @@ const formattedHistory = computed(() => {
                 <h2>Riwayat langkah</h2>
                 <p>{{ history.length }} aksi tercatat</p>
             </div>
+            <button type="button" class="copy-button" :disabled="history.length === 0" @click="copyHistoryToClipboard">
+                {{ copied ? 'Tersalin!' : 'Salin JSON' }}
+            </button>
         </header>
-
+        <p v-if="copyError" class="copy-error" role="alert">
+            {{ copyError }}
+        </p>
         <div v-if="formattedHistory.length === 0" class="empty-state">
             Belum ada langkah. Pertandingan baru dimulai.
         </div>
@@ -55,8 +113,8 @@ const formattedHistory = computed(() => {
                             item.player === 0
                                 ? 'Pemain 0'
                                 : item.player === 1
-                        ? 'Pemain 1'
-                        : 'Pemain'
+                                    ? 'Pemain 1'
+                                    : 'Pemain'
                         }}
                     </strong>
 
@@ -146,5 +204,44 @@ const formattedHistory = computed(() => {
 
 .move-details small {
     color: #9ca3af;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.copy-button {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    border: 1px solid #4b5563;
+    border-radius: 8px;
+    background: #1f2937;
+    color: #e5e7eb;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.copy-button:hover:not(:disabled) {
+    background: #374151;
+    border-color: #6b7280;
+}
+
+.copy-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.copy-error {
+    margin: 0 0 12px;
+    color: #fca5a5;
+    font-size: 0.8rem;
 }
 </style>
