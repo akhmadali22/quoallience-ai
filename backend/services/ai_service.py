@@ -15,6 +15,10 @@ class AIService:
         self.ai = QuoridorAI(self.config)
 
     def choose_action(self, state: GameState) -> dict:
+        print("\n========== AI POSITION ==========")
+        print(self.ai.debug_position(state))
+        print("======== END AI POSITION ========\n")
+
         result = self.ai.choose_action(state)
 
         return {

@@ -5,7 +5,7 @@ import time
 
 from dataclasses import dataclass
 from typing import Literal
-from collections import defaultdict
+from collections import defaultdict, deque
 
 from quoridor.engine import (
     GameState,
@@ -16,6 +16,7 @@ from quoridor.engine import (
     shortest_distance,
     shortest_path,
     is_legal_wall,
+    blocked,
 )
 
 ActionType = Literal["move", "wall"]
@@ -60,6 +61,9 @@ class AIConfig:
     # max_wall_candidates: int = 24
     max_wall_candidates: int = 8
     transposition_table_limit: int = 50_000
+
+    own_progress_weight: float = 2.5
+    opponent_delay_weight: float = 1.5
 
 
 @dataclass
@@ -137,6 +141,24 @@ class QuoridorAI:
     def _profile_start(self, name: str) -> float:
         self.profile_calls[name] += 1
         return time.perf_counter()
+
+    def debug_position(self, state: GameState) -> dict:
+        """Menampilkan jarak BFS dan informasi posisi tanpa batas waktu pencarian AI."""
+        player = state.current_player
+        opponent = 1 - player
+
+        # Hitung BFS secara langsung agar tidak terkena SearchTimeout
+        own_distance = shortest_distance(state, player)
+        opponent_distance = shortest_distance(state, opponent)
+
+        return {
+            "current_player": player,
+            "pawns": state.pawns,
+            "walls_remaining": state.walls_remaining,
+            "own_distance": own_distance,
+            "opponent_distance": opponent_distance,
+            "legal_moves": legal_pawn_moves(state, player),
+        }
 
     def _profile_end(self, name: str, start: float) -> None:
         self.profile_time[name] += time.perf_counter() - start
@@ -241,16 +263,17 @@ class QuoridorAI:
             opponent,
         )
 
-        if math.isinf(own_distance):
+        if own_distance is None:
             score = -MATE_SCORE
 
-        elif math.isinf(opponent_distance):
+        elif opponent_distance is None:
             score = MATE_SCORE
 
         else:
             progress_score = (
-                opponent_distance - own_distance
-            ) * self.config.progress_weight
+                opponent_distance * self.config.opponent_delay_weight
+                - own_distance * self.config.own_progress_weight
+            )
 
             own_walls = state.walls_remaining[self.root_player]
             opponent_walls = state.walls_remaining[opponent]
@@ -317,6 +340,86 @@ class QuoridorAI:
 
         return candidates
 
+    def _alternative_paths(
+        self,
+        state: GameState,
+        player: int,
+        max_paths: int = 3,
+    ) -> list[list[tuple[int, int]]]:
+        """
+        Cari beberapa jalur berbeda dengan menghindari setiap edge
+        pada jalur terpendek awal.
+
+        Jalur alternatif tidak harus sama panjang dengan jalur awal.
+        """
+        base_path = shortest_path(state, player)
+
+        if not base_path:
+            return []
+
+        paths = [base_path]
+        seen = {tuple(base_path)}
+        goal_y = 0 if player == 0 else 8
+        start = state.pawns[player]
+
+        for index in range(len(base_path) - 1):
+            if len(paths) >= max_paths:
+                break
+
+            first = base_path[index]
+            second = base_path[index + 1]
+            forbidden_edge = frozenset((first, second))
+
+            queue = deque([start])
+            previous = {start: None}
+
+            while queue:
+                current = queue.popleft()
+
+                if current[1] == goal_y:
+                    path = []
+                    node = current
+
+                    while node is not None:
+                        path.append(node)
+                        node = previous[node]
+
+                    path.reverse()
+                    path_key = tuple(path)
+
+                    if path_key not in seen:
+                        seen.add(path_key)
+                        paths.append(path)
+
+                    break
+
+                x, y = current
+
+                for nxt in (
+                    (x, y - 1),
+                    (x + 1, y),
+                    (x, y + 1),
+                    (x - 1, y),
+                ):
+                    if not (0 <= nxt[0] < 9 and 0 <= nxt[1] < 9):
+                        continue
+
+                    if nxt in previous:
+                        continue
+
+                    edge = frozenset((current, nxt))
+
+                    if edge == forbidden_edge:
+                        continue
+
+                    if blocked(state.walls, current, nxt):
+                        continue
+
+                    previous[nxt] = current
+                    queue.append(nxt)
+
+        return paths
+
     def _candidate_walls(
         self,
         state: GameState,
@@ -352,7 +455,8 @@ class QuoridorAI:
         candidates.update(own_path_walls)
         candidates.update(opponent_path_walls)
 
-        # Prefer walls that intersect the opponent's shortest path.
+        # Prioritaskan dinding yang mengganggu rute lawan,
+        # tetapi hindari kandidat yang juga mengganggu rute sendiri.
         ordered = sorted(
             candidates,
             key=lambda wall: (
@@ -369,14 +473,26 @@ class QuoridorAI:
         for wall in ordered:
             self._check_deadline()
 
-            if is_legal_wall(state, wall, player):
-                legal_candidates.append(wall)
+            if not is_legal_wall(state, wall, player):
+                continue
 
-                if len(legal_candidates) >= self.config.max_wall_candidates:
-                    break
+            legal_candidates.append(wall)
+
+            if len(legal_candidates) >= self.config.max_wall_candidates:
+                break
+
+        print(
+            f"[WALL SEARCH] "
+            f"player={player} | "
+            f"own_paths={len(own_path)} | "
+            f"opponent_paths={len(opponent_path)} | "
+            f"own_wall_candidates={len(own_path_walls)} | "
+            f"opponent_wall_candidates={len(opponent_path_walls)} | "
+            f"legal_candidates={len(legal_candidates)}"
+        )
 
         return legal_candidates
-
+    
     def _generate_children(
         self,
         state: GameState,
