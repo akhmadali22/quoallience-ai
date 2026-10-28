@@ -70,6 +70,9 @@ class AIConfig:
     max_robustness_wall_candidates: int = 8
 
     route_impact_weight: float = 0.5
+    route_flexibility_weight: float = 0.65
+    route_probe_depth: int = 3
+    route_detour_allowance: int = 2
 
 
 @dataclass
@@ -126,8 +129,12 @@ class QuoridorAI:
         # Exact results from fully searched Minimax nodes.
         self.transposition_table: dict[tuple, TTEntry] = {}
 
-        # Cache path distances and static position evaluations.
+        # Cache path distances, goal-distance maps, route flexibility,
+        # and static position evaluations. Goal maps are shared by all
+        # pawn positions that have the same wall layout.
         self.distance_cache: dict[tuple, int | None] = {}
+        self.goal_distance_map_cache: dict[tuple, dict[tuple[int, int], int]] = {}
+        self.route_flexibility_cache: dict[tuple, float] = {}
         self.evaluation_cache: dict[tuple, float] = {}
 
         # Basic performance counters.
@@ -336,11 +343,106 @@ class QuoridorAI:
 
         return worst_score
 
+    def _goal_distance_map(
+        self,
+        state: GameState,
+        player: int,
+    ) -> dict[tuple[int, int], int]:
+        """Return distances from every square to the player's goal row."""
+        self._check_deadline()
+        goal_y = 0 if player == 0 else 8
+        key = (state.walls, goal_y)
+        cached = self.goal_distance_map_cache.get(key)
+        if cached is not None:
+            return cached
+
+        distances = {(x, goal_y): 0 for x in range(9)}
+        queue = deque(distances)
+
+        # Walls block movement symmetrically, so a multi-source BFS from
+        # every goal-row square gives distance-to-goal for every cell.
+        while queue:
+            self._check_deadline()
+            current = queue.popleft()
+            x, y = current
+            for nxt in ((x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)):
+                if not (0 <= nxt[0] < 9 and 0 <= nxt[1] < 9):
+                    continue
+                if nxt in distances or blocked(state.walls, current, nxt):
+                    continue
+                distances[nxt] = distances[current] + 1
+                queue.append(nxt)
+
+        self.goal_distance_map_cache[key] = distances
+        return distances
+
+    def _route_flexibility(self, state: GameState, player: int) -> float:
+        """
+        Estimate near-optimal route options in the first few moves.
+
+        Count distinct simple route prefixes that can still reach the goal
+        within a small detour budget. This rewards positions with alternatives
+        without running Yen's full alternative-path search at every leaf.
+        """
+        self._check_deadline()
+        goal_y = 0 if player == 0 else 8
+        start = state.pawns[player]
+        key = (state.walls, start, goal_y)
+        cached = self.route_flexibility_cache.get(key)
+        if cached is not None:
+            return cached
+
+        distances = self._goal_distance_map(state, player)
+        shortest = distances.get(start)
+        if shortest is None:
+            return 0.0
+
+        max_depth = max(1, self.config.route_probe_depth)
+        detour_allowance = max(0, self.config.route_detour_allowance)
+        visited = {start}
+
+        def explore(position: tuple[int, int], depth: int) -> float:
+            self._check_deadline()
+            if depth >= max_depth:
+                return 0.0
+
+            x, y = position
+            total = 0.0
+            for nxt in ((x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)):
+                if not (0 <= nxt[0] < 9 and 0 <= nxt[1] < 9):
+                    continue
+                if nxt in visited or blocked(state.walls, position, nxt):
+                    continue
+
+                next_distance = distances.get(nxt)
+                if next_distance is None:
+                    continue
+
+                next_depth = depth + 1
+                detour = next_depth + next_distance - shortest
+                if detour > detour_allowance:
+                    continue
+
+                # Nearby choices matter most; slight detours remain useful,
+                # but should not outweigh a genuinely shorter route.
+                total += (0.65 ** depth) / (1.0 + detour)
+                visited.add(nxt)
+                total += explore(nxt, next_depth)
+                visited.remove(nxt)
+
+            return total
+
+        raw_options = explore(start, 0)
+        flexibility = math.log1p(raw_options)
+        self.route_flexibility_cache[key] = flexibility
+        return flexibility
+
     def _evaluate(self, state: GameState) -> float:
         """
-        Static evaluation from the root player's perspective.
+        Static strategic evaluation from the root player's perspective.
 
-        Higher scores favor the root player.
+        The score combines race progress, phase-sensitive wall reserves, and
+        near-optimal route flexibility. Higher scores favor the root player.
         """
         self._check_deadline()
 
@@ -385,11 +487,29 @@ class QuoridorAI:
             own_walls = state.walls_remaining[self.root_player]
             opponent_walls = state.walls_remaining[opponent]
 
+            # Walls have more option value early, when both players still
+            # have long races ahead. Their reserve value tapers as the game
+            # approaches the goal, while immediate tactical wall effects are
+            # still represented by the search itself.
+            average_race_distance = (own_distance + opponent_distance) / 2.0
+            phase_multiplier = 0.55 + 0.45 * min(8.0, average_race_distance) / 8.0
             wall_resource_score = (
-                own_walls - opponent_walls
-            ) * self.config.wall_resource_weight
+                (own_walls - opponent_walls)
+                * self.config.wall_resource_weight
+                * phase_multiplier
+            )
 
-            score = progress_score + wall_resource_score
+            own_flexibility = self._route_flexibility(state, self.root_player)
+            opponent_flexibility = self._route_flexibility(state, opponent)
+            route_flexibility_score = self.config.route_flexibility_weight * (
+                own_flexibility - opponent_flexibility
+            )
+
+            score = (
+                progress_score
+                + wall_resource_score
+                + route_flexibility_score
+            )
 
         self.evaluation_cache[key] = score
 
@@ -1075,6 +1195,8 @@ class QuoridorAI:
 
         self.transposition_table = {}
         self.distance_cache = {}
+        self.goal_distance_map_cache = {}
+        self.route_flexibility_cache = {}
         self.evaluation_cache = {}
 
         self.distance_cache_hits = 0
