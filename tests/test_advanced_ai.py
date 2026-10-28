@@ -4,6 +4,7 @@ import pytest
 
 from quoridor.engine import (
     GameState,
+    Wall,
     apply_move,
     apply_wall,
     legal_pawn_moves,
@@ -141,34 +142,55 @@ def test_wall_candidates_are_inside_board():
         assert 0 <= wall.y <= 7
 
 
-def test_route_disruption_detects_vulnerable_shortest_path():
-    ai = QuoridorAI(
-        AIConfig(
-            time_limit=5.0,
-            max_depth=1,
-            route_robustness_candidates=4,
-        )
+def test_urgent_defense_includes_wall_blocking_immediate_win():
+    state = GameState(
+        pawns=((1, 2), (0, 7)),
+        current_player=0,
     )
-    state = GameState()
-    ai.root_player = 0
-    ai.deadline = time.monotonic() + 5.0
-
-    disruption = ai._route_disruption_cost(state, target_player=1)
-
-    assert disruption >= 0
-    assert disruption > 0
-
-
-def test_route_disruption_is_zero_when_placer_has_no_walls():
     ai = QuoridorAI(
-        AIConfig(
-            time_limit=1.0,
-            max_depth=1,
-            route_robustness_candidates=4,
-        )
+        AIConfig(time_limit=1.0, max_depth=1)
     )
-    state = GameState(walls_remaining=(0, 10))
     ai.root_player = 0
     ai.deadline = time.monotonic() + 1.0
 
-    assert ai._route_disruption_cost(state, target_player=1) == 0
+    urgent = ai._urgent_defensive_walls(state)
+
+    assert Wall("H", 0, 7) in urgent
+
+
+def test_fallback_uses_defensive_wall_when_all_moves_allow_immediate_win():
+    state = GameState(
+        pawns=((1, 2), (0, 7)),
+        current_player=0,
+    )
+    ai = QuoridorAI(
+        AIConfig(time_limit=1.0, max_depth=1)
+    )
+    ai.root_player = 0
+    ai.deadline = __import__("time").monotonic() + 1.0
+
+    action = ai._fallback_action(state)
+
+    assert action.kind == "wall"
+    assert action.wall == Wall("H", 0, 7)
+
+
+def test_wall_candidates_preserve_urgent_defense_outside_shortlist():
+    state = GameState(
+        pawns=((1, 2), (0, 7)),
+        current_player=0,
+    )
+    ai = QuoridorAI(
+        AIConfig(
+            time_limit=3.0,
+            max_depth=1,
+            max_wall_candidates=1,
+            max_alternative_paths=1,
+        )
+    )
+    ai.root_player = 0
+    ai.deadline = __import__("time").monotonic() + 3.0
+
+    candidates = ai._candidate_walls(state)
+
+    assert Wall("H", 0, 7) in candidates

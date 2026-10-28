@@ -60,7 +60,7 @@ class AIConfig:
     wall_resource_weight: float = 0.25
 
     max_wall_candidates: int = 8
-    max_alternative_paths: int = 3
+    max_alternative_paths: int = 2
     transposition_table_limit: int = 50_000
 
     own_progress_weight: float = 2.5
@@ -178,6 +178,44 @@ class QuoridorAI:
             blocked(wall_set, current, nxt)
             for current, nxt in zip(path, path[1:])
         )
+
+    def _immediate_winning_moves(
+        self,
+        state: GameState,
+        player: int,
+    ) -> list[tuple[int, int]]:
+        """Return legal pawn moves that win immediately for player."""
+        if state.winner is not None:
+            return []
+        goal_y = 0 if player == 0 else 8
+        return [
+            tuple(destination)
+            for destination in legal_pawn_moves(state, player)
+            if destination[1] == goal_y
+        ]
+
+    def _opponent_has_immediate_win(self, state: GameState) -> bool:
+        """State is assumed to be after our action, with opponent to move."""
+        if state.winner is not None:
+            return False
+        return bool(self._immediate_winning_moves(state, state.current_player))
+
+    def _urgent_defensive_walls(self, state: GameState) -> list[Wall]:
+        """Find legal walls that block an opponent's one-move winning edge."""
+        if state.winner is not None:
+            return []
+        player = state.current_player
+        opponent = 1 - player
+        threats = self._immediate_winning_moves(state, opponent)
+        if not threats or state.walls_remaining[player] <= 0:
+            return []
+        opponent_position = state.pawns[opponent]
+        urgent: set[Wall] = set()
+        for destination in threats:
+            for wall in self._wall_candidates_from_path([opponent_position, destination]):
+                if is_legal_wall(state, wall, player):
+                    urgent.add(wall)
+        return sorted(urgent, key=lambda wall: (wall.orientation, wall.x, wall.y))
 
     def _profile_end(self, name: str, start: float) -> None:
         self.profile_time[name] += time.perf_counter() - start
@@ -578,121 +616,98 @@ class QuoridorAI:
         self,
         state: GameState,
     ) -> list[Wall]:
-        """
-        Generate wall candidates from multiple routes for both players.
-
-        Candidate walls are ranked by their static impact on the
-        root player's evaluation.
-        """
+        """Generate a bounded set of useful walls, preserving urgent defenses."""
         self._check_deadline()
-
         player = state.current_player
-
         if state.walls_remaining[player] <= 0:
             return []
 
+        urgent_walls = self._urgent_defensive_walls(state)
         max_paths = max(1, self.config.max_alternative_paths)
 
-        # Cari beberapa rute untuk kedua pemain.
         started = self._profile_start("alternative_paths")
-
-        own_paths = self._alternative_paths(
-            state,
-            player,
-            max_paths=max_paths,
-        )
-
+        own_paths = self._alternative_paths(state, player, max_paths=max_paths)
         self._check_deadline()
-
         opponent_paths = self._alternative_paths(
-            state,
-            1 - player,
-            max_paths=max_paths,
+            state, 1 - player, max_paths=max_paths
         )
-
         self._profile_end("alternative_paths", started)
 
-        # Kumpulkan wall yang berpotensi mengubah salah satu rute.
         own_path_walls: set[Wall] = set()
         opponent_path_walls: set[Wall] = set()
-
         for path in own_paths:
-            own_path_walls.update(
-                self._wall_candidates_from_path(path)
-            )
-
+            own_path_walls.update(self._wall_candidates_from_path(path))
         for path in opponent_paths:
-            opponent_path_walls.update(
-                self._wall_candidates_from_path(path)
-            )
-
+            opponent_path_walls.update(self._wall_candidates_from_path(path))
         candidates = own_path_walls | opponent_path_walls
+        candidates.update(urgent_walls)
 
-        ranked_candidates: list[tuple[float, Wall]] = []
-
-        # Susun jalur berdasarkan perspektif root_player.
         if player == self.root_player:
-            root_paths = own_paths
-            opponent_paths_for_impact = opponent_paths
+            root_paths, opponent_paths_for_impact = own_paths, opponent_paths
         else:
-            root_paths = opponent_paths
-            opponent_paths_for_impact = own_paths
+            root_paths, opponent_paths_for_impact = opponent_paths, own_paths
 
-        impact_weight = self.config.route_impact_weight
-
+        # Rank cheaply by route impact before doing distance-based evaluation.
+        impact_ranked: list[tuple[float, Wall]] = []
         for wall in candidates:
             self._check_deadline()
-
             if not is_legal_wall(state, wall, player):
                 continue
+            root_blocked = sum(
+                self._wall_blocks_path(wall, path) for path in root_paths
+            )
+            opponent_blocked = sum(
+                self._wall_blocks_path(wall, path)
+                for path in opponent_paths_for_impact
+            )
+            impact_ranked.append((opponent_blocked - root_blocked, wall))
 
+        impact_ranked.sort(
+            key=lambda item: (
+                item[0] if player == self.root_player else -item[0],
+                item[1].orientation, item[1].x, item[1].y,
+            )
+        )
+
+        # Previously every candidate triggered a full static evaluation.
+        # Keep that expensive work to a bounded shortlist.
+        shortlist_size = max(12, max(0, self.config.max_wall_candidates) * 2)
+        shortlist = list(urgent_walls)
+        for _, wall in impact_ranked:
+            if wall not in shortlist:
+                shortlist.append(wall)
+            if len(shortlist) >= shortlist_size:
+                break
+
+        ranked_candidates: list[tuple[float, Wall]] = []
+        for wall in shortlist:
+            self._check_deadline()
+            if not is_legal_wall(state, wall, player):
+                continue
             try:
                 child_state = apply_wall(state, wall)
             except (ValueError, AssertionError):
                 continue
-
-            # Evaluasi posisi setelah wall dipasang.
+            impact = (
+                sum(self._wall_blocks_path(wall, path) for path in opponent_paths_for_impact)
+                - sum(self._wall_blocks_path(wall, path) for path in root_paths)
+            )
             score = self._evaluate(child_state)
-
-            # Hitung berapa jalur masing-masing pihak yang terganggu.
-            root_paths_blocked = sum(
-                self._wall_blocks_path(wall, path)
-                for path in root_paths
-            )
-
-            opponent_paths_blocked = sum(
-                self._wall_blocks_path(wall, path)
-                for path in opponent_paths_for_impact
-            )
-
-            # Skor positif menguntungkan root_player.
-            route_impact = (
-                opponent_paths_blocked - root_paths_blocked
-            )
-
-            score += impact_weight * route_impact
-
+            score += self.config.route_impact_weight * impact
             ranked_candidates.append((score, wall))
 
-        # Skor selalu dilihat dari perspektif root_player.
-        # Root memilih skor tertinggi, lawan memilih skor terendah.
         if player == self.root_player:
-            ranked_candidates.sort(
-                key=lambda item: item[0],
-                reverse=True,
-            )
+            ranked_candidates.sort(key=lambda item: item[0], reverse=True)
         else:
-            ranked_candidates.sort(
-                key=lambda item: item[0],
-            )
+            ranked_candidates.sort(key=lambda item: item[0])
 
+        selected = list(urgent_walls)
         limit = max(0, self.config.max_wall_candidates)
-
-        selected = [
-            wall
-            for _, wall in ranked_candidates[:limit]
-        ]
-
+        for _, wall in ranked_candidates:
+            if wall not in selected:
+                selected.append(wall)
+            if len(selected) >= max(limit, len(urgent_walls)):
+                break
         return selected
 
     def _generate_children(
@@ -726,6 +741,13 @@ class QuoridorAI:
                     next_state,
                 )
             )
+
+        winning_children = [
+            child for child in children if child[1].winner == player
+        ]
+        if winning_children:
+            self.stats["children_generated"] += len(winning_children)
+            return winning_children
 
         # Wall candidates
         wall_candidates = self._candidate_walls(state)
@@ -942,6 +964,22 @@ class QuoridorAI:
         if not children:
             return fallback, self._evaluate(state)
 
+        # If any action prevents an immediate opponent win, discard actions
+        # that allow one. Tactical safety outranks static route scores.
+        safe_children = [
+            (action, child_state)
+            for action, child_state in children
+            if not self._opponent_has_immediate_win(child_state)
+        ]
+        if safe_children:
+            children = safe_children
+
+        winning_children = [
+            item for item in children if item[1].winner == self.root_player
+        ]
+        if winning_children:
+            return winning_children[0][0], MATE_SCORE
+
         children = self._ordered_children(
             children,
             maximizing=True,
@@ -973,35 +1011,46 @@ class QuoridorAI:
 
 
     def _fallback_action(self, state: GameState) -> Action:
-        """
-        Find a legal pawn move to use if the search times out.
-
-        Prefer the move with the lowest remaining path distance.
-        """
+        """Quick fallback: win now, avoid immediate loss, then advance."""
         player = state.current_player
         moves = legal_pawn_moves(state, player)
-
         if not moves:
             raise ValueError("Tidak ada langkah legal untuk posisi ini.")
 
-        best_move = moves[0]
-        best_distance = INFINITY
+        goal_y = 0 if player == 0 else 8
+        for move in moves:
+            if move[1] == goal_y:
+                return Action(kind="move", destination=tuple(move))
 
+        safe_moves: list[tuple[int | float, tuple[int, int]]] = []
+        all_moves: list[tuple[int | float, tuple[int, int]]] = []
         for move in moves:
             try:
                 next_state = apply_move(state, move)
                 distance = shortest_distance(next_state, player)
             except (ValueError, AssertionError):
                 continue
+            item = (distance if distance is not None else INFINITY, move)
+            all_moves.append(item)
+            if not self._opponent_has_immediate_win(next_state):
+                safe_moves.append(item)
 
-            if distance < best_distance:
-                best_distance = distance
-                best_move = move
+        if safe_moves:
+            _, move = min(safe_moves, key=lambda item: item[0])
+            return Action(kind="move", destination=tuple(move))
 
-        return Action(
-            kind="move",
-            destination=tuple(best_move),
-        )
+        # If every pawn move loses immediately, try a wall that blocks the
+        # opponent's winning edge before accepting a losing pawn move.
+        for wall in self._urgent_defensive_walls(state):
+            try:
+                next_state = apply_wall(state, wall)
+            except (ValueError, AssertionError):
+                continue
+            if not self._opponent_has_immediate_win(next_state):
+                return Action(kind="wall", wall=wall)
+
+        _, move = min(all_moves, key=lambda item: item[0])
+        return Action(kind="move", destination=tuple(move))
 
     def choose_action(self, state: GameState) -> SearchResult:
         """
