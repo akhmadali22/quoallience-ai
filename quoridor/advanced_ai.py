@@ -57,6 +57,10 @@ class AIConfig:
     progress_weight: float = 2.0
     wall_resource_weight: float = 0.25
 
+    # Evaluate a small, evenly sampled set of walls that could disrupt a route.
+    route_robustness_weight: float = 0.75
+    route_robustness_candidates: int = 6
+
     # max_wall_candidates: int = 24
     max_wall_candidates: int = 8
     transposition_table_limit: int = 50_000
@@ -119,6 +123,7 @@ class QuoridorAI:
         # Cache path distances and static position evaluations.
         self.distance_cache: dict[tuple, int | None] = {}
         self.evaluation_cache: dict[tuple, float] = {}
+        self.route_disruption_cache: dict[tuple, int] = {}
 
         # Basic performance counters.
         self.distance_cache_hits = 0
@@ -259,11 +264,113 @@ class QuoridorAI:
                 own_walls - opponent_walls
             ) * self.config.wall_resource_weight
 
-            score = progress_score + wall_resource_score
+            # Estimate whether the side to move can disrupt the other
+            # player's route with one legal wall. If the opponent is to move,
+            # penalize the root for a vulnerable route; if the root is to move,
+            # reward its opportunity to delay the opponent.
+            if state.current_player == self.root_player:
+                route_disruption = self._route_disruption_cost(state, opponent)
+                route_score = (
+                    route_disruption * self.config.route_robustness_weight
+                )
+            else:
+                route_disruption = self._route_disruption_cost(
+                    state,
+                    self.root_player,
+                )
+                route_score = (
+                    -route_disruption * self.config.route_robustness_weight
+                )
+
+            score = progress_score + wall_resource_score + route_score
 
         self.evaluation_cache[key] = score
 
         return score
+
+    def _route_disruption_cost(
+        self,
+        state: GameState,
+        target_player: int,
+    ) -> int:
+        """
+        Estimate the largest route-length increase caused by one legal wall
+        that the side to move can place across the target player's current
+        shortest path.
+
+        This is a bounded heuristic, not a proof that every possible wall
+        response has been searched.
+        """
+        placer = state.current_player
+
+        if (
+            state.winner is not None
+            or target_player not in (0, 1)
+            or target_player == placer
+            or state.walls_remaining[placer] <= 0
+            or self.config.route_robustness_candidates <= 0
+        ):
+            return 0
+
+        cache_key = (self._state_key(state), target_player)
+        cached = self.route_disruption_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        self._check_deadline()
+
+        baseline = self._cached_distance(state, target_player)
+        path = shortest_path(state, target_player)
+        if baseline is None or not path or len(path) < 2:
+            self.route_disruption_cache[cache_key] = 0
+            return 0
+
+        # Associate each wall with the earliest path edge it could block.
+        wall_steps: dict[Wall, int] = {}
+        for step, (first, second) in enumerate(zip(path, path[1:])):
+            for wall in self._wall_candidates_from_path([first, second]):
+                wall_steps.setdefault(wall, step)
+
+        ordered = sorted(
+            wall_steps,
+            key=lambda wall: (
+                wall_steps[wall],
+                wall.orientation,
+                wall.x,
+                wall.y,
+            ),
+        )
+
+        limit = self.config.route_robustness_candidates
+        if len(ordered) > limit:
+            if limit == 1:
+                ordered = [ordered[0]]
+            else:
+                indices = {
+                    round(index * (len(ordered) - 1) / (limit - 1))
+                    for index in range(limit)
+                }
+                ordered = [wall for index, wall in enumerate(ordered) if index in indices]
+
+        worst_delay = 0
+        for wall in ordered:
+            self._check_deadline()
+
+            if not is_legal_wall(state, wall, placer):
+                continue
+
+            try:
+                after_wall = apply_wall(state, wall, placer)
+            except (ValueError, AssertionError):
+                continue
+
+            distance_after = self._cached_distance(after_wall, target_player)
+            if distance_after is not None:
+                worst_delay = max(worst_delay, distance_after - baseline)
+
+        result = max(0, worst_delay)
+        self.route_disruption_cache[cache_key] = result
+        return result
 
     @staticmethod
     def _wall_candidates_from_path(
@@ -796,6 +903,7 @@ class QuoridorAI:
         self.transposition_table = {}
         self.distance_cache = {}
         self.evaluation_cache = {}
+        self.route_disruption_cache = {}
 
         self.distance_cache_hits = 0
         self.evaluation_cache_hits = 0
