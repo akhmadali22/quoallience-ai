@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import math
 import time
+import heapq
 
 from dataclasses import dataclass
 from typing import Literal
-from collections import defaultdict
+from collections import defaultdict, deque
 
 from quoridor.engine import (
     GameState,
@@ -16,6 +17,7 @@ from quoridor.engine import (
     shortest_distance,
     shortest_path,
     is_legal_wall,
+    blocked,
 )
 
 ActionType = Literal["move", "wall"]
@@ -57,13 +59,17 @@ class AIConfig:
     progress_weight: float = 2.0
     wall_resource_weight: float = 0.25
 
-    # Evaluate a small, evenly sampled set of walls that could disrupt a route.
-    route_robustness_weight: float = 0.75
-    route_robustness_candidates: int = 6
-
-    # max_wall_candidates: int = 24
     max_wall_candidates: int = 8
+    max_alternative_paths: int = 3
     transposition_table_limit: int = 50_000
+
+    own_progress_weight: float = 2.5
+    opponent_delay_weight: float = 1.5
+
+    route_robustness_weight: float = 0.35
+    max_robustness_wall_candidates: int = 8
+
+    route_impact_weight: float = 0.5
 
 
 @dataclass
@@ -123,7 +129,6 @@ class QuoridorAI:
         # Cache path distances and static position evaluations.
         self.distance_cache: dict[tuple, int | None] = {}
         self.evaluation_cache: dict[tuple, float] = {}
-        self.route_disruption_cache: dict[tuple, int] = {}
 
         # Basic performance counters.
         self.distance_cache_hits = 0
@@ -142,6 +147,37 @@ class QuoridorAI:
     def _profile_start(self, name: str) -> float:
         self.profile_calls[name] += 1
         return time.perf_counter()
+
+    def debug_position(self, state: GameState) -> dict:
+        """Menampilkan jarak BFS dan informasi posisi tanpa batas waktu pencarian AI."""
+        player = state.current_player
+        opponent = 1 - player
+
+        # Hitung BFS secara langsung agar tidak terkena SearchTimeout
+        own_distance = shortest_distance(state, player)
+        opponent_distance = shortest_distance(state, opponent)
+
+        return {
+            "current_player": player,
+            "pawns": state.pawns,
+            "walls_remaining": state.walls_remaining,
+            "own_distance": own_distance,
+            "opponent_distance": opponent_distance,
+            "legal_moves": legal_pawn_moves(state, player),
+        }
+
+    def _wall_blocks_path(
+        self,
+        wall: Wall,
+        path: list[tuple[int, int]],
+    ) -> bool:
+        """Return True if this wall blocks an edge in the path."""
+        wall_set = frozenset({wall})
+
+        return any(
+            blocked(wall_set, current, nxt)
+            for current, nxt in zip(path, path[1:])
+        )
 
     def _profile_end(self, name: str, start: float) -> None:
         self.profile_time[name] += time.perf_counter() - start
@@ -212,6 +248,56 @@ class QuoridorAI:
             state.ply,
         )
 
+    def _route_robustness(
+        self,
+        child_state: GameState,
+    ) -> float:
+        """
+        Evaluate how vulnerable the root player's position is
+        to the opponent's strongest candidate wall response.
+
+        Returns the worst static evaluation after a legal
+        opponent wall placement, from the root player's perspective.
+        """
+        self._check_deadline()
+
+        if child_state.winner is not None:
+            return self._evaluate(child_state)
+
+        opponent = child_state.current_player
+
+        if child_state.walls_remaining[opponent] <= 0:
+            return self._evaluate(child_state)
+
+        baseline_score = self._evaluate(child_state)
+
+        candidates = self._candidate_walls(child_state)
+
+        if not candidates:
+            return baseline_score
+
+        worst_score = baseline_score
+        tested = 0
+
+        for wall in candidates:
+            self._check_deadline()
+
+            try:
+                response_state = apply_wall(child_state, wall)
+            except (ValueError, AssertionError):
+                continue
+
+            response_score = self._evaluate(response_state)
+
+            worst_score = min(worst_score, response_score)
+
+            tested += 1
+
+            if tested >= self.config.max_robustness_wall_candidates:
+                break
+
+        return worst_score
+
     def _evaluate(self, state: GameState) -> float:
         """
         Static evaluation from the root player's perspective.
@@ -246,16 +332,17 @@ class QuoridorAI:
             opponent,
         )
 
-        if math.isinf(own_distance):
+        if own_distance is None:
             score = -MATE_SCORE
 
-        elif math.isinf(opponent_distance):
+        elif opponent_distance is None:
             score = MATE_SCORE
 
         else:
             progress_score = (
-                opponent_distance - own_distance
-            ) * self.config.progress_weight
+                opponent_distance * self.config.opponent_delay_weight
+                - own_distance * self.config.own_progress_weight
+            )
 
             own_walls = state.walls_remaining[self.root_player]
             opponent_walls = state.walls_remaining[opponent]
@@ -269,90 +356,6 @@ class QuoridorAI:
         self.evaluation_cache[key] = score
 
         return score
-
-    def _route_disruption_cost(
-        self,
-        state: GameState,
-        target_player: int,
-    ) -> int:
-        """
-        Estimate the largest route-length increase caused by one legal wall
-        that the side to move can place across the target player's current
-        shortest path.
-
-        This is a bounded heuristic, not a proof that every possible wall
-        response has been searched.
-        """
-        placer = state.current_player
-
-        if (
-            state.winner is not None
-            or target_player not in (0, 1)
-            or target_player == placer
-            or state.walls_remaining[placer] <= 0
-            or self.config.route_robustness_candidates <= 0
-        ):
-            return 0
-
-        cache_key = (self._state_key(state), target_player)
-        cached = self.route_disruption_cache.get(cache_key)
-        if cached is not None:
-            return cached
-
-        self._check_deadline()
-
-        baseline = self._cached_distance(state, target_player)
-        path = shortest_path(state, target_player)
-        if baseline is None or not path or len(path) < 2:
-            self.route_disruption_cache[cache_key] = 0
-            return 0
-
-        # Associate each wall with the earliest path edge it could block.
-        wall_steps: dict[Wall, int] = {}
-        for step, (first, second) in enumerate(zip(path, path[1:])):
-            for wall in self._wall_candidates_from_path([first, second]):
-                wall_steps.setdefault(wall, step)
-
-        ordered = sorted(
-            wall_steps,
-            key=lambda wall: (
-                wall_steps[wall],
-                wall.orientation,
-                wall.x,
-                wall.y,
-            ),
-        )
-
-        limit = self.config.route_robustness_candidates
-        if len(ordered) > limit:
-            if limit == 1:
-                ordered = [ordered[0]]
-            else:
-                indices = {
-                    round(index * (len(ordered) - 1) / (limit - 1))
-                    for index in range(limit)
-                }
-                ordered = [wall for index, wall in enumerate(ordered) if index in indices]
-
-        worst_delay = 0
-        for wall in ordered:
-            self._check_deadline()
-
-            if not is_legal_wall(state, wall, placer):
-                continue
-
-            try:
-                after_wall = apply_wall(state, wall, placer)
-            except (ValueError, AssertionError):
-                continue
-
-            distance_after = self._cached_distance(after_wall, target_player)
-            if distance_after is not None:
-                worst_delay = max(worst_delay, distance_after - baseline)
-
-        result = max(0, worst_delay)
-        self.route_disruption_cache[cache_key] = result
-        return result
 
     @staticmethod
     def _wall_candidates_from_path(
@@ -405,77 +408,304 @@ class QuoridorAI:
                         )
 
         return candidates
+    
 
+    def _alternative_paths(
+        self,
+        state: GameState,
+        player: int,
+        max_paths: int = 3,
+    ) -> list[list[tuple[int, int]]]:
+        """
+        Temukan K jalur sederhana terpendek menggunakan Yen's algorithm.
+
+        Jalur diurutkan berdasarkan jumlah langkah. Setiap jalur:
+        - Valid terhadap wall yang ada.
+        - Tidak mengunjungi kotak yang sama lebih dari sekali.
+        - Unik berdasarkan seluruh urutan koordinat.
+        - Dicari dengan tetap menghormati deadline AI.
+        """
+        self._check_deadline()
+
+        if max_paths <= 0:
+            return []
+
+        # Jalur terpendek pertama.
+        first_path = shortest_path(state, player)
+
+        if not first_path:
+            return []
+
+        accepted_paths = [first_path]
+        accepted_keys = {tuple(first_path)}
+
+        # Kandidat disimpan sebagai:
+        # (jumlah langkah, urutan koordinat).
+        candidates = []
+        candidate_keys = set()
+
+        start = state.pawns[player]
+        goal_y = 0 if player == 0 else 8
+
+        def find_spur_path(
+            spur_start: tuple[int, int],
+            forbidden_nodes: set[tuple[int, int]],
+            forbidden_edges: set[
+                tuple[tuple[int, int], tuple[int, int]]
+            ],
+        ) -> list[tuple[int, int]] | None:
+            """BFS untuk mencari jalur dari spur node ke baris tujuan."""
+
+            queue = deque([spur_start])
+            previous = {spur_start: None}
+
+            while queue:
+                self._check_deadline()
+
+                current = queue.popleft()
+
+                if current[1] == goal_y:
+                    path = []
+                    node = current
+
+                    while node is not None:
+                        path.append(node)
+                        node = previous[node]
+
+                    path.reverse()
+                    return path
+
+                x, y = current
+
+                # Urutan deterministik agar hasil pengujian konsisten.
+                neighbors = (
+                    (x, y - 1),
+                    (x - 1, y),
+                    (x + 1, y),
+                    (x, y + 1),
+                )
+
+                for nxt in neighbors:
+                    if not (0 <= nxt[0] < 9 and 0 <= nxt[1] < 9):
+                        continue
+
+                    if nxt in previous:
+                        continue
+
+                    if nxt in forbidden_nodes:
+                        continue
+
+                    if (current, nxt) in forbidden_edges:
+                        continue
+
+                    if blocked(state.walls, current, nxt):
+                        continue
+
+                    previous[nxt] = current
+                    queue.append(nxt)
+
+            return None
+
+        # Yen's algorithm:
+        # setiap iterasi menghasilkan kandidat setelah jalur terakhir.
+        while len(accepted_paths) < max_paths:
+            self._check_deadline()
+
+            previous_path = accepted_paths[-1]
+
+            for spur_index in range(len(previous_path) - 1):
+                self._check_deadline()
+
+                # Prefix dari start hingga spur node.
+                root_path = previous_path[:spur_index + 1]
+                spur_node = root_path[-1]
+
+                # Hilangkan edge yang akan menghasilkan prefix yang
+                # sama dengan jalur yang sudah diterima.
+                forbidden_edges = set()
+
+                for path in accepted_paths:
+                    if (
+                        len(path) > spur_index + 1
+                        and path[:spur_index + 1] == root_path
+                    ):
+                        forbidden_edges.add(
+                            (path[spur_index], path[spur_index + 1])
+                        )
+
+                # Cegah jalur spur kembali ke node prefix sebelumnya.
+                forbidden_nodes = set(root_path[:-1])
+
+                spur_path = find_spur_path(
+                    spur_start=spur_node,
+                    forbidden_nodes=forbidden_nodes,
+                    forbidden_edges=forbidden_edges,
+                )
+
+                if spur_path is None:
+                    continue
+
+                # Spur path sudah mencakup spur node.
+                total_path = root_path[:-1] + spur_path
+                path_key = tuple(total_path)
+
+                if path_key in accepted_keys:
+                    continue
+
+                if path_key in candidate_keys:
+                    continue
+
+                heapq.heappush(
+                    candidates,
+                    (len(total_path) - 1, path_key),
+                )
+                candidate_keys.add(path_key)
+
+            # Tidak ada kandidat lain yang bisa ditemukan.
+            if not candidates:
+                break
+
+            # Kandidat dengan jumlah langkah paling sedikit dipilih.
+            _, next_path_key = heapq.heappop(candidates)
+            candidate_keys.remove(next_path_key)
+
+            accepted_paths.append(list(next_path_key))
+            accepted_keys.add(next_path_key)
+
+        return accepted_paths
+    
     def _candidate_walls(
         self,
         state: GameState,
     ) -> list[Wall]:
         """
-        Generate a reduced set of potentially useful walls.
+        Generate wall candidates from multiple routes for both players.
 
-        Reuse the shortest paths already computed for this call.
+        Candidate walls are ranked by their static impact on the
+        root player's evaluation.
         """
+        self._check_deadline()
+
         player = state.current_player
 
         if state.walls_remaining[player] <= 0:
             return []
 
-        self._check_deadline()
+        max_paths = max(1, self.config.max_alternative_paths)
 
-        started = self._profile_start("shortest_path")
-        own_path = shortest_path(state, player)
-        self._profile_end("shortest_path", started)
+        # Cari beberapa rute untuk kedua pemain.
+        started = self._profile_start("alternative_paths")
 
-        self._check_deadline()
-
-        started = self._profile_start("shortest_path")
-        opponent_path = shortest_path(state, 1 - player)
-        self._profile_end("shortest_path", started)
-
-        candidates: set[Wall] = set()
-
-        own_path_walls = self._wall_candidates_from_path(own_path or [])
-
-        opponent_path_walls = self._wall_candidates_from_path(opponent_path or [])
-
-        candidates.update(own_path_walls)
-        candidates.update(opponent_path_walls)
-
-        # Prefer walls that intersect the opponent's shortest path.
-        ordered = sorted(
-            candidates,
-            key=lambda wall: (
-                wall not in opponent_path_walls,
-                wall in own_path_walls,
-                wall.orientation,
-                wall.x,
-                wall.y,
-            ),
+        own_paths = self._alternative_paths(
+            state,
+            player,
+            max_paths=max_paths,
         )
 
-        legal_candidates = []
+        self._check_deadline()
 
-        for wall in ordered:
+        opponent_paths = self._alternative_paths(
+            state,
+            1 - player,
+            max_paths=max_paths,
+        )
+
+        self._profile_end("alternative_paths", started)
+
+        # Kumpulkan wall yang berpotensi mengubah salah satu rute.
+        own_path_walls: set[Wall] = set()
+        opponent_path_walls: set[Wall] = set()
+
+        for path in own_paths:
+            own_path_walls.update(
+                self._wall_candidates_from_path(path)
+            )
+
+        for path in opponent_paths:
+            opponent_path_walls.update(
+                self._wall_candidates_from_path(path)
+            )
+
+        candidates = own_path_walls | opponent_path_walls
+
+        ranked_candidates: list[tuple[float, Wall]] = []
+
+        # Susun jalur berdasarkan perspektif root_player.
+        if player == self.root_player:
+            root_paths = own_paths
+            opponent_paths_for_impact = opponent_paths
+        else:
+            root_paths = opponent_paths
+            opponent_paths_for_impact = own_paths
+
+        impact_weight = self.config.route_impact_weight
+
+        for wall in candidates:
             self._check_deadline()
 
-            if is_legal_wall(state, wall, player):
-                legal_candidates.append(wall)
+            if not is_legal_wall(state, wall, player):
+                continue
 
-                if len(legal_candidates) >= self.config.max_wall_candidates:
-                    break
+            try:
+                child_state = apply_wall(state, wall)
+            except (ValueError, AssertionError):
+                continue
 
-        return legal_candidates
+            # Evaluasi posisi setelah wall dipasang.
+            score = self._evaluate(child_state)
+
+            # Hitung berapa jalur masing-masing pihak yang terganggu.
+            root_paths_blocked = sum(
+                self._wall_blocks_path(wall, path)
+                for path in root_paths
+            )
+
+            opponent_paths_blocked = sum(
+                self._wall_blocks_path(wall, path)
+                for path in opponent_paths_for_impact
+            )
+
+            # Skor positif menguntungkan root_player.
+            route_impact = (
+                opponent_paths_blocked - root_paths_blocked
+            )
+
+            score += impact_weight * route_impact
+
+            ranked_candidates.append((score, wall))
+
+        # Skor selalu dilihat dari perspektif root_player.
+        # Root memilih skor tertinggi, lawan memilih skor terendah.
+        if player == self.root_player:
+            ranked_candidates.sort(
+                key=lambda item: item[0],
+                reverse=True,
+            )
+        else:
+            ranked_candidates.sort(
+                key=lambda item: item[0],
+            )
+
+        limit = max(0, self.config.max_wall_candidates)
+
+        selected = [
+            wall
+            for _, wall in ranked_candidates[:limit]
+        ]
+
+        return selected
 
     def _generate_children(
         self,
         state: GameState,
     ) -> list[tuple[Action, GameState]]:
-        """Generate successors, prioritizing immediate wins."""
+        """Generate legal successor states."""
         self._check_deadline()
 
-        player = state.current_player
         children: list[tuple[Action, GameState]] = []
+        player = state.current_player
 
+        # Pawn moves
         moves = legal_pawn_moves(state, player)
         self.stats["move_candidates"] += len(moves)
 
@@ -487,29 +717,23 @@ class QuoridorAI:
             except (ValueError, AssertionError):
                 continue
 
-            children.append((
-                Action(
-                    kind="move",
-                    destination=tuple(destination),
-                ),
-                next_state,
-            ))
+            children.append(
+                (
+                    Action(
+                        kind="move",
+                        destination=tuple(destination),
+                    ),
+                    next_state,
+                )
+            )
 
-        # A direct winning move must not be delayed by wall generation.
-        winning_children = [
-            child for child in children
-            if child[1].winner == player
-        ]
-
-        if winning_children:
-            self.stats["children_generated"] += len(winning_children)
-            return winning_children
-
+        # Wall candidates
         wall_candidates = self._candidate_walls(state)
         self.stats["wall_candidates"] += len(wall_candidates)
 
         for wall in wall_candidates:
             self._check_deadline()
+
             started = self._profile_start("apply_wall")
 
             try:
@@ -519,12 +743,15 @@ class QuoridorAI:
             finally:
                 self._profile_end("apply_wall", started)
 
-            children.append((
-                Action(kind="wall", wall=wall),
-                next_state,
-            ))
+            children.append(
+                (
+                    Action(kind="wall", wall=wall),
+                    next_state,
+                )
+            )
 
         self.stats["children_generated"] += len(children)
+
         return children
 
     def _ordered_children(
@@ -591,18 +818,15 @@ class QuoridorAI:
         depth: int,
         alpha: float,
         beta: float,
-        ply_from_root: int = 0,
     ) -> float:
         self._check_deadline()
         self.nodes += 1
 
         if state.winner is not None:
             if state.winner == self.root_player:
-                # A faster win receives a higher score.
-                return MATE_SCORE - ply_from_root
+                return MATE_SCORE + depth
 
-            # If losing is unavoidable, prefer delaying the loss.
-            return -MATE_SCORE + ply_from_root
+            return -MATE_SCORE - depth
 
         if depth <= 0:
             return self._evaluate(state)
@@ -654,7 +878,6 @@ class QuoridorAI:
                 depth - 1,
                 alpha,
                 beta,
-                ply_from_root=ply_from_root + 1,
             )
 
             if maximizing:
@@ -707,6 +930,11 @@ class QuoridorAI:
         depth: int,
         fallback: Action,
     ) -> tuple[Action, float]:
+        """
+        Search root actions using standard alpha-beta minimax.
+
+        All scores compared at the root use the same evaluation scale.
+        """
         self._check_deadline()
 
         children = self._generate_children(state)
@@ -721,6 +949,7 @@ class QuoridorAI:
 
         best_action = fallback
         best_score = -INFINITY
+
         alpha = -INFINITY
         beta = INFINITY
 
@@ -732,20 +961,7 @@ class QuoridorAI:
                 depth - 1,
                 alpha,
                 beta,
-                ply_from_root=1,
             )
-
-            # Apply route robustness only when comparing root actions. Doing
-            # this at every leaf would multiply wall-legality BFS work across
-            # the entire minimax tree and risk exhausting the time budget.
-            if child_state.winner != self.root_player:
-                route_disruption = self._route_disruption_cost(
-                    child_state,
-                    self.root_player,
-                )
-                score -= (
-                    route_disruption * self.config.route_robustness_weight
-                )
 
             if score > best_score:
                 best_score = score
@@ -755,123 +971,37 @@ class QuoridorAI:
 
         return best_action, best_score
 
+
     def _fallback_action(self, state: GameState) -> Action:
         """
-        Choose a legal emergency action when search times out.
+        Find a legal pawn move to use if the search times out.
 
-        Priority:
-        1. Win immediately.
-        2. Choose a pawn move that avoids an immediate opponent win.
-        3. If necessary, try a defensive wall.
-        4. If no safe action is found, choose the best available pawn move.
+        Prefer the move with the lowest remaining path distance.
         """
         player = state.current_player
-        opponent = 1 - player
         moves = legal_pawn_moves(state, player)
 
         if not moves:
             raise ValueError("Tidak ada langkah legal untuk posisi ini.")
 
-        move_options = []
+        best_move = moves[0]
+        best_distance = INFINITY
 
         for move in moves:
             try:
                 next_state = apply_move(state, move)
+                distance = shortest_distance(next_state, player)
             except (ValueError, AssertionError):
                 continue
 
-            # Never miss a direct win.
-            if next_state.winner == player:
-                return Action(
-                    kind="move",
-                    destination=tuple(move),
-                )
+            if distance < best_distance:
+                best_distance = distance
+                best_move = move
 
-            own_distance = shortest_distance(next_state, player)
-            if own_distance is None:
-                own_distance = 10**6
-
-            opponent_can_win = False
-
-            for reply in legal_pawn_moves(next_state, opponent):
-                try:
-                    reply_state = apply_move(next_state, reply)
-                except (ValueError, AssertionError):
-                    continue
-
-                if reply_state.winner == opponent:
-                    opponent_can_win = True
-                    break
-
-            move_options.append((
-                opponent_can_win,
-                own_distance,
-                Action(kind="move", destination=tuple(move)),
-            ))
-
-        if not move_options:
-            raise ValueError("Tidak ditemukan langkah pion yang legal.")
-
-        # Prefer safe pawn moves, then the shortest own route.
-        safe_moves = [item for item in move_options if not item[0]]
-
-        if safe_moves:
-            return min(safe_moves, key=lambda item: item[1])[2]
-
-        # Every pawn move permits an immediate win. Try a defensive wall.
-        # Candidate generation may time out, so preserve a legal fallback.
-        try:
-            wall_candidates = self._candidate_walls(state)
-        except SearchTimeout:
-            wall_candidates = []
-
-        safe_walls = []
-
-        for wall in wall_candidates:
-            try:
-                next_state = apply_wall(state, wall)
-            except (ValueError, AssertionError):
-                continue
-
-            opponent_can_win = False
-
-            for reply in legal_pawn_moves(next_state, opponent):
-                try:
-                    reply_state = apply_move(next_state, reply)
-                except (ValueError, AssertionError):
-                    continue
-
-                if reply_state.winner == opponent:
-                    opponent_can_win = True
-                    break
-
-            if opponent_can_win:
-                continue
-
-            own_distance = shortest_distance(next_state, player)
-            opponent_distance = shortest_distance(next_state, opponent)
-
-            if own_distance is None:
-                own_distance = 10**6
-
-            if opponent_distance is None:
-                opponent_distance = -10**6
-
-            # Prefer a wall that delays the opponent without ruining
-            # the current player's own route.
-            score = opponent_distance - own_distance
-
-            safe_walls.append((
-                score,
-                Action(kind="wall", wall=wall),
-            ))
-
-        if safe_walls:
-            safe_walls.sort(key=lambda item: item[0], reverse=True)
-            return safe_walls[0][1]
-
-        # No safe action was found. Preserve a legal move rather than crash.
-        return min(move_options, key=lambda item: item[1])[2]
+        return Action(
+            kind="move",
+            destination=tuple(best_move),
+        )
 
     def choose_action(self, state: GameState) -> SearchResult:
         """
@@ -897,7 +1027,6 @@ class QuoridorAI:
         self.transposition_table = {}
         self.distance_cache = {}
         self.evaluation_cache = {}
-        self.route_disruption_cache = {}
 
         self.distance_cache_hits = 0
         self.evaluation_cache_hits = 0
@@ -913,19 +1042,11 @@ class QuoridorAI:
         fallback = self._fallback_action(state)
 
         best_action = fallback
+        best_score = self._evaluate(state)
         completed_depth = 0
         timed_out = False
 
-        try:
-            best_score = self._evaluate(state)
-        except SearchTimeout:
-            best_score = 0.0
-            timed_out = True
-
         for depth in range(1, self.config.max_depth + 1):
-            if timed_out:
-                break
-
             try:
                 action, score = self._search_root(
                     state,
