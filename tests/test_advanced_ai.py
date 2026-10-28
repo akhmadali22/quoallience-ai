@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from quoridor.engine import (
@@ -137,3 +139,36 @@ def test_wall_candidates_are_inside_board():
         assert wall.orientation in ("H", "V")
         assert 0 <= wall.x <= 7
         assert 0 <= wall.y <= 7
+
+
+def test_route_disruption_detects_vulnerable_shortest_path():
+    ai = QuoridorAI(
+        AIConfig(
+            time_limit=5.0,
+            max_depth=1,
+            route_robustness_candidates=4,
+        )
+    )
+    state = GameState()
+    ai.root_player = 0
+    ai.deadline = time.monotonic() + 5.0
+
+    disruption = ai._route_disruption_cost(state, target_player=1)
+
+    assert disruption >= 0
+    assert disruption > 0
+
+
+def test_route_disruption_is_zero_when_placer_has_no_walls():
+    ai = QuoridorAI(
+        AIConfig(
+            time_limit=1.0,
+            max_depth=1,
+            route_robustness_candidates=4,
+        )
+    )
+    state = GameState(walls_remaining=(0, 10))
+    ai.root_player = 0
+    ai.deadline = time.monotonic() + 1.0
+
+    assert ai._route_disruption_cost(state, target_player=1) == 0
