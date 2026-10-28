@@ -5,8 +5,8 @@ from quoridor.advanced_ai import AIConfig, QuoridorAI
 class AIService:
     def __init__(
         self,
-        time_limit: float = 55,
-        max_depth: int = 5,
+        time_limit: float = 5.0,
+        max_depth: int = 4,
     ):
         self.config = AIConfig(
             time_limit=time_limit,
@@ -15,10 +15,6 @@ class AIService:
         self.ai = QuoridorAI(self.config)
 
     def choose_action(self, state: GameState) -> dict:
-        print("\n========== AI POSITION ==========")
-        print(self.ai.debug_position(state))
-        print("======== END AI POSITION ========\n")
-
         result = self.ai.choose_action(state)
 
         return {
