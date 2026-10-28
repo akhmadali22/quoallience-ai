@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from quoridor.engine import (
@@ -149,7 +151,7 @@ def test_urgent_defense_includes_wall_blocking_immediate_win():
         AIConfig(time_limit=1.0, max_depth=1)
     )
     ai.root_player = 0
-    ai.deadline = __import__("time").monotonic() + 1.0
+    ai.deadline = time.monotonic() + 1.0
 
     urgent = ai._urgent_defensive_walls(state)
 
