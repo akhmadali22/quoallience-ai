@@ -13,8 +13,6 @@ class GameService:
     def __init__(self, session: GameSession):
         self.session = session
         self.ai_service = AIService(
-            time_limit=session.ai_time_limit,
-            max_depth=session.ai_max_depth,
         )
 
     def human_move(self, destination: tuple[int, int]) -> dict:

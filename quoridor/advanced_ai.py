@@ -53,7 +53,7 @@ class Action:
 
 @dataclass(frozen=True)
 class AIConfig:
-    time_limit: float = 55
+    time_limit: float = 40
     max_depth: int = 5
 
     progress_weight: float = 2.0
@@ -63,13 +63,20 @@ class AIConfig:
     max_alternative_paths: int = 2
     transposition_table_limit: int = 50_000
 
+    # Race distance is relative: gaining one step and costing the
+    # opponent one step should have comparable strategic value.
     own_progress_weight: float = 2.5
-    opponent_delay_weight: float = 1.5
+    opponent_delay_weight: float = 2.5
 
     route_robustness_weight: float = 0.35
     max_robustness_wall_candidates: int = 8
 
     route_impact_weight: float = 0.5
+    # Flexibility is a tie-breaker, not a reason to abandon progress.
+    route_flexibility_weight: float = 0.25
+    route_detour_allowance: int = 2
+    endgame_extension_distance: int = 3
+    endgame_extension_plies: int = 3
 
 
 @dataclass
@@ -126,8 +133,12 @@ class QuoridorAI:
         # Exact results from fully searched Minimax nodes.
         self.transposition_table: dict[tuple, TTEntry] = {}
 
-        # Cache path distances and static position evaluations.
+        # Cache path distances, goal-distance maps, route flexibility,
+        # and static position evaluations. Goal maps are shared by all
+        # pawn positions that have the same wall layout.
         self.distance_cache: dict[tuple, int | None] = {}
+        self.goal_distance_map_cache: dict[tuple, dict[tuple[int, int], int]] = {}
+        self.route_flexibility_cache: dict[tuple, float] = {}
         self.evaluation_cache: dict[tuple, float] = {}
 
         # Basic performance counters.
@@ -336,11 +347,87 @@ class QuoridorAI:
 
         return worst_score
 
+    def _goal_distance_map(
+        self,
+        state: GameState,
+        player: int,
+    ) -> dict[tuple[int, int], int]:
+        """Return distances from every square to the player's goal row."""
+        self._check_deadline()
+        goal_y = 0 if player == 0 else 8
+        key = (state.walls, goal_y)
+        cached = self.goal_distance_map_cache.get(key)
+        if cached is not None:
+            return cached
+
+        distances = {(x, goal_y): 0 for x in range(9)}
+        queue = deque(distances)
+
+        # Walls block movement symmetrically, so a multi-source BFS from
+        # every goal-row square gives distance-to-goal for every cell.
+        while queue:
+            self._check_deadline()
+            current = queue.popleft()
+            x, y = current
+            for nxt in ((x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)):
+                if not (0 <= nxt[0] < 9 and 0 <= nxt[1] < 9):
+                    continue
+                if nxt in distances or blocked(state.walls, current, nxt):
+                    continue
+                distances[nxt] = distances[current] + 1
+                queue.append(nxt)
+
+        self.goal_distance_map_cache[key] = distances
+        return distances
+
+    def _route_flexibility(self, state: GameState, player: int) -> float:
+        """
+        Cheaply estimate route choice at the next move.
+
+        Count legal first steps that stay on, or close to, a shortest route.
+        This avoids recursively enumerating route prefixes at every leaf,
+        and makes flexibility a modest tie-breaker rather than a progress
+        substitute.
+        """
+        self._check_deadline()
+        goal_y = 0 if player == 0 else 8
+        start = state.pawns[player]
+        key = (state.walls, start, goal_y)
+        cached = self.route_flexibility_cache.get(key)
+        if cached is not None:
+            return cached
+
+        distances = self._goal_distance_map(state, player)
+        shortest = distances.get(start)
+        if shortest is None:
+            return 0.0
+
+        x, y = start
+        weighted_options = 0.0
+        for nxt in ((x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)):
+            if not (0 <= nxt[0] < 9 and 0 <= nxt[1] < 9):
+                continue
+            if blocked(state.walls, start, nxt):
+                continue
+
+            next_distance = distances.get(nxt)
+            if next_distance is None:
+                continue
+
+            detour = 1 + next_distance - shortest
+            if detour <= self.config.route_detour_allowance:
+                weighted_options += 1.0 / (1.0 + detour)
+
+        flexibility = math.log1p(weighted_options)
+        self.route_flexibility_cache[key] = flexibility
+        return flexibility
+
     def _evaluate(self, state: GameState) -> float:
         """
-        Static evaluation from the root player's perspective.
+        Static strategic evaluation from the root player's perspective.
 
-        Higher scores favor the root player.
+        The score combines race progress, phase-sensitive wall reserves, and
+        near-optimal route flexibility. Higher scores favor the root player.
         """
         self._check_deadline()
 
@@ -385,11 +472,29 @@ class QuoridorAI:
             own_walls = state.walls_remaining[self.root_player]
             opponent_walls = state.walls_remaining[opponent]
 
+            # Walls have more option value early, when both players still
+            # have long races ahead. Their reserve value tapers as the game
+            # approaches the goal, while immediate tactical wall effects are
+            # still represented by the search itself.
+            average_race_distance = (own_distance + opponent_distance) / 2.0
+            phase_multiplier = 0.55 + 0.45 * min(8.0, average_race_distance) / 8.0
             wall_resource_score = (
-                own_walls - opponent_walls
-            ) * self.config.wall_resource_weight
+                (own_walls - opponent_walls)
+                * self.config.wall_resource_weight
+                * phase_multiplier
+            )
 
-            score = progress_score + wall_resource_score
+            own_flexibility = self._route_flexibility(state, self.root_player)
+            opponent_flexibility = self._route_flexibility(state, opponent)
+            route_flexibility_score = self.config.route_flexibility_weight * (
+                own_flexibility - opponent_flexibility
+            )
+
+            score = (
+                progress_score
+                + wall_resource_score
+                + route_flexibility_score
+            )
 
         self.evaluation_cache[key] = score
 
@@ -840,9 +945,13 @@ class QuoridorAI:
         depth: int,
         alpha: float,
         beta: float,
+        extensions_remaining: int | None = None,
     ) -> float:
         self._check_deadline()
         self.nodes += 1
+
+        if extensions_remaining is None:
+            extensions_remaining = self.config.endgame_extension_plies
 
         if state.winner is not None:
             if state.winner == self.root_player:
@@ -851,11 +960,24 @@ class QuoridorAI:
             return -MATE_SCORE - depth
 
         if depth <= 0:
-            return self._evaluate(state)
+            # Fixed-depth search often stops one or two plies before a
+            # near-goal pawn can convert its race lead into a win. Extend
+            # only volatile endgame positions, with a strict ply cap.
+            if extensions_remaining <= 0:
+                return self._evaluate(state)
 
-        # Satu key untuk setiap posisi.
-        # Kedalaman pencarian disimpan di dalam TTEntry.
-        key = self._state_key(state)
+            own_distance = self._cached_distance(state, self.root_player)
+            opponent_distance = self._cached_distance(state, 1 - self.root_player)
+            distances = [d for d in (own_distance, opponent_distance) if d is not None]
+            if not distances or min(distances) > self.config.endgame_extension_distance:
+                return self._evaluate(state)
+
+            depth = 1
+            extensions_remaining -= 1
+
+        # Include remaining extension budget in the TT key: the same board
+        # searched with different tactical horizons is not the same result.
+        key = (self._state_key(state), extensions_remaining)
 
         original_alpha = alpha
         original_beta = beta
@@ -900,6 +1022,7 @@ class QuoridorAI:
                 depth - 1,
                 alpha,
                 beta,
+                extensions_remaining,
             )
 
             if maximizing:
@@ -1075,6 +1198,8 @@ class QuoridorAI:
 
         self.transposition_table = {}
         self.distance_cache = {}
+        self.goal_distance_map_cache = {}
+        self.route_flexibility_cache = {}
         self.evaluation_cache = {}
 
         self.distance_cache_hits = 0

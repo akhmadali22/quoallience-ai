@@ -15,8 +15,8 @@ def main():
 
     ai = QuoridorAI(
         AIConfig(
-            time_limit=60,
-            max_depth=5,
+            time_limit=40,
+            max_depth=3,
             progress_weight=2.0,
             wall_resource_weight=0.25,
             max_wall_candidates=8,
