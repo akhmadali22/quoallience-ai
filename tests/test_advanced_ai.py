@@ -194,3 +194,46 @@ def test_wall_candidates_preserve_urgent_defense_outside_shortlist():
     candidates = ai._candidate_walls(state)
 
     assert Wall("H", 0, 7) in candidates
+
+def test_route_flexibility_prefers_center_with_more_near_optimal_options():
+    center_state = GameState(
+        pawns=((4, 4), (4, 2)),
+        current_player=0,
+    )
+    edge_state = GameState(
+        pawns=((0, 4), (4, 2)),
+        current_player=0,
+    )
+    ai = QuoridorAI(
+        AIConfig(time_limit=2.0, max_depth=1)
+    )
+    ai.root_player = 0
+    ai.deadline = time.monotonic() + 2.0
+
+    center_flexibility = ai._route_flexibility(center_state, 0)
+    edge_flexibility = ai._route_flexibility(edge_state, 0)
+
+    assert center_flexibility > edge_flexibility
+
+
+def test_static_evaluation_accounts_for_route_flexibility():
+    center_state = GameState(
+        pawns=((4, 4), (4, 2)),
+        current_player=0,
+    )
+    edge_state = GameState(
+        pawns=((0, 4), (4, 2)),
+        current_player=0,
+    )
+    ai = QuoridorAI(
+        AIConfig(time_limit=2.0, max_depth=1)
+    )
+    ai.root_player = 0
+    ai.deadline = time.monotonic() + 2.0
+
+    center_score = ai._evaluate(center_state)
+    edge_score = ai._evaluate(edge_state)
+
+    # Both pawns have the same shortest distance and wall reserves;
+    # the center position should score higher because it retains more routes.
+    assert center_score > edge_score
