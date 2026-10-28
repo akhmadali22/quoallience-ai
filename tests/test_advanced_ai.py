@@ -237,3 +237,31 @@ def test_static_evaluation_accounts_for_route_flexibility():
     # Both pawns have the same shortest distance and wall reserves;
     # the center position should score higher because it retains more routes.
     assert center_score > edge_score
+
+def test_search_extends_horizon_for_near_goal_tactics():
+    state = GameState(
+        pawns=((4, 1), (0, 7)),
+        current_player=1,
+    )
+    ai = QuoridorAI(
+        AIConfig(
+            time_limit=1.0,
+            max_depth=1,
+            endgame_extension_distance=3,
+            endgame_extension_plies=2,
+        )
+    )
+    ai.root_player = 0
+    ai.deadline = time.monotonic() + 1.0
+
+    score = ai._minimax(
+        state,
+        depth=0,
+        alpha=float("-inf"),
+        beta=float("inf"),
+        extensions_remaining=2,
+    )
+
+    # The opponent can win in one move. A leaf evaluation must not treat
+    # this as an ordinary positional state just because nominal depth is 0.
+    assert score <= -10_000.0
