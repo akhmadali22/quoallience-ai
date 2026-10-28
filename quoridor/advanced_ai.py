@@ -63,16 +63,20 @@ class AIConfig:
     max_alternative_paths: int = 2
     transposition_table_limit: int = 50_000
 
+    # Race distance is relative: gaining one step and costing the
+    # opponent one step should have comparable strategic value.
     own_progress_weight: float = 2.5
-    opponent_delay_weight: float = 1.5
+    opponent_delay_weight: float = 2.5
 
     route_robustness_weight: float = 0.35
     max_robustness_wall_candidates: int = 8
 
     route_impact_weight: float = 0.5
-    route_flexibility_weight: float = 0.65
-    route_probe_depth: int = 3
+    # Flexibility is a tie-breaker, not a reason to abandon progress.
+    route_flexibility_weight: float = 0.25
     route_detour_allowance: int = 2
+    endgame_extension_distance: int = 3
+    endgame_extension_plies: int = 3
 
 
 @dataclass
@@ -378,11 +382,12 @@ class QuoridorAI:
 
     def _route_flexibility(self, state: GameState, player: int) -> float:
         """
-        Estimate near-optimal route options in the first few moves.
+        Cheaply estimate route choice at the next move.
 
-        Count distinct simple route prefixes that can still reach the goal
-        within a small detour budget. This rewards positions with alternatives
-        without running Yen's full alternative-path search at every leaf.
+        Count legal first steps that stay on, or close to, a shortest route.
+        This avoids recursively enumerating route prefixes at every leaf,
+        and makes flexibility a modest tie-breaker rather than a progress
+        substitute.
         """
         self._check_deadline()
         goal_y = 0 if player == 0 else 8
@@ -397,43 +402,23 @@ class QuoridorAI:
         if shortest is None:
             return 0.0
 
-        max_depth = max(1, self.config.route_probe_depth)
-        detour_allowance = max(0, self.config.route_detour_allowance)
-        visited = {start}
+        x, y = start
+        weighted_options = 0.0
+        for nxt in ((x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)):
+            if not (0 <= nxt[0] < 9 and 0 <= nxt[1] < 9):
+                continue
+            if blocked(state.walls, start, nxt):
+                continue
 
-        def explore(position: tuple[int, int], depth: int) -> float:
-            self._check_deadline()
-            if depth >= max_depth:
-                return 0.0
+            next_distance = distances.get(nxt)
+            if next_distance is None:
+                continue
 
-            x, y = position
-            total = 0.0
-            for nxt in ((x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1)):
-                if not (0 <= nxt[0] < 9 and 0 <= nxt[1] < 9):
-                    continue
-                if nxt in visited or blocked(state.walls, position, nxt):
-                    continue
+            detour = 1 + next_distance - shortest
+            if detour <= self.config.route_detour_allowance:
+                weighted_options += 1.0 / (1.0 + detour)
 
-                next_distance = distances.get(nxt)
-                if next_distance is None:
-                    continue
-
-                next_depth = depth + 1
-                detour = next_depth + next_distance - shortest
-                if detour > detour_allowance:
-                    continue
-
-                # Nearby choices matter most; slight detours remain useful,
-                # but should not outweigh a genuinely shorter route.
-                total += (0.65 ** depth) / (1.0 + detour)
-                visited.add(nxt)
-                total += explore(nxt, next_depth)
-                visited.remove(nxt)
-
-            return total
-
-        raw_options = explore(start, 0)
-        flexibility = math.log1p(raw_options)
+        flexibility = math.log1p(weighted_options)
         self.route_flexibility_cache[key] = flexibility
         return flexibility
 
@@ -960,9 +945,13 @@ class QuoridorAI:
         depth: int,
         alpha: float,
         beta: float,
+        extensions_remaining: int | None = None,
     ) -> float:
         self._check_deadline()
         self.nodes += 1
+
+        if extensions_remaining is None:
+            extensions_remaining = self.config.endgame_extension_plies
 
         if state.winner is not None:
             if state.winner == self.root_player:
@@ -971,11 +960,24 @@ class QuoridorAI:
             return -MATE_SCORE - depth
 
         if depth <= 0:
-            return self._evaluate(state)
+            # Fixed-depth search often stops one or two plies before a
+            # near-goal pawn can convert its race lead into a win. Extend
+            # only volatile endgame positions, with a strict ply cap.
+            if extensions_remaining <= 0:
+                return self._evaluate(state)
 
-        # Satu key untuk setiap posisi.
-        # Kedalaman pencarian disimpan di dalam TTEntry.
-        key = self._state_key(state)
+            own_distance = self._cached_distance(state, self.root_player)
+            opponent_distance = self._cached_distance(state, 1 - self.root_player)
+            distances = [d for d in (own_distance, opponent_distance) if d is not None]
+            if not distances or min(distances) > self.config.endgame_extension_distance:
+                return self._evaluate(state)
+
+            depth = 1
+            extensions_remaining -= 1
+
+        # Include remaining extension budget in the TT key: the same board
+        # searched with different tactical horizons is not the same result.
+        key = (self._state_key(state), extensions_remaining)
 
         original_alpha = alpha
         original_beta = beta
@@ -1020,6 +1022,7 @@ class QuoridorAI:
                 depth - 1,
                 alpha,
                 beta,
+                extensions_remaining,
             )
 
             if maximizing:
