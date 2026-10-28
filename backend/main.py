@@ -49,8 +49,6 @@ def create_game(request: NewGameRequest):
         session = game_manager.create_game(
             human_player=request.human_player,
             first_player=request.first_player,
-            ai_time_limit=55,
-            ai_max_depth=5,
         )
 
         game_services[session.game_id] = GameService(session)
