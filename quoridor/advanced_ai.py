@@ -264,25 +264,7 @@ class QuoridorAI:
                 own_walls - opponent_walls
             ) * self.config.wall_resource_weight
 
-            # Estimate whether the side to move can disrupt the other
-            # player's route with one legal wall. If the opponent is to move,
-            # penalize the root for a vulnerable route; if the root is to move,
-            # reward its opportunity to delay the opponent.
-            if state.current_player == self.root_player:
-                route_disruption = self._route_disruption_cost(state, opponent)
-                route_score = (
-                    route_disruption * self.config.route_robustness_weight
-                )
-            else:
-                route_disruption = self._route_disruption_cost(
-                    state,
-                    self.root_player,
-                )
-                route_score = (
-                    -route_disruption * self.config.route_robustness_weight
-                )
-
-            score = progress_score + wall_resource_score + route_score
+            score = progress_score + wall_resource_score
 
         self.evaluation_cache[key] = score
 
@@ -752,6 +734,18 @@ class QuoridorAI:
                 beta,
                 ply_from_root=1,
             )
+
+            # Apply route robustness only when comparing root actions. Doing
+            # this at every leaf would multiply wall-legality BFS work across
+            # the entire minimax tree and risk exhausting the time budget.
+            if child_state.winner != self.root_player:
+                route_disruption = self._route_disruption_cost(
+                    child_state,
+                    self.root_player,
+                )
+                score -= (
+                    route_disruption * self.config.route_robustness_weight
+                )
 
             if score > best_score:
                 best_score = score
