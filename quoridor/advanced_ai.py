@@ -381,13 +381,12 @@ class QuoridorAI:
         self,
         state: GameState,
     ) -> list[tuple[Action, GameState]]:
-        """Generate legal successor states."""
+        """Generate successors, prioritizing immediate wins."""
         self._check_deadline()
 
-        children: list[tuple[Action, GameState]] = []
         player = state.current_player
+        children: list[tuple[Action, GameState]] = []
 
-        # Pawn moves
         moves = legal_pawn_moves(state, player)
         self.stats["move_candidates"] += len(moves)
 
@@ -399,23 +398,29 @@ class QuoridorAI:
             except (ValueError, AssertionError):
                 continue
 
-            children.append(
-                (
-                    Action(
-                        kind="move",
-                        destination=tuple(destination),
-                    ),
-                    next_state,
-                )
-            )
+            children.append((
+                Action(
+                    kind="move",
+                    destination=tuple(destination),
+                ),
+                next_state,
+            ))
 
-        # Wall candidates
+        # A direct winning move must not be delayed by wall generation.
+        winning_children = [
+            child for child in children
+            if child[1].winner == player
+        ]
+
+        if winning_children:
+            self.stats["children_generated"] += len(winning_children)
+            return winning_children
+
         wall_candidates = self._candidate_walls(state)
         self.stats["wall_candidates"] += len(wall_candidates)
 
         for wall in wall_candidates:
             self._check_deadline()
-
             started = self._profile_start("apply_wall")
 
             try:
@@ -425,15 +430,12 @@ class QuoridorAI:
             finally:
                 self._profile_end("apply_wall", started)
 
-            children.append(
-                (
-                    Action(kind="wall", wall=wall),
-                    next_state,
-                )
-            )
+            children.append((
+                Action(kind="wall", wall=wall),
+                next_state,
+            ))
 
         self.stats["children_generated"] += len(children)
-
         return children
 
     def _ordered_children(
@@ -500,15 +502,18 @@ class QuoridorAI:
         depth: int,
         alpha: float,
         beta: float,
+        ply_from_root: int = 0,
     ) -> float:
         self._check_deadline()
         self.nodes += 1
 
         if state.winner is not None:
             if state.winner == self.root_player:
-                return MATE_SCORE + depth
+                # A faster win receives a higher score.
+                return MATE_SCORE - ply_from_root
 
-            return -MATE_SCORE - depth
+            # If losing is unavoidable, prefer delaying the loss.
+            return -MATE_SCORE + ply_from_root
 
         if depth <= 0:
             return self._evaluate(state)
@@ -560,6 +565,7 @@ class QuoridorAI:
                 depth - 1,
                 alpha,
                 beta,
+                ply_from_root=ply_from_root + 1,
             )
 
             if maximizing:
@@ -637,6 +643,7 @@ class QuoridorAI:
                 depth - 1,
                 alpha,
                 beta,
+                ply_from_root=1,
             )
 
             if score > best_score:
@@ -649,34 +656,121 @@ class QuoridorAI:
 
     def _fallback_action(self, state: GameState) -> Action:
         """
-        Find a legal pawn move to use if the search times out.
+        Choose a legal emergency action when search times out.
 
-        Prefer the move with the lowest remaining path distance.
+        Priority:
+        1. Win immediately.
+        2. Choose a pawn move that avoids an immediate opponent win.
+        3. If necessary, try a defensive wall.
+        4. If no safe action is found, choose the best available pawn move.
         """
         player = state.current_player
+        opponent = 1 - player
         moves = legal_pawn_moves(state, player)
 
         if not moves:
             raise ValueError("Tidak ada langkah legal untuk posisi ini.")
 
-        best_move = moves[0]
-        best_distance = INFINITY
+        move_options = []
 
         for move in moves:
             try:
                 next_state = apply_move(state, move)
-                distance = shortest_distance(next_state, player)
             except (ValueError, AssertionError):
                 continue
 
-            if distance < best_distance:
-                best_distance = distance
-                best_move = move
+            # Never miss a direct win.
+            if next_state.winner == player:
+                return Action(
+                    kind="move",
+                    destination=tuple(move),
+                )
 
-        return Action(
-            kind="move",
-            destination=tuple(best_move),
-        )
+            own_distance = shortest_distance(next_state, player)
+            if own_distance is None:
+                own_distance = 10**6
+
+            opponent_can_win = False
+
+            for reply in legal_pawn_moves(next_state, opponent):
+                try:
+                    reply_state = apply_move(next_state, reply)
+                except (ValueError, AssertionError):
+                    continue
+
+                if reply_state.winner == opponent:
+                    opponent_can_win = True
+                    break
+
+            move_options.append((
+                opponent_can_win,
+                own_distance,
+                Action(kind="move", destination=tuple(move)),
+            ))
+
+        if not move_options:
+            raise ValueError("Tidak ditemukan langkah pion yang legal.")
+
+        # Prefer safe pawn moves, then the shortest own route.
+        safe_moves = [item for item in move_options if not item[0]]
+
+        if safe_moves:
+            return min(safe_moves, key=lambda item: item[1])[2]
+
+        # Every pawn move permits an immediate win. Try a defensive wall.
+        # Candidate generation may time out, so preserve a legal fallback.
+        try:
+            wall_candidates = self._candidate_walls(state)
+        except SearchTimeout:
+            wall_candidates = []
+
+        safe_walls = []
+
+        for wall in wall_candidates:
+            try:
+                next_state = apply_wall(state, wall)
+            except (ValueError, AssertionError):
+                continue
+
+            opponent_can_win = False
+
+            for reply in legal_pawn_moves(next_state, opponent):
+                try:
+                    reply_state = apply_move(next_state, reply)
+                except (ValueError, AssertionError):
+                    continue
+
+                if reply_state.winner == opponent:
+                    opponent_can_win = True
+                    break
+
+            if opponent_can_win:
+                continue
+
+            own_distance = shortest_distance(next_state, player)
+            opponent_distance = shortest_distance(next_state, opponent)
+
+            if own_distance is None:
+                own_distance = 10**6
+
+            if opponent_distance is None:
+                opponent_distance = -10**6
+
+            # Prefer a wall that delays the opponent without ruining
+            # the current player's own route.
+            score = opponent_distance - own_distance
+
+            safe_walls.append((
+                score,
+                Action(kind="wall", wall=wall),
+            ))
+
+        if safe_walls:
+            safe_walls.sort(key=lambda item: item[0], reverse=True)
+            return safe_walls[0][1]
+
+        # No safe action was found. Preserve a legal move rather than crash.
+        return min(move_options, key=lambda item: item[1])[2]
 
     def choose_action(self, state: GameState) -> SearchResult:
         """
@@ -717,11 +811,19 @@ class QuoridorAI:
         fallback = self._fallback_action(state)
 
         best_action = fallback
-        best_score = self._evaluate(state)
         completed_depth = 0
         timed_out = False
 
+        try:
+            best_score = self._evaluate(state)
+        except SearchTimeout:
+            best_score = 0.0
+            timed_out = True
+
         for depth in range(1, self.config.max_depth + 1):
+            if timed_out:
+                break
+
             try:
                 action, score = self._search_root(
                     state,
