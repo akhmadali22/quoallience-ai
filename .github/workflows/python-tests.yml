@@ -1,4 +1,4 @@
-name: Python tests
+name: Python tests # Run tests on each branch update
 
 on:
   push:
