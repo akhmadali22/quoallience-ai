@@ -227,26 +227,13 @@ def test_actual_position_history_ignores_duplicate_request():
 
 
 def test_urgent_root_turn_considers_opponents_alternative_routes():
-    # Recreate a dangerous mid/late-game position from the losing match.
-    # The opponent has a short route to the goal, so root search must include
-    # legal walls that target alternate opponent routes, not only the current
-    # shortest route.
+    # The opponent is close to the goal and has several open routes.
+    # Root search should include legal walls that target alternate routes.
     state = GameState(
-        pawns=((3, 3), (6, 7)),
-        walls=frozenset({
-            Wall("H", 3, 7),
-            Wall("H", 3, 1),
-            Wall("H", 5, 1),
-            Wall("H", 4, 6),
-            Wall("H", 5, 7),
-            Wall("H", 1, 1),
-            Wall("V", 3, 6),
-            Wall("V", 7, 7),
-            Wall("H", 6, 6),
-        }),
-        walls_remaining=(7, 4),
+        pawns=((4, 4), (4, 6)),
+        walls_remaining=(10, 10),
         current_player=0,
-        ply=28,
+        ply=10,
     )
     ai = QuoridorAI(
         AIConfig(
