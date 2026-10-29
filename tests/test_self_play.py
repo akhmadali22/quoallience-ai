@@ -1,4 +1,3 @@
-from dataclasses import replace
 import json
 
 from quoridor.engine import GameState, Wall, apply_wall
@@ -45,8 +44,10 @@ def test_self_play_game_records_actions_and_wall_log(tmp_path):
     assert game_log.exists()
     records = [json.loads(line) for line in game_log.read_text().splitlines()]
     assert records
-    assert all(record["event"] == "action" for record in records)
-    assert all("state_before" in record and "state_after" in record for record in records)
+    action_records = [record for record in records if record["event"] == "action"]
+    assert action_records
+    assert all("state_before" in record and "state_after" in record for record in action_records)
+    assert records[-1]["event"] == "game_end"
     if wall_log.exists():
         wall_records = [json.loads(line) for line in wall_log.read_text().splitlines()]
         assert all(record["event"] == "wall_analysis" for record in wall_records)
