@@ -576,7 +576,7 @@ class QuoridorAI:
             and own_distance is not None
             and opponent_distance is not None
             and (
-                opponent_distance <= own_distance + 2
+                opponent_distance < own_distance
                 or opponent_distance <= 4
             )
             and self.config.predictive_path_count > 1
