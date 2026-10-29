@@ -563,9 +563,25 @@ class QuoridorAI:
         own_path_walls = self._wall_candidates_from_path(own_path or [])
         opponent_path_walls = self._wall_candidates_from_path(opponent_path or [])
 
-        # At each opponent turn inside the searched line, include walls that
-        # attack our alternative routes. This lets minimax see the sequence
-        # wall -> reroute -> second wall, rather than only the first closure.
+        # Keep predictive wall candidates on opponent replies as before, but
+        # also generate them at the root when the opponent is close enough to
+        # threaten our race. Waiting until the opponent's minimax turn can be
+        # too late: the root shortlist may otherwise omit the wall that
+        # preserves our lead.
+        own_distance = shortest_distance(state, player)
+        opponent_distance = shortest_distance(state, 1 - player)
+        is_root_turn = player == self.root_player and state.ply == self.root_ply
+        urgent_root_defense = (
+            is_root_turn
+            and own_distance is not None
+            and opponent_distance is not None
+            and (
+                opponent_distance <= own_distance + 2
+                or opponent_distance <= 4
+            )
+            and self.config.predictive_path_count > 1
+            and self.config.predictive_wall_candidates > 0
+        )
         is_opponent_reply = (
             player != self.root_player
             and state.ply > self.root_ply
@@ -573,12 +589,17 @@ class QuoridorAI:
             and self.config.predictive_path_count > 1
             and self.config.predictive_wall_candidates > 0
         )
+        use_predictive_walls = is_opponent_reply or urgent_root_defense
 
         predicted_path_walls: set[Wall] = set()
-        if is_opponent_reply:
+        if use_predictive_walls:
+            # On opponent turns, attack our own alternate routes. On an urgent
+            # root turn, attack the opponent's alternate routes before they
+            # become the only viable response.
+            target_player = self.root_player if is_opponent_reply else 1 - player
             predictive_paths = self._alternative_paths(
                 state,
-                1 - player,
+                target_player,
                 max_paths=max(2, self.config.predictive_path_count),
             )
             for path in predictive_paths[1:]:
@@ -586,35 +607,63 @@ class QuoridorAI:
                     self._wall_candidates_from_path(path)
                 )
 
-        # Preserve distinct priority groups: walls on our current shortest
-        # path first, then walls attacking our alternative routes, then other
-        # useful walls. This avoids the direct-path candidates filling the
-        # entire shortlist and silently discarding all predictive candidates.
+        # Validate all candidates before ranking. For urgent root defense,
+        # rank legal walls by the actual distance change they cause, rather
+        # than assuming every wall touching a shortest path is equally useful.
         candidates = own_path_walls | opponent_path_walls | predicted_path_walls
-        ordered = sorted(
-            candidates,
-            key=lambda wall: (
+        legal_candidates: list[Wall] = []
+        for wall in candidates:
+            self._check_deadline()
+            if is_legal_wall(state, wall, player):
+                legal_candidates.append(wall)
+
+        def wall_priority(wall: Wall) -> tuple:
+            if urgent_root_defense:
+                wall_state = state.__class__(
+                    pawns=state.pawns,
+                    walls=state.walls | {wall},
+                    walls_remaining=state.walls_remaining,
+                    current_player=state.current_player,
+                    winner=state.winner,
+                    ply=state.ply,
+                )
+                new_own_distance = shortest_distance(wall_state, player)
+                new_opponent_distance = shortest_distance(wall_state, 1 - player)
+                own_detour = (
+                    99 if new_own_distance is None or own_distance is None
+                    else new_own_distance - own_distance
+                )
+                opponent_delay = (
+                    -99 if new_opponent_distance is None or opponent_distance is None
+                    else new_opponent_distance - opponent_distance
+                )
+                # Prefer delaying the opponent, then avoid damaging our own
+                # route. Path membership breaks ties deterministically.
+                return (
+                    -opponent_delay,
+                    own_detour,
+                    wall not in predicted_path_walls,
+                    wall not in opponent_path_walls,
+                    wall.orientation,
+                    wall.x,
+                    wall.y,
+                )
+            return (
                 wall not in opponent_path_walls,
                 wall not in predicted_path_walls,
                 wall in own_path_walls,
                 wall.orientation,
                 wall.x,
                 wall.y,
-            ),
-        )
+            )
 
-        legal_candidates: list[Wall] = []
-        for wall in ordered:
-            self._check_deadline()
-            if is_legal_wall(state, wall, player):
-                legal_candidates.append(wall)
-
+        ordered = sorted(legal_candidates, key=wall_priority)
         limit = max(0, self.config.max_wall_candidates)
-        if len(legal_candidates) <= limit:
-            selected = legal_candidates
-        elif is_opponent_reply:
+        if len(ordered) <= limit:
+            selected = ordered
+        elif use_predictive_walls:
             predictive_legal = [
-                wall for wall in legal_candidates
+                wall for wall in ordered
                 if wall in predicted_path_walls and wall not in opponent_path_walls
             ]
             predictive_limit = min(
@@ -623,18 +672,26 @@ class QuoridorAI:
                 len(predictive_legal),
             )
             direct = [
-                wall for wall in legal_candidates
+                wall for wall in ordered
                 if wall not in predicted_path_walls or wall in opponent_path_walls
             ]
             selected = direct[: limit - predictive_limit]
             selected.extend(predictive_legal[:predictive_limit])
+            # Re-sort after reserving slots so urgent root defense retains
+            # the distance-based ranking among all selected candidates.
+            selected.sort(key=wall_priority)
         else:
-            selected = legal_candidates[:limit]
+            selected = ordered[:limit]
 
         self.stats.setdefault("predictive_wall_candidates", 0)
         self.stats["predictive_wall_candidates"] += sum(
             wall in predicted_path_walls for wall in selected
         )
+        self.stats.setdefault("root_defensive_wall_candidates", 0)
+        if urgent_root_defense:
+            self.stats["root_defensive_wall_candidates"] += sum(
+                wall in predicted_path_walls for wall in selected
+            )
 
         return selected
 
