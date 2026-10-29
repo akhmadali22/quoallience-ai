@@ -662,19 +662,31 @@ class QuoridorAI:
         if len(ordered) <= limit:
             selected = ordered
         elif use_predictive_walls:
-            predictive_legal = [
-                wall for wall in ordered
-                if wall in predicted_path_walls and wall not in opponent_path_walls
-            ]
+            if urgent_root_defense:
+                # On root defense, reserve slots for any wall that intersects
+                # an alternate opponent route, even if it also touches the
+                # shortest route. Such walls can still be strategically useful
+                # when the direct blocker is illegal or tactically inferior.
+                predictive_legal = [
+                    wall for wall in ordered if wall in predicted_path_walls
+                ]
+                direct = [
+                    wall for wall in ordered if wall not in predicted_path_walls
+                ]
+            else:
+                predictive_legal = [
+                    wall for wall in ordered
+                    if wall in predicted_path_walls and wall not in opponent_path_walls
+                ]
+                direct = [
+                    wall for wall in ordered
+                    if wall not in predicted_path_walls or wall in opponent_path_walls
+                ]
             predictive_limit = min(
                 self.config.predictive_wall_candidates,
                 limit,
                 len(predictive_legal),
             )
-            direct = [
-                wall for wall in ordered
-                if wall not in predicted_path_walls or wall in opponent_path_walls
-            ]
             selected = direct[: limit - predictive_limit]
             selected.extend(predictive_legal[:predictive_limit])
             # Re-sort after reserving slots so urgent root defense retains
