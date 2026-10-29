@@ -38,6 +38,8 @@ SUMMARY_FIELDS = [
     "total_plies",
     "ai_p0_walls",
     "ai_p1_walls",
+    "ai_turns_p0",
+    "ai_turns_p1",
     "avg_p0_thinking_ms",
     "avg_p1_thinking_ms",
     "max_p0_thinking_ms",
@@ -228,7 +230,6 @@ def play_game(
                     "walls_remaining_after": list(after.walls_remaining),
                     "ai_score": search.score,
                     "ai_depth": search.depth,
-                    "game_result": "pending",
                     "interpretation": (
                         "directly_delayed" if metrics["opponent_delay"] and metrics["opponent_delay"] > 0
                         else "no_shortest_path_delay" if metrics["opponent_delay"] == 0
@@ -241,6 +242,17 @@ def play_game(
 
     winner = state.winner
     result = "win" if winner is not None else "draw_max_plies"
+    _write_jsonl(
+        game_log,
+        {
+            "event": "game_end",
+            "game_id": game_id,
+            "winner": f"P{winner}" if winner is not None else None,
+            "result": result,
+            "total_plies": state.ply,
+            "final_state": state.to_dict(),
+        },
+    )
     all_thinking = thinking[0] + thinking[1]
     delay_rate = (
         sum(1 for delay in wall_delays if delay == 0) / len(wall_delays)
@@ -257,6 +269,8 @@ def play_game(
         "total_plies": state.ply,
         "ai_p0_walls": wall_counts[0],
         "ai_p1_walls": wall_counts[1],
+        "ai_turns_p0": len(thinking[0]),
+        "ai_turns_p1": len(thinking[1]),
         "avg_p0_thinking_ms": _mean(thinking[0]),
         "avg_p1_thinking_ms": _mean(thinking[1]),
         "max_p0_thinking_ms": round(max(thinking[0]), 3) if thinking[0] else None,
