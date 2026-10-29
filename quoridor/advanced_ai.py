@@ -288,7 +288,7 @@ class QuoridorAI:
         own_distance: int | None,
     ) -> float:
         """Penalize repeated AI-turn positions and unproductive pawn oscillation."""
-        if state.current_player != self.root_player or own_distance is None:
+        if own_distance is None:
             return 0.0
 
         prior_states = [
