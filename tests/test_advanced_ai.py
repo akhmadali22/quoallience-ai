@@ -173,7 +173,7 @@ def test_opponent_reply_considers_walls_against_alternative_routes():
 def test_evaluation_penalizes_unproductive_repeated_pawn_position():
     state = GameState(
         pawns=((3, 3), (5, 0)),
-        current_player=0,
+        current_player=1,
         ply=4,
     )
     ai = QuoridorAI(AIConfig(time_limit=5, max_depth=1))
