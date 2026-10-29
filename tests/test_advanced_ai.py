@@ -167,3 +167,39 @@ def test_opponent_reply_considers_walls_against_alternative_routes():
     assert candidates
     assert ai.stats["predictive_wall_candidates"] > 0
     assert len(candidates) <= ai.config.max_wall_candidates
+
+
+
+def test_ai_experiment_selects_highest_score_across_completed_depths(monkeypatch):
+    state = GameState()
+    ai = QuoridorAI(
+        AIConfig(
+            time_limit=2,
+            max_depth=5,
+        )
+    )
+
+    # Deliberately make the shallowest iteration score highest. Strategy A
+    # should choose it, even though deeper iterations completed successfully.
+    iterations = {
+        1: (Action(kind="move", destination=(4, 7)), 12.0),
+        2: (Action(kind="move", destination=(3, 8)), 8.0),
+        3: (Action(kind="move", destination=(5, 8)), 10.5),
+        4: (Action(kind="move", destination=(4, 6)), 7.0),
+        5: (Action(kind="move", destination=(2, 8)), 9.0),
+    }
+    visited_depths = []
+
+    def fake_search_root(_state, depth, fallback):
+        visited_depths.append(depth)
+        return iterations[depth]
+
+    monkeypatch.setattr(ai, "_search_root", fake_search_root)
+
+    result = ai.choose_action(state)
+
+    assert visited_depths == [1, 2, 3, 4, 5]
+    assert result.action == iterations[1][0]
+    assert result.score == 12.0
+    assert result.depth == 1
+    assert not result.timed_out
