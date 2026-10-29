@@ -65,6 +65,11 @@ class AIConfig:
     own_progress_weight: float = 2.5
     opponent_delay_weight: float = 1.5
 
+    # Reserve a small part of the opponent's immediate reply search for
+    # walls that attack our second-best routes, not only the current shortest path.
+    predictive_path_count: int = 3
+    predictive_wall_candidates: int = 2
+
 
 @dataclass
 class SearchResult:
@@ -115,6 +120,7 @@ class QuoridorAI:
 
         self.deadline = 0.0
         self.root_player = 0
+        self.root_ply = 0
         self.nodes = 0
 
         # Exact results from fully searched Minimax nodes.
@@ -135,6 +141,7 @@ class QuoridorAI:
             "children_generated": 0,
             "move_candidates": 0,
             "wall_candidates": 0,
+            "predictive_wall_candidates": 0,
             "alpha_beta_cutoffs": 0,
         }
 
@@ -363,6 +370,7 @@ class QuoridorAI:
         start = state.pawns[player]
 
         for index in range(len(base_path) - 1):
+            self._check_deadline()
             if len(paths) >= max_paths:
                 break
 
@@ -374,6 +382,7 @@ class QuoridorAI:
             previous = {start: None}
 
             while queue:
+                self._check_deadline()
                 current = queue.popleft()
 
                 if current[1] == goal_y:
@@ -425,9 +434,14 @@ class QuoridorAI:
         state: GameState,
     ) -> list[Wall]:
         """
-        Generate a reduced set of potentially useful walls.
+        Generate useful walls, including a small set that threatens our
+        alternative routes when the opponent gets its immediate reply.
 
-        Reuse the shortest paths already computed for this call.
+        The opponent normally considers walls intersecting our current
+        shortest path. That is insufficient when we can reroute around one
+        wall but lose if the next wall closes the reroute as well. On the
+        first opponent reply, reserve a few candidates for those alternative
+        paths so minimax can see the route-closing threat.
         """
         player = state.current_player
 
@@ -446,21 +460,40 @@ class QuoridorAI:
         opponent_path = shortest_path(state, 1 - player)
         self._profile_end("shortest_path", started)
 
-        candidates: set[Wall] = set()
-
         own_path_walls = self._wall_candidates_from_path(own_path or [])
-
         opponent_path_walls = self._wall_candidates_from_path(opponent_path or [])
 
-        candidates.update(own_path_walls)
-        candidates.update(opponent_path_walls)
+        # Only spend the extra BFS work on the opponent's immediate reply
+        # to the root action. Deeper nodes retain the cheaper baseline search.
+        is_immediate_opponent_reply = (
+            player != self.root_player
+            and state.ply == self.root_ply + 1
+            and self.config.predictive_path_count > 1
+            and self.config.predictive_wall_candidates > 0
+        )
 
-        # Prioritaskan dinding yang mengganggu rute lawan,
-        # tetapi hindari kandidat yang juga mengganggu rute sendiri.
+        predicted_path_walls: set[Wall] = set()
+        if is_immediate_opponent_reply:
+            predictive_paths = self._alternative_paths(
+                state,
+                1 - player,
+                max_paths=max(2, self.config.predictive_path_count),
+            )
+            for path in predictive_paths[1:]:
+                predicted_path_walls.update(
+                    self._wall_candidates_from_path(path)
+                )
+
+        # Preserve distinct priority groups: walls on our current shortest
+        # path first, then walls attacking our alternative routes, then other
+        # useful walls. This avoids the direct-path candidates filling the
+        # entire shortlist and silently discarding all predictive candidates.
+        candidates = own_path_walls | opponent_path_walls | predicted_path_walls
         ordered = sorted(
             candidates,
             key=lambda wall: (
                 wall not in opponent_path_walls,
+                wall not in predicted_path_walls,
                 wall in own_path_walls,
                 wall.orientation,
                 wall.x,
@@ -468,31 +501,41 @@ class QuoridorAI:
             ),
         )
 
-        legal_candidates = []
-
+        legal_candidates: list[Wall] = []
         for wall in ordered:
             self._check_deadline()
+            if is_legal_wall(state, wall, player):
+                legal_candidates.append(wall)
 
-            if not is_legal_wall(state, wall, player):
-                continue
+        limit = max(0, self.config.max_wall_candidates)
+        if len(legal_candidates) <= limit:
+            selected = legal_candidates
+        elif is_immediate_opponent_reply:
+            predictive_legal = [
+                wall for wall in legal_candidates
+                if wall in predicted_path_walls and wall not in opponent_path_walls
+            ]
+            predictive_limit = min(
+                self.config.predictive_wall_candidates,
+                limit,
+                len(predictive_legal),
+            )
+            direct = [
+                wall for wall in legal_candidates
+                if wall not in predicted_path_walls or wall in opponent_path_walls
+            ]
+            selected = direct[: limit - predictive_limit]
+            selected.extend(predictive_legal[:predictive_limit])
+        else:
+            selected = legal_candidates[:limit]
 
-            legal_candidates.append(wall)
-
-            if len(legal_candidates) >= self.config.max_wall_candidates:
-                break
-
-        print(
-            f"[WALL SEARCH] "
-            f"player={player} | "
-            f"own_paths={len(own_path)} | "
-            f"opponent_paths={len(opponent_path)} | "
-            f"own_wall_candidates={len(own_path_walls)} | "
-            f"opponent_wall_candidates={len(opponent_path_walls)} | "
-            f"legal_candidates={len(legal_candidates)}"
+        self.stats.setdefault("predictive_wall_candidates", 0)
+        self.stats["predictive_wall_candidates"] += sum(
+            wall in predicted_path_walls for wall in selected
         )
 
-        return legal_candidates
-    
+        return selected
+
     def _generate_children(
         self,
         state: GameState,
@@ -813,6 +856,7 @@ class QuoridorAI:
         start_time = time.monotonic()
         self.deadline = start_time + self.config.time_limit
         self.root_player = state.current_player
+        self.root_ply = state.ply
         self.nodes = 0
 
         self.transposition_table = {}
