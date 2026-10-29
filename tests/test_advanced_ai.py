@@ -167,3 +167,59 @@ def test_opponent_reply_considers_walls_against_alternative_routes():
     assert candidates
     assert ai.stats["predictive_wall_candidates"] > 0
     assert len(candidates) <= ai.config.max_wall_candidates
+
+
+
+def test_evaluation_penalizes_unproductive_repeated_pawn_position():
+    state = GameState(
+        pawns=((3, 3), (5, 0)),
+        current_player=1,
+        ply=4,
+    )
+    ai = QuoridorAI(AIConfig(time_limit=5, max_depth=1))
+    ai.root_player = 0
+    ai.deadline = 10**12
+
+    baseline = ai._evaluate(state)
+
+    # The opponent's pawn moved, so this is not an exact repeated board.
+    # The AI pawn returned to a square it visited at the same route distance.
+    ai.evaluation_cache.clear()
+    ai.actual_pawn_history.append((0, (3, 3), 3))
+    repeated_score = ai._evaluate(state)
+
+    assert repeated_score == pytest.approx(
+        baseline - ai.config.repetition_penalty
+    )
+
+
+def test_evaluation_penalizes_opponent_race_threat():
+    ai = QuoridorAI(AIConfig(time_limit=5, max_depth=1))
+    ai.root_player = 0
+    ai.deadline = 10**12
+
+    safe_state = GameState(
+        pawns=((4, 4), (0, 0)),
+        current_player=0,
+    )
+    threatened_state = GameState(
+        pawns=((4, 4), (4, 5)),
+        current_player=0,
+    )
+
+    safe_score = ai._evaluate(safe_state)
+    ai.evaluation_cache.clear()
+    threatened_score = ai._evaluate(threatened_state)
+
+    assert threatened_score < safe_score
+
+
+def test_actual_position_history_ignores_duplicate_request():
+    state = GameState()
+    ai = QuoridorAI(AIConfig(time_limit=5, max_depth=1))
+
+    ai._record_actual_position(state)
+    ai._record_actual_position(state)
+
+    assert len(ai.actual_state_history) == 1
+    assert len(ai.actual_pawn_history) == 1
