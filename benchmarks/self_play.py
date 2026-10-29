@@ -287,18 +287,16 @@ def play_game(
 def run_benchmark(args: argparse.Namespace) -> Path:
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     output_dir = Path(args.output_dir) if args.output_dir else Path("data/self_play") / timestamp
+    if output_dir.exists() and any(output_dir.iterdir()):
+        raise FileExistsError(
+            f"Output directory is not empty: {output_dir}. "
+            "Choose a new --output-dir to preserve the previous run."
+        )
     games_dir = output_dir / "games"
     games_dir.mkdir(parents=True, exist_ok=True)
     wall_log = output_dir / "wall_analysis.jsonl"
     summary_path = output_dir / "game_summary.csv"
     metadata_path = output_dir / "run_metadata.json"
-
-    # Do not append results to an old run by accident.
-    if wall_log.exists() or summary_path.exists():
-        raise FileExistsError(
-            f"Output already contains benchmark results: {output_dir}. "
-            "Choose a new --output-dir to preserve the previous run."
-        )
 
     config = AIConfig(time_limit=args.time_limit, max_depth=args.max_depth)
     metadata = {
