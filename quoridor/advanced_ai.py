@@ -73,6 +73,13 @@ class AIConfig:
     predictive_path_count: int = 3
     predictive_wall_candidates: int = 2
 
+    # Softly discourage returning to a recently visited pawn square when
+    # doing so does not improve the shortest route.
+    repetition_penalty: float = 3.5
+
+    # Extra urgency when the opponent can finish in as few moves as we can.
+    opponent_threat_weight: float = 1.5
+
 
 @dataclass
 class SearchResult:
@@ -136,6 +143,11 @@ class QuoridorAI:
         # Basic performance counters.
         self.distance_cache_hits = 0
         self.evaluation_cache_hits = 0
+
+        # Real positions observed on this AI instance's actual turns only.
+        # Search-tree positions are deliberately never added to this history.
+        self.actual_state_history: list[tuple[int, tuple]] = []
+        self.actual_pawn_history: list[tuple[int, tuple[int, int], int | None]] = []
 
         self.profile_calls = defaultdict(int)
         self.profile_time = defaultdict(float)
@@ -239,6 +251,75 @@ class QuoridorAI:
             state.ply,
         )
 
+    @staticmethod
+    def _repetition_key(state: GameState) -> tuple:
+        """Position identity without ply, so the same board can be detected later."""
+        return QuoridorAI._state_key(state)[:-1]
+
+    def _record_actual_position(self, state: GameState) -> None:
+        """Record one real AI-turn position, not simulated minimax nodes."""
+        key = self._repetition_key(state)
+
+        if self.actual_state_history:
+            last_ply, last_key = self.actual_state_history[-1]
+            if state.ply == last_ply and key == last_key:
+                # Avoid counting a retried API request as another occurrence.
+                return
+            if state.ply < last_ply:
+                # Defensive reset if this AI object is reused for a new game.
+                self.actual_state_history.clear()
+                self.actual_pawn_history.clear()
+            elif state.ply == last_ply:
+                return
+
+        player = state.current_player
+        distance = shortest_distance(state, player)
+        self.actual_state_history.append((state.ply, key))
+        self.actual_pawn_history.append((state.ply, state.pawns[player], distance))
+
+        # A short rolling history is enough to catch oscillation without
+        # penalizing a pawn for squares visited many turns ago.
+        self.actual_state_history = self.actual_state_history[-16:]
+        self.actual_pawn_history = self.actual_pawn_history[-16:]
+
+    def _repetition_penalty(
+        self,
+        state: GameState,
+        own_distance: int | None,
+    ) -> float:
+        """Penalize repeated AI-turn positions and unproductive pawn oscillation."""
+        if state.current_player != self.root_player or own_distance is None:
+            return 0.0
+
+        prior_states = [
+            key
+            for ply, key in self.actual_state_history
+            if ply < state.ply and key == self._repetition_key(state)
+        ]
+        exact_penalty = (
+            self.config.repetition_penalty
+            * 0.5
+            * min(len(prior_states), 2)
+        )
+
+        current_pawn = state.pawns[self.root_player]
+        prior_distances = [
+            distance
+            for ply, position, distance in self.actual_pawn_history
+            if ply < state.ply
+            and position == current_pawn
+            and distance is not None
+        ]
+
+        pawn_penalty = 0.0
+        if prior_distances and own_distance >= min(prior_distances):
+            pawn_penalty = (
+                self.config.repetition_penalty
+                * min(len(prior_distances), 2)
+            )
+
+        return exact_penalty + pawn_penalty
+
     def _evaluate(self, state: GameState) -> float:
         """
         Static evaluation from the root player's perspective.
@@ -292,7 +373,24 @@ class QuoridorAI:
                 own_walls - opponent_walls
             ) * self.config.wall_resource_weight
 
-            score = progress_score + wall_resource_score
+            # Do not reward forward movement blindly when the opponent is
+            # already at least as close to their goal as we are.
+            opponent_threat_penalty = (
+                self.config.opponent_threat_weight
+                * max(0, own_distance - opponent_distance + 1)
+            )
+
+            repetition_penalty = self._repetition_penalty(
+                state,
+                own_distance,
+            )
+
+            score = (
+                progress_score
+                + wall_resource_score
+                - opponent_threat_penalty
+                - repetition_penalty
+            )
 
         self.evaluation_cache[key] = score
 
@@ -919,6 +1017,9 @@ class QuoridorAI:
         self.distance_cache_hits = 0
         self.evaluation_cache_hits = 0
 
+        # Keep actual-turn history across calls; clear only per-search caches.
+        self._record_actual_position(state)
+
         self.stats = {
             "children_generated": 0,
             "move_candidates": 0,
@@ -941,7 +1042,8 @@ class QuoridorAI:
                 f"pawns={state.pawns} goal_y={goal_y} "
                 f"distance={own_distance} opponent_distance={opponent_distance} "
                 f"walls={state.walls_remaining} legal_moves={legal_pawn_moves(state, player)} "
-                f"wall_count={len(state.walls)}"
+                f"wall_count={len(state.walls)} "
+                f"repetition_history={len(self.actual_pawn_history)}"
             )
 
         best_action = fallback
@@ -988,7 +1090,9 @@ class QuoridorAI:
                 f"distance={shortest_distance(state, player)}->{next_own_distance} "
                 f"opponent_distance={shortest_distance(state, opponent)}->{next_opponent_distance} "
                 f"cache_hits(distance={self.distance_cache_hits},eval={self.evaluation_cache_hits}) "
-                f"tt={len(self.transposition_table)} stats={self.stats}"
+                f"tt={len(self.transposition_table)} "
+                f"repetition_history={len(self.actual_pawn_history)} "
+                f"stats={self.stats}"
             )
 
         return SearchResult(
