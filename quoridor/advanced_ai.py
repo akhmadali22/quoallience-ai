@@ -3,6 +3,8 @@ from __future__ import annotations
 import math
 import os
 import time
+from datetime import datetime
+from pathlib import Path
 
 from dataclasses import dataclass
 from typing import Literal
@@ -780,8 +782,27 @@ class QuoridorAI:
         }
 
     def _debug_log(self, message: str) -> None:
-        if self._debug_enabled():
-            print(f"[AI-DEBUG] {message}", flush=True)
+        if not self._debug_enabled():
+            return
+
+        # Write diagnostics to a dedicated text file because API/server processes
+        # may not forward stdout to the terminal that launched the game.
+        log_path = Path(
+            os.getenv("QUORIDOR_AI_DEBUG_FILE", "quoridor_ai_debug.txt")
+        ).expanduser()
+        timestamp = datetime.now().astimezone().isoformat(timespec="milliseconds")
+        line = f"{timestamp} [AI-DEBUG] {message}\\n"
+
+        try:
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            with log_path.open("a", encoding="utf-8") as log_file:
+                log_file.write(line)
+        except OSError as exc:
+            # Keep a visible fallback if the configured log path is not writable.
+            print(
+                f"[AI-DEBUG] Gagal menulis {log_path}: {exc}; pesan: {message}",
+                flush=True,
+            )
 
     def _search_root(
         self,
