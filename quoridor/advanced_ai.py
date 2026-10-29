@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import math
+import os
 import time
+from datetime import datetime
+from pathlib import Path
 
 from dataclasses import dataclass
 from typing import Literal
@@ -70,6 +73,13 @@ class AIConfig:
     predictive_path_count: int = 3
     predictive_wall_candidates: int = 2
 
+    # Softly discourage returning to a recently visited pawn square when
+    # doing so does not improve the shortest route.
+    repetition_penalty: float = 3.5
+
+    # Extra urgency when the opponent can finish in as few moves as we can.
+    opponent_threat_weight: float = 1.5
+
 
 @dataclass
 class SearchResult:
@@ -133,6 +143,11 @@ class QuoridorAI:
         # Basic performance counters.
         self.distance_cache_hits = 0
         self.evaluation_cache_hits = 0
+
+        # Real positions observed on this AI instance's actual turns only.
+        # Search-tree positions are deliberately never added to this history.
+        self.actual_state_history: list[tuple[int, tuple]] = []
+        self.actual_pawn_history: list[tuple[int, tuple[int, int], int | None]] = []
 
         self.profile_calls = defaultdict(int)
         self.profile_time = defaultdict(float)
@@ -236,6 +251,75 @@ class QuoridorAI:
             state.ply,
         )
 
+    @staticmethod
+    def _repetition_key(state: GameState) -> tuple:
+        """Position identity without ply, so the same board can be detected later."""
+        return QuoridorAI._state_key(state)[:-1]
+
+    def _record_actual_position(self, state: GameState) -> None:
+        """Record one real AI-turn position, not simulated minimax nodes."""
+        key = self._repetition_key(state)
+
+        if self.actual_state_history:
+            last_ply, last_key = self.actual_state_history[-1]
+            if state.ply == last_ply and key == last_key:
+                # Avoid counting a retried API request as another occurrence.
+                return
+            if state.ply < last_ply:
+                # Defensive reset if this AI object is reused for a new game.
+                self.actual_state_history.clear()
+                self.actual_pawn_history.clear()
+            elif state.ply == last_ply:
+                return
+
+        player = state.current_player
+        distance = shortest_distance(state, player)
+        self.actual_state_history.append((state.ply, key))
+        self.actual_pawn_history.append((state.ply, state.pawns[player], distance))
+
+        # A short rolling history is enough to catch oscillation without
+        # penalizing a pawn for squares visited many turns ago.
+        self.actual_state_history = self.actual_state_history[-16:]
+        self.actual_pawn_history = self.actual_pawn_history[-16:]
+
+    def _repetition_penalty(
+        self,
+        state: GameState,
+        own_distance: int | None,
+    ) -> float:
+        """Penalize repeated AI-turn positions and unproductive pawn oscillation."""
+        if own_distance is None:
+            return 0.0
+
+        prior_states = [
+            key
+            for ply, key in self.actual_state_history
+            if ply < state.ply and key == self._repetition_key(state)
+        ]
+        exact_penalty = (
+            self.config.repetition_penalty
+            * 0.5
+            * min(len(prior_states), 2)
+        )
+
+        current_pawn = state.pawns[self.root_player]
+        prior_distances = [
+            distance
+            for ply, position, distance in self.actual_pawn_history
+            if ply < state.ply
+            and position == current_pawn
+            and distance is not None
+        ]
+
+        pawn_penalty = 0.0
+        if prior_distances and own_distance >= min(prior_distances):
+            pawn_penalty = (
+                self.config.repetition_penalty
+                * min(len(prior_distances), 2)
+            )
+
+        return exact_penalty + pawn_penalty
+
     def _evaluate(self, state: GameState) -> float:
         """
         Static evaluation from the root player's perspective.
@@ -289,7 +373,24 @@ class QuoridorAI:
                 own_walls - opponent_walls
             ) * self.config.wall_resource_weight
 
-            score = progress_score + wall_resource_score
+            # Do not reward forward movement blindly when the opponent is
+            # already at least as close to their goal as we are.
+            opponent_threat_penalty = (
+                self.config.opponent_threat_weight
+                * max(0, own_distance - opponent_distance + 1)
+            )
+
+            repetition_penalty = self._repetition_penalty(
+                state,
+                own_distance,
+            )
+
+            score = (
+                progress_score
+                + wall_resource_score
+                - opponent_threat_penalty
+                - repetition_penalty
+            )
 
         self.evaluation_cache[key] = score
 
@@ -462,9 +563,25 @@ class QuoridorAI:
         own_path_walls = self._wall_candidates_from_path(own_path or [])
         opponent_path_walls = self._wall_candidates_from_path(opponent_path or [])
 
-        # At each opponent turn inside the searched line, include walls that
-        # attack our alternative routes. This lets minimax see the sequence
-        # wall -> reroute -> second wall, rather than only the first closure.
+        # Keep predictive wall candidates on opponent replies as before, but
+        # also generate them at the root when the opponent is close enough to
+        # threaten our race. Waiting until the opponent's minimax turn can be
+        # too late: the root shortlist may otherwise omit the wall that
+        # preserves our lead.
+        own_distance = shortest_distance(state, player)
+        opponent_distance = shortest_distance(state, 1 - player)
+        is_root_turn = player == self.root_player and state.ply == self.root_ply
+        urgent_root_defense = (
+            is_root_turn
+            and own_distance is not None
+            and opponent_distance is not None
+            and (
+                opponent_distance < own_distance
+                or opponent_distance <= 4
+            )
+            and self.config.predictive_path_count > 1
+            and self.config.predictive_wall_candidates > 0
+        )
         is_opponent_reply = (
             player != self.root_player
             and state.ply > self.root_ply
@@ -472,12 +589,17 @@ class QuoridorAI:
             and self.config.predictive_path_count > 1
             and self.config.predictive_wall_candidates > 0
         )
+        use_predictive_walls = is_opponent_reply or urgent_root_defense
 
         predicted_path_walls: set[Wall] = set()
-        if is_opponent_reply:
+        if use_predictive_walls:
+            # On opponent turns, attack our own alternate routes. On an urgent
+            # root turn, attack the opponent's alternate routes before they
+            # become the only viable response.
+            target_player = self.root_player if is_opponent_reply else 1 - player
             predictive_paths = self._alternative_paths(
                 state,
-                1 - player,
+                target_player,
                 max_paths=max(2, self.config.predictive_path_count),
             )
             for path in predictive_paths[1:]:
@@ -485,55 +607,103 @@ class QuoridorAI:
                     self._wall_candidates_from_path(path)
                 )
 
-        # Preserve distinct priority groups: walls on our current shortest
-        # path first, then walls attacking our alternative routes, then other
-        # useful walls. This avoids the direct-path candidates filling the
-        # entire shortlist and silently discarding all predictive candidates.
+        # Validate all candidates before ranking. For urgent root defense,
+        # rank legal walls by the actual distance change they cause, rather
+        # than assuming every wall touching a shortest path is equally useful.
         candidates = own_path_walls | opponent_path_walls | predicted_path_walls
-        ordered = sorted(
-            candidates,
-            key=lambda wall: (
+        legal_candidates: list[Wall] = []
+        for wall in candidates:
+            self._check_deadline()
+            if is_legal_wall(state, wall, player):
+                legal_candidates.append(wall)
+
+        def wall_priority(wall: Wall) -> tuple:
+            if urgent_root_defense:
+                wall_state = state.__class__(
+                    pawns=state.pawns,
+                    walls=state.walls | {wall},
+                    walls_remaining=state.walls_remaining,
+                    current_player=state.current_player,
+                    winner=state.winner,
+                    ply=state.ply,
+                )
+                new_own_distance = shortest_distance(wall_state, player)
+                new_opponent_distance = shortest_distance(wall_state, 1 - player)
+                own_detour = (
+                    99 if new_own_distance is None or own_distance is None
+                    else new_own_distance - own_distance
+                )
+                opponent_delay = (
+                    -99 if new_opponent_distance is None or opponent_distance is None
+                    else new_opponent_distance - opponent_distance
+                )
+                # Prefer delaying the opponent, then avoid damaging our own
+                # route. Path membership breaks ties deterministically.
+                return (
+                    -opponent_delay,
+                    own_detour,
+                    wall not in predicted_path_walls,
+                    wall not in opponent_path_walls,
+                    wall.orientation,
+                    wall.x,
+                    wall.y,
+                )
+            return (
                 wall not in opponent_path_walls,
                 wall not in predicted_path_walls,
                 wall in own_path_walls,
                 wall.orientation,
                 wall.x,
                 wall.y,
-            ),
-        )
+            )
 
-        legal_candidates: list[Wall] = []
-        for wall in ordered:
-            self._check_deadline()
-            if is_legal_wall(state, wall, player):
-                legal_candidates.append(wall)
-
+        ordered = sorted(legal_candidates, key=wall_priority)
         limit = max(0, self.config.max_wall_candidates)
-        if len(legal_candidates) <= limit:
-            selected = legal_candidates
-        elif is_opponent_reply:
-            predictive_legal = [
-                wall for wall in legal_candidates
-                if wall in predicted_path_walls and wall not in opponent_path_walls
-            ]
+        if len(ordered) <= limit:
+            selected = ordered
+        elif use_predictive_walls:
+            if urgent_root_defense:
+                # On root defense, reserve slots for any wall that intersects
+                # an alternate opponent route, even if it also touches the
+                # shortest route. Such walls can still be strategically useful
+                # when the direct blocker is illegal or tactically inferior.
+                predictive_legal = [
+                    wall for wall in ordered if wall in predicted_path_walls
+                ]
+                direct = [
+                    wall for wall in ordered if wall not in predicted_path_walls
+                ]
+            else:
+                predictive_legal = [
+                    wall for wall in ordered
+                    if wall in predicted_path_walls and wall not in opponent_path_walls
+                ]
+                direct = [
+                    wall for wall in ordered
+                    if wall not in predicted_path_walls or wall in opponent_path_walls
+                ]
             predictive_limit = min(
                 self.config.predictive_wall_candidates,
                 limit,
                 len(predictive_legal),
             )
-            direct = [
-                wall for wall in legal_candidates
-                if wall not in predicted_path_walls or wall in opponent_path_walls
-            ]
             selected = direct[: limit - predictive_limit]
             selected.extend(predictive_legal[:predictive_limit])
+            # Re-sort after reserving slots so urgent root defense retains
+            # the distance-based ranking among all selected candidates.
+            selected.sort(key=wall_priority)
         else:
-            selected = legal_candidates[:limit]
+            selected = ordered[:limit]
 
         self.stats.setdefault("predictive_wall_candidates", 0)
         self.stats["predictive_wall_candidates"] += sum(
             wall in predicted_path_walls for wall in selected
         )
+        self.stats.setdefault("root_defensive_wall_candidates", 0)
+        if urgent_root_defense:
+            self.stats["root_defensive_wall_candidates"] += sum(
+                wall in predicted_path_walls for wall in selected
+            )
 
         return selected
 
@@ -766,6 +936,41 @@ class QuoridorAI:
 
         return best_score
 
+    @staticmethod
+    def _format_action(action: Action) -> str:
+        if action.kind == "move":
+            return f"move->{action.destination}"
+        wall = action.wall
+        return f"wall-{wall.orientation}@({wall.x},{wall.y})"
+
+    def _debug_enabled(self) -> bool:
+        return os.getenv("QUORIDOR_AI_DEBUG", "").strip().lower() in {
+            "1", "true", "yes", "on"
+        }
+
+    def _debug_log(self, message: str) -> None:
+        if not self._debug_enabled():
+            return
+
+        # Write diagnostics to a dedicated text file because API/server processes
+        # may not forward stdout to the terminal that launched the game.
+        log_path = Path(
+            os.getenv("QUORIDOR_AI_DEBUG_FILE", "quoridor_ai_debug.txt")
+        ).expanduser()
+        timestamp = datetime.now().astimezone().isoformat(timespec="milliseconds")
+        line = f"{timestamp} [AI-DEBUG] {message}\n"
+
+        try:
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            with log_path.open("a", encoding="utf-8") as log_file:
+                log_file.write(line)
+        except OSError as exc:
+            # Keep a visible fallback if the configured log path is not writable.
+            print(
+                f"[AI-DEBUG] Gagal menulis {log_path}: {exc}; pesan: {message}",
+                flush=True,
+            )
+
     def _search_root(
         self,
         state: GameState,
@@ -788,6 +993,7 @@ class QuoridorAI:
         best_score = -INFINITY
         alpha = -INFINITY
         beta = INFINITY
+        root_scores: list[tuple[Action, float]] = []
 
         for action, child_state in children:
             self._check_deadline()
@@ -798,12 +1004,25 @@ class QuoridorAI:
                 alpha,
                 beta,
             )
+            root_scores.append((action, score))
 
             if score > best_score:
                 best_score = score
                 best_action = action
 
             alpha = max(alpha, best_score)
+
+        if self._debug_enabled():
+            ranked = sorted(root_scores, key=lambda item: item[1], reverse=True)
+            details = " | ".join(
+                f"{self._format_action(action)}={score:.2f}"
+                for action, score in ranked[:8]
+            )
+            self._debug_log(
+                f"ROOT depth={depth} candidates={len(root_scores)} "
+                f"best={self._format_action(best_action)} score={best_score:.2f}; "
+                f"top: {details}"
+            )
 
         return best_action, best_score
 
@@ -867,6 +1086,9 @@ class QuoridorAI:
         self.distance_cache_hits = 0
         self.evaluation_cache_hits = 0
 
+        # Keep actual-turn history across calls; clear only per-search caches.
+        self._record_actual_position(state)
+
         self.stats = {
             "children_generated": 0,
             "move_candidates": 0,
@@ -877,6 +1099,21 @@ class QuoridorAI:
 
         # Ensure the AI has a legal action before starting deeper search.
         fallback = self._fallback_action(state)
+
+        if self._debug_enabled():
+            player = state.current_player
+            opponent = 1 - player
+            own_distance = shortest_distance(state, player)
+            opponent_distance = shortest_distance(state, opponent)
+            goal_y = 0 if player == 0 else 8
+            self._debug_log(
+                f"START ply={state.ply} player={player} "
+                f"pawns={state.pawns} goal_y={goal_y} "
+                f"distance={own_distance} opponent_distance={opponent_distance} "
+                f"walls={state.walls_remaining} legal_moves={legal_pawn_moves(state, player)} "
+                f"wall_count={len(state.walls)} "
+                f"repetition_history={len(self.actual_pawn_history)}"
+            )
 
         best_action = fallback
         best_score = self._evaluate(state)
@@ -900,6 +1137,32 @@ class QuoridorAI:
                 break
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
+
+        if self._debug_enabled():
+            player = state.current_player
+            opponent = 1 - player
+            try:
+                if best_action.kind == "move":
+                    next_state = apply_move(state, best_action.destination)
+                else:
+                    next_state = apply_wall(state, best_action.wall)
+                next_own_distance = shortest_distance(next_state, player)
+                next_opponent_distance = shortest_distance(next_state, opponent)
+            except (ValueError, AssertionError):
+                next_own_distance = None
+                next_opponent_distance = None
+
+            self._debug_log(
+                f"CHOSEN ply={state.ply} action={self._format_action(best_action)} "
+                f"score={best_score:.2f} depth={completed_depth}/{self.config.max_depth} "
+                f"elapsed_ms={elapsed_ms:.1f} nodes={self.nodes} timeout={timed_out} "
+                f"distance={shortest_distance(state, player)}->{next_own_distance} "
+                f"opponent_distance={shortest_distance(state, opponent)}->{next_opponent_distance} "
+                f"cache_hits(distance={self.distance_cache_hits},eval={self.evaluation_cache_hits}) "
+                f"tt={len(self.transposition_table)} "
+                f"repetition_history={len(self.actual_pawn_history)} "
+                f"stats={self.stats}"
+            )
 
         return SearchResult(
             action=best_action,
