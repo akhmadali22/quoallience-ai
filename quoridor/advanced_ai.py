@@ -947,8 +947,16 @@ class QuoridorAI:
         best_action = fallback
         best_score = self._evaluate(state)
         completed_depth = 0
+        chosen_depth = 0
+        highest_score_action = fallback
+        highest_score = -INFINITY
+        highest_score_depth = 0
         timed_out = False
 
+        # Experiment A: compare each completed iteration's best root score
+        # and choose the action with the numerically highest score, even when
+        # it came from a shallower depth. This is intentionally experimental:
+        # scores from different search horizons are not guaranteed comparable.
         for depth in range(1, self.config.max_depth + 1):
             try:
                 action, score = self._search_root(
@@ -956,14 +964,29 @@ class QuoridorAI:
                     depth,
                     fallback,
                 )
-
-                best_action = action
-                best_score = score
                 completed_depth = depth
+
+                if score > highest_score:
+                    highest_score = score
+                    highest_score_action = action
+                    highest_score_depth = depth
+
+                self._debug_log(
+                    f"ITERATION depth={depth} action={self._format_action(action)} "
+                    f"score={score:.2f} "
+                    f"global_best={self._format_action(highest_score_action)} "
+                    f"global_best_score={highest_score:.2f} "
+                    f"global_best_depth={highest_score_depth}"
+                )
 
             except SearchTimeout:
                 timed_out = True
                 break
+
+        if highest_score_depth > 0:
+            best_action = highest_score_action
+            best_score = highest_score
+            chosen_depth = highest_score_depth
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
 
@@ -983,7 +1006,8 @@ class QuoridorAI:
 
             self._debug_log(
                 f"CHOSEN ply={state.ply} action={self._format_action(best_action)} "
-                f"score={best_score:.2f} depth={completed_depth}/{self.config.max_depth} "
+                f"score={best_score:.2f} depth={chosen_depth}/{self.config.max_depth} "
+                f"completed_depth={completed_depth} selection=highest_score_across_depths "
                 f"elapsed_ms={elapsed_ms:.1f} nodes={self.nodes} timeout={timed_out} "
                 f"distance={shortest_distance(state, player)}->{next_own_distance} "
                 f"opponent_distance={shortest_distance(state, opponent)}->{next_opponent_distance} "
@@ -994,7 +1018,7 @@ class QuoridorAI:
         return SearchResult(
             action=best_action,
             score=best_score,
-            depth=completed_depth,
+            depth=chosen_depth,
             elapsed_ms=elapsed_ms,
             timed_out=timed_out,
             nodes=self.nodes,
