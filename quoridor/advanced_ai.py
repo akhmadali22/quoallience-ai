@@ -435,13 +435,12 @@ class QuoridorAI:
     ) -> list[Wall]:
         """
         Generate useful walls, including a small set that threatens our
-        alternative routes when the opponent gets its immediate reply.
+        alternative routes on opponent turns within the search.
 
         The opponent normally considers walls intersecting our current
-        shortest path. That is insufficient when we can reroute around one
-        wall but lose if the next wall closes the reroute as well. On the
-        first opponent reply, reserve a few candidates for those alternative
-        paths so minimax can see the route-closing threat.
+        shortest path. That is insufficient when we reroute around one wall
+        but lose if a later wall closes the reroute as well. Reserve a few
+        candidates for alternative paths so minimax can see that sequence.
         """
         player = state.current_player
 
