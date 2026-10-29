@@ -463,17 +463,19 @@ class QuoridorAI:
         own_path_walls = self._wall_candidates_from_path(own_path or [])
         opponent_path_walls = self._wall_candidates_from_path(opponent_path or [])
 
-        # Only spend the extra BFS work on the opponent's immediate reply
-        # to the root action. Deeper nodes retain the cheaper baseline search.
-        is_immediate_opponent_reply = (
+        # At each opponent turn inside the searched line, include walls that
+        # attack our alternative routes. This lets minimax see the sequence
+        # wall -> reroute -> second wall, rather than only the first closure.
+        is_opponent_reply = (
             player != self.root_player
-            and state.ply == self.root_ply + 1
+            and state.ply > self.root_ply
+            and (state.ply - self.root_ply) % 2 == 1
             and self.config.predictive_path_count > 1
             and self.config.predictive_wall_candidates > 0
         )
 
         predicted_path_walls: set[Wall] = set()
-        if is_immediate_opponent_reply:
+        if is_opponent_reply:
             predictive_paths = self._alternative_paths(
                 state,
                 1 - player,
@@ -510,7 +512,7 @@ class QuoridorAI:
         limit = max(0, self.config.max_wall_candidates)
         if len(legal_candidates) <= limit:
             selected = legal_candidates
-        elif is_immediate_opponent_reply:
+        elif is_opponent_reply:
             predictive_legal = [
                 wall for wall in legal_candidates
                 if wall in predicted_path_walls and wall not in opponent_path_walls
@@ -870,6 +872,7 @@ class QuoridorAI:
             "children_generated": 0,
             "move_candidates": 0,
             "wall_candidates": 0,
+            "predictive_wall_candidates": 0,
             "alpha_beta_cutoffs": 0,
         }
 
