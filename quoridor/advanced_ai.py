@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import os
 import time
 
 from dataclasses import dataclass
@@ -766,6 +767,22 @@ class QuoridorAI:
 
         return best_score
 
+    @staticmethod
+    def _format_action(action: Action) -> str:
+        if action.kind == "move":
+            return f"move->{action.destination}"
+        wall = action.wall
+        return f"wall-{wall.orientation}@({wall.x},{wall.y})"
+
+    def _debug_enabled(self) -> bool:
+        return os.getenv("QUORIDOR_AI_DEBUG", "").strip().lower() in {
+            "1", "true", "yes", "on"
+        }
+
+    def _debug_log(self, message: str) -> None:
+        if self._debug_enabled():
+            print(f"[AI-DEBUG] {message}", flush=True)
+
     def _search_root(
         self,
         state: GameState,
@@ -788,6 +805,7 @@ class QuoridorAI:
         best_score = -INFINITY
         alpha = -INFINITY
         beta = INFINITY
+        root_scores: list[tuple[Action, float]] = []
 
         for action, child_state in children:
             self._check_deadline()
@@ -798,12 +816,25 @@ class QuoridorAI:
                 alpha,
                 beta,
             )
+            root_scores.append((action, score))
 
             if score > best_score:
                 best_score = score
                 best_action = action
 
             alpha = max(alpha, best_score)
+
+        if self._debug_enabled():
+            ranked = sorted(root_scores, key=lambda item: item[1], reverse=True)
+            details = " | ".join(
+                f"{self._format_action(action)}={score:.2f}"
+                for action, score in ranked[:8]
+            )
+            self._debug_log(
+                f"ROOT depth={depth} candidates={len(root_scores)} "
+                f"best={self._format_action(best_action)} score={best_score:.2f}; "
+                f"top: {details}"
+            )
 
         return best_action, best_score
 
@@ -878,6 +909,20 @@ class QuoridorAI:
         # Ensure the AI has a legal action before starting deeper search.
         fallback = self._fallback_action(state)
 
+        if self._debug_enabled():
+            player = state.current_player
+            opponent = 1 - player
+            own_distance = shortest_distance(state, player)
+            opponent_distance = shortest_distance(state, opponent)
+            goal_y = 0 if player == 0 else 8
+            self._debug_log(
+                f"START ply={state.ply} player={player} "
+                f"pawns={state.pawns} goal_y={goal_y} "
+                f"distance={own_distance} opponent_distance={opponent_distance} "
+                f"walls={state.walls_remaining} legal_moves={legal_pawn_moves(state, player)} "
+                f"wall_count={len(state.walls)}"
+            )
+
         best_action = fallback
         best_score = self._evaluate(state)
         completed_depth = 0
@@ -900,6 +945,30 @@ class QuoridorAI:
                 break
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
+
+        if self._debug_enabled():
+            player = state.current_player
+            opponent = 1 - player
+            try:
+                if best_action.kind == "move":
+                    next_state = apply_move(state, best_action.destination)
+                else:
+                    next_state = apply_wall(state, best_action.wall)
+                next_own_distance = shortest_distance(next_state, player)
+                next_opponent_distance = shortest_distance(next_state, opponent)
+            except (ValueError, AssertionError):
+                next_own_distance = None
+                next_opponent_distance = None
+
+            self._debug_log(
+                f"CHOSEN ply={state.ply} action={self._format_action(best_action)} "
+                f"score={best_score:.2f} depth={completed_depth}/{self.config.max_depth} "
+                f"elapsed_ms={elapsed_ms:.1f} nodes={self.nodes} timeout={timed_out} "
+                f"distance={shortest_distance(state, player)}->{next_own_distance} "
+                f"opponent_distance={shortest_distance(state, opponent)}->{next_opponent_distance} "
+                f"cache_hits(distance={self.distance_cache_hits},eval={self.evaluation_cache_hits}) "
+                f"tt={len(self.transposition_table)} stats={self.stats}"
+            )
 
         return SearchResult(
             action=best_action,
