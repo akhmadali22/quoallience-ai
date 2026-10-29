@@ -791,7 +791,7 @@ class QuoridorAI:
             os.getenv("QUORIDOR_AI_DEBUG_FILE", "quoridor_ai_debug.txt")
         ).expanduser()
         timestamp = datetime.now().astimezone().isoformat(timespec="milliseconds")
-        line = f"{timestamp} [AI-DEBUG] {message}\\n"
+        line = f"{timestamp} [AI-DEBUG] {message}\n"
 
         try:
             log_path.parent.mkdir(parents=True, exist_ok=True)
