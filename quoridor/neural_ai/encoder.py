@@ -38,7 +38,7 @@ def encode_state(state: GameState) -> list[list[list[float]]]:
 
     planes[6] = [[state.walls_remaining[player] / 10.0] * 9 for _ in range(9)]
     planes[7] = [[state.walls_remaining[opponent] / 10.0] * 9 for _ in range(9)]
-    planes[8] = [[1.0 if state.current_player == 0 else 0.0] * 9 for _ in range(9)]
+    planes[8] = [[1.0] * 9 for _ in range(9)]
     planes[9] = [[min(state.ply, 200) / 200.0] * 9 for _ in range(9)]
     return planes
 
