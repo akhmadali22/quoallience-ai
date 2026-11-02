@@ -1,4 +1,4 @@
-"""PUCT Monte Carlo Tree Search guided by a policy/value network."""
+"""PUCT Monte Carlo Tree Search with optional progressive widening."""
 from __future__ import annotations
 
 import math
@@ -7,6 +7,9 @@ from typing import Any
 
 from quoridor.engine import GameState
 from .encoder import ACTION_SIZE, apply_action_index, encode_state, legal_action_indices
+
+
+MOVE_ACTIONS = 9 * 9
 
 
 @dataclass
@@ -26,6 +29,8 @@ class Node:
     state: GameState
     visits: int = 0
     edges: dict[int, Edge] = field(default_factory=dict)
+    # Wall actions not yet admitted by progressive widening.
+    pending_walls: list[tuple[int, Edge]] = field(default_factory=list)
     expanded: bool = False
 
 
@@ -39,15 +44,29 @@ class MCTS:
         dirichlet_alpha: float = 0.3,
         dirichlet_fraction: float = 0.25,
         device: str = "cpu",
+        progressive_widening: bool = True,
+        initial_wall_candidates: int = 8,
+        widening_coefficient: float = 2.0,
+        widening_exponent: float = 0.5,
     ):
         if simulations < 1:
             raise ValueError("simulations must be positive")
+        if initial_wall_candidates < 0:
+            raise ValueError("initial_wall_candidates cannot be negative")
+        if widening_coefficient <= 0:
+            raise ValueError("widening_coefficient must be positive")
+        if not 0 < widening_exponent <= 1:
+            raise ValueError("widening_exponent must be in (0, 1]")
         self.model = model
         self.simulations = simulations
         self.c_puct = c_puct
         self.dirichlet_alpha = dirichlet_alpha
         self.dirichlet_fraction = dirichlet_fraction
         self.device = device
+        self.progressive_widening = progressive_widening
+        self.initial_wall_candidates = initial_wall_candidates
+        self.widening_coefficient = widening_coefficient
+        self.widening_exponent = widening_exponent
 
     def _evaluate(self, state: GameState) -> tuple[dict[int, float], float]:
         import torch
@@ -58,7 +77,9 @@ class MCTS:
                 return {}, (1.0 if state.winner == state.current_player else -1.0)
             raise RuntimeError("Non-terminal Quoridor state has no legal actions")
 
-        tensor = torch.tensor(encode_state(state), dtype=torch.float32, device=self.device).unsqueeze(0)
+        tensor = torch.tensor(
+            encode_state(state), dtype=torch.float32, device=self.device
+        ).unsqueeze(0)
         with torch.inference_mode():
             logits, value = self.model(tensor)
             logits = logits[0]
@@ -72,44 +93,122 @@ class MCTS:
         if node.state.winner is not None:
             node.expanded = True
             return 1.0 if node.state.winner == node.state.current_player else -1.0
+
         priors, value = self._evaluate(node.state)
-        node.edges = {action: Edge(prior=prior) for action, prior in priors.items()}
+        pawn_actions = {
+            action: Edge(prior=prior)
+            for action, prior in priors.items()
+            if action < MOVE_ACTIONS
+        }
+        wall_actions = [
+            (action, Edge(prior=prior))
+            for action, prior in priors.items()
+            if action >= MOVE_ACTIONS
+        ]
+
+        node.edges = pawn_actions
+        node.pending_walls = sorted(
+            wall_actions, key=lambda item: item[1].prior, reverse=True
+        )
         node.expanded = True
+
+        if not self.progressive_widening:
+            node.edges.update(node.pending_walls)
+            node.pending_walls.clear()
+        else:
+            self._widen(node)
         return value
+
+    def _widen(self, node: Node) -> None:
+        """Admit more wall actions as this node receives more visits.
+
+        Every legal pawn action is active immediately. Wall candidates are
+        admitted in descending policy-prior order.
+        """
+        if not self.progressive_widening or not node.pending_walls:
+            return
+
+        active_wall_count = sum(
+            action >= MOVE_ACTIONS for action in node.edges
+        )
+        target_wall_count = max(
+            self.initial_wall_candidates,
+            math.ceil(
+                self.widening_coefficient
+                * max(1, node.visits) ** self.widening_exponent
+            ),
+        )
+        target_wall_count = min(target_wall_count, active_wall_count + len(node.pending_walls))
+
+        while active_wall_count < target_wall_count and node.pending_walls:
+            action, edge = node.pending_walls.pop(0)
+            node.edges[action] = edge
+            active_wall_count += 1
 
     def _select(self, node: Node) -> tuple[int, Edge]:
         scale = math.sqrt(max(1, node.visits))
+        prior_total = sum(edge.prior for edge in node.edges.values())
+        if prior_total <= 0:
+            prior_total = 1.0
+
         best_action = -1
         best_edge = None
         best_score = -float("inf")
         for action, edge in node.edges.items():
-            u = self.c_puct * edge.prior * scale / (1 + edge.visits)
+            normalized_prior = edge.prior / prior_total
+            u = (
+                self.c_puct
+                * normalized_prior
+                * scale
+                / (1 + edge.visits)
+            )
             score = edge.q + u
             if score > best_score:
                 best_action, best_edge, best_score = action, edge, score
         assert best_edge is not None
         return best_action, best_edge
 
-    def search(self, state: GameState, *, add_root_noise: bool = False) -> dict[int, float]:
+    def _all_root_edges(self, root: Node) -> dict[int, Edge]:
+        result = dict(root.edges)
+        result.update(root.pending_walls)
+        return result
+
+    def search(
+        self,
+        state: GameState,
+        *,
+        add_root_noise: bool = False,
+    ) -> dict[int, float]:
         if state.winner is not None:
             return {}
+
         root = Node(state)
         self._expand(root)
 
         if add_root_noise and root.edges:
             import torch
-            actions = list(root.edges)
+
+            all_edges = self._all_root_edges(root)
+            actions = list(all_edges)
             noise = torch.distributions.Dirichlet(
                 torch.full((len(actions),), self.dirichlet_alpha, device="cpu")
             ).sample().tolist()
             for action, sample in zip(actions, noise):
-                edge = root.edges[action]
-                edge.prior = (1 - self.dirichlet_fraction) * edge.prior + self.dirichlet_fraction * sample
+                edge = all_edges[action]
+                edge.prior = (
+                    (1 - self.dirichlet_fraction) * edge.prior
+                    + self.dirichlet_fraction * sample
+                )
+            root.pending_walls.sort(
+                key=lambda item: item[1].prior, reverse=True
+            )
 
         for _ in range(self.simulations):
             node = root
             path: list[tuple[Node, Edge]] = []
+
             while node.expanded and node.edges:
+                self._widen(node)
                 action, edge = self._select(node)
                 if edge.child is None:
                     edge.child = Node(apply_action_index(node.state, action))
@@ -125,21 +224,45 @@ class MCTS:
                 edge.value_sum += value
                 parent.visits += 1
 
-        total = sum(edge.visits for edge in root.edges.values())
+        all_root_edges = self._all_root_edges(root)
+        total = sum(edge.visits for edge in all_root_edges.values())
         if total == 0:
-            return {action: edge.prior for action, edge in root.edges.items()}
-        return {action: edge.visits / total for action, edge in root.edges.items()}
+            prior_total = sum(edge.prior for edge in all_root_edges.values())
+            if prior_total <= 0:
+                return {action: 0.0 for action in all_root_edges}
+            return {
+                action: edge.prior / prior_total
+                for action, edge in all_root_edges.items()
+            }
+        return {
+            action: edge.visits / total
+            for action, edge in all_root_edges.items()
+        }
 
-    def choose_action(self, state: GameState, *, temperature: float = 0.0, add_root_noise: bool = False) -> tuple[int, dict[int, float]]:
+    def choose_action(
+        self,
+        state: GameState,
+        *,
+        temperature: float = 0.0,
+        add_root_noise: bool = False,
+    ) -> tuple[int, dict[int, float]]:
         import random
+
         visits = self.search(state, add_root_noise=add_root_noise)
         if not visits:
             raise ValueError("Cannot choose an action from a terminal state")
         if temperature <= 1e-8:
             action = max(visits, key=visits.get)
         else:
-            weights = {a: max(v, 1e-12) ** (1.0 / temperature) for a, v in visits.items()}
+            weights = {
+                action: max(probability, 1e-12) ** (1.0 / temperature)
+                for action, probability in visits.items()
+            }
             total = sum(weights.values())
             threshold = random.random() * total
-            action = next(a for a, w in weights.items() if (threshold := threshold - w) <= 0)
+            action = next(
+                action
+                for action, weight in weights.items()
+                if (threshold := threshold - weight) <= 0
+            )
         return action, visits
