@@ -22,10 +22,13 @@ def main() -> int:
     parser.add_argument("--heuristic-depth", type=int, default=3)
     parser.add_argument("--max-plies", type=int, default=200)
     parser.add_argument("--device", default="cpu")
+    parser.add_argument("--pawn-prior-fraction", type=float, default=None, help="Total prior mass for pawn actions; e.g. 0.5 or 0.7. Default keeps raw network priors.")
     parser.add_argument("--output", type=Path, default=Path("data/neural_evaluation.json"))
     args = parser.parse_args()
     if args.games < 2 or args.simulations < 1 or args.max_plies < 1:
         parser.error("--games must be >= 2; simulations and max-plies must be positive")
+    if args.pawn_prior_fraction is not None and not 0.0 < args.pawn_prior_fraction < 1.0:
+        parser.error("--pawn-prior-fraction must be between 0 and 1")
 
     model = load_model(args.checkpoint, device=args.device)
     model.eval()
@@ -35,7 +38,7 @@ def main() -> int:
     for game in range(args.games):
         neural_player = game % 2
         state = GameState.initial()
-        search = MCTS(model, simulations=args.simulations, device=args.device)
+        search = MCTS(model, simulations=args.simulations, device=args.device, pawn_prior_fraction=args.pawn_prior_fraction)
         heuristic = QuoridorAI(heuristic_config)
         while state.winner is None and state.ply < args.max_plies:
             if state.current_player == neural_player:
