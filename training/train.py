@@ -7,9 +7,9 @@ import json
 import random
 from pathlib import Path
 
-from quoridor.neural_ai.encoder import INPUT_CHANNELS, ACTION_SIZE
+from quoridor.neural_ai.encoder import ACTION_SIZE
 from quoridor.neural_ai.network import QuoridorNet
-from quoridor.neural_ai.policy import save_checkpoint
+from quoridor.neural_ai.policy import load_model, save_checkpoint
 from training.config import TrainConfig
 
 
@@ -35,6 +35,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("replay", type=Path, help="Path to replay.jsonl")
     parser.add_argument("--output", default="models/checkpoints/neural_latest.pt")
+    parser.add_argument("--checkpoint", help="Resume from an existing checkpoint.")
     parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=1e-3)
@@ -55,8 +56,12 @@ def main() -> int:
     if device.startswith("cuda") and not torch.cuda.is_available():
         parser.error("CUDA requested but unavailable")
 
-    model = QuoridorNet(args.channels, args.residual_blocks).to(device)
+    model = load_model(args.checkpoint, device=device) if args.checkpoint else QuoridorNet(args.channels, args.residual_blocks).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=1e-4)
+    if args.checkpoint:
+        payload = torch.load(args.checkpoint, map_location=device, weights_only=False)
+        if "optimizer_state_dict" in payload:
+            optimizer.load_state_dict(payload["optimizer_state_dict"])
     model.train()
 
     states = torch.tensor([s["state"] for s in samples], dtype=torch.float32)
