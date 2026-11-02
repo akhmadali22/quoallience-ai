@@ -16,7 +16,7 @@ from training.config import SelfPlayConfig
 
 
 def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device: str) -> tuple[list[dict], dict]:
-    rng = random.Random(seed)
+    random.seed(seed)
     state = GameState.initial()
     search = MCTS(model, simulations=config.simulations, device=device)
     samples: list[dict] = []
@@ -94,9 +94,11 @@ def main() -> int:
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=True)
     snapshot_path = output / "selfplay_model_snapshot.pt"
-    save_checkpoint(model, snapshot_path, extra={"source_checkpoint": args.checkpoint, "seed": args.seed})
     samples_path = output / "replay.jsonl"
     games_path = output / "games.jsonl"
+    if samples_path.exists() or games_path.exists():
+        parser.error(f"Output already contains replay data: {output}. Use a new --output-dir.")
+    save_checkpoint(model, snapshot_path, extra={"source_checkpoint": args.checkpoint, "seed": args.seed})
     config = SelfPlayConfig(simulations=args.simulations, max_plies=args.max_plies)
 
     with samples_path.open("a", encoding="utf-8") as samples_file, games_path.open("a", encoding="utf-8") as games_file:
