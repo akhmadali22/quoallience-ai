@@ -11,7 +11,7 @@ from quoridor.engine import GameState
 from quoridor.neural_ai.encoder import apply_action_index, encode_state
 from quoridor.neural_ai.mcts import MCTS
 from quoridor.neural_ai.network import QuoridorNet
-from quoridor.neural_ai.policy import load_model
+from quoridor.neural_ai.policy import load_model, save_checkpoint
 from training.config import SelfPlayConfig
 
 
@@ -39,6 +39,8 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
         next_state = apply_action_index(state, action)
         action_log.append({"ply": state.ply, "player": player, "action": action})
         state = next_state
+        if state.ply % 10 == 0:
+            print(f"  game={game_id} ply={state.ply} winner={state.winner}", flush=True)
 
     winner = state.winner
     result = "win" if winner is not None else "draw_max_plies"
@@ -91,6 +93,8 @@ def main() -> int:
 
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=True)
+    snapshot_path = output / "selfplay_model_snapshot.pt"
+    save_checkpoint(model, snapshot_path, extra={"source_checkpoint": args.checkpoint, "seed": args.seed})
     samples_path = output / "replay.jsonl"
     games_path = output / "games.jsonl"
     config = SelfPlayConfig(simulations=args.simulations, max_plies=args.max_plies)
@@ -111,6 +115,7 @@ def main() -> int:
                 f"plies={summary['plies']} samples={summary['samples']}",
                 flush=True,
             )
+    print(f"Model snapshot: {snapshot_path}")
     print(f"Replay data: {samples_path}")
     print(f"Game summaries: {games_path}")
     return 0
