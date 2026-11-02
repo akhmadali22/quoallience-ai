@@ -10,7 +10,10 @@ dependency:
 
 ```bash
 source .venv/bin/activate
-python -m pip install -r requirements-nn.txt
+# Intel CPU / no CUDA:
+python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+# Or, on another supported platform, use the optional dependency file:
+# python -m pip install -r requirements-nn.txt
 ```
 
 Use a PyTorch wheel appropriate for the machine. CPU is the supported baseline;
