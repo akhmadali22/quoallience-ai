@@ -13,6 +13,24 @@ from .encoder import ACTION_SIZE, apply_action_index, encode_state, legal_action
 MOVE_ACTIONS = 9 * 9
 
 
+def balance_category_priors(priors: dict[int, float], pawn_fraction: float) -> dict[int, float]:
+    """Set total prior mass per action category, preserving within-category ratios."""
+    if not 0.0 < pawn_fraction < 1.0:
+        raise ValueError("pawn_fraction must be in (0, 1)")
+    pawn = {a: p for a, p in priors.items() if a < MOVE_ACTIONS}
+    walls = {a: p for a, p in priors.items() if a >= MOVE_ACTIONS}
+    pawn_total, wall_total = sum(pawn.values()), sum(walls.values())
+    result: dict[int, float] = {}
+    if pawn and walls and pawn_total > 0 and wall_total > 0:
+        result.update({a: pawn_fraction * p / pawn_total for a, p in pawn.items()})
+        result.update({a: (1.0 - pawn_fraction) * p / wall_total for a, p in walls.items()})
+    elif pawn and pawn_total > 0:
+        result.update({a: p / pawn_total for a, p in pawn.items()})
+    elif walls and wall_total > 0:
+        result.update({a: p / wall_total for a, p in walls.items()})
+    return result
+
+
 @dataclass
 class Edge:
     prior: float
@@ -49,6 +67,7 @@ class MCTS:
         initial_wall_candidates: int = 8,
         widening_coefficient: float = 2.0,
         widening_exponent: float = 0.5,
+        pawn_prior_fraction: float | None = None,
     ):
         if simulations < 1:
             raise ValueError("simulations must be positive")
@@ -67,6 +86,9 @@ class MCTS:
         self.progressive_widening = progressive_widening
         self.initial_wall_candidates = initial_wall_candidates
         self.widening_coefficient = widening_coefficient
+        if pawn_prior_fraction is not None and not 0.0 < pawn_prior_fraction < 1.0:
+            raise ValueError("pawn_prior_fraction must be in (0, 1) or None")
+        self.pawn_prior_fraction = pawn_prior_fraction
         self.widening_exponent = widening_exponent
         self.last_search_stats: dict[str, Any] = {}
 
@@ -89,6 +111,8 @@ class MCTS:
             mask[legal] = logits[legal]
             probs = torch.softmax(mask, dim=0)
             priors = {action: float(probs[action].item()) for action in legal}
+            if self.pawn_prior_fraction is not None:
+                priors = balance_category_priors(priors, self.pawn_prior_fraction)
             return priors, float(value[0].item())
 
     def _expand(self, node: Node) -> float:
