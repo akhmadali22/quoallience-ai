@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -67,6 +68,7 @@ class MCTS:
         self.initial_wall_candidates = initial_wall_candidates
         self.widening_coefficient = widening_coefficient
         self.widening_exponent = widening_exponent
+        self.last_search_stats: dict[str, Any] = {}
 
     def _evaluate(self, state: GameState) -> tuple[dict[int, float], float]:
         import torch
@@ -95,20 +97,19 @@ class MCTS:
             return 1.0 if node.state.winner == node.state.current_player else -1.0
 
         priors, value = self._evaluate(node.state)
-        pawn_actions = {
+        node.edges = {
             action: Edge(prior=prior)
             for action, prior in priors.items()
             if action < MOVE_ACTIONS
         }
-        wall_actions = [
-            (action, Edge(prior=prior))
-            for action, prior in priors.items()
-            if action >= MOVE_ACTIONS
-        ]
-
-        node.edges = pawn_actions
         node.pending_walls = sorted(
-            wall_actions, key=lambda item: item[1].prior, reverse=True
+            [
+                (action, Edge(prior=prior))
+                for action, prior in priors.items()
+                if action >= MOVE_ACTIONS
+            ],
+            key=lambda item: item[1].prior,
+            reverse=True,
         )
         node.expanded = True
 
@@ -138,7 +139,10 @@ class MCTS:
                 * max(1, node.visits) ** self.widening_exponent
             ),
         )
-        target_wall_count = min(target_wall_count, active_wall_count + len(node.pending_walls))
+        target_wall_count = min(
+            target_wall_count,
+            active_wall_count + len(node.pending_walls),
+        )
 
         while active_wall_count < target_wall_count and node.pending_walls:
             action, edge = node.pending_walls.pop(0)
@@ -180,10 +184,33 @@ class MCTS:
         add_root_noise: bool = False,
     ) -> dict[int, float]:
         if state.winner is not None:
+            self.last_search_stats = {}
             return {}
 
+        stats: dict[str, Any] = {
+            "simulations": self.simulations,
+            "expanded_nodes": 0,
+            "nn_evaluations": 0,
+            "terminal_nodes": 0,
+        }
+        expanded_depths: Counter[int] = Counter()
+        evaluated_depths: Counter[int] = Counter()
+        selection_depths: Counter[int] = Counter()
+        leaf_depths: list[int] = []
+
+        def expand_tracked(node: Node) -> float:
+            depth = node.state.ply - state.ply
+            stats["expanded_nodes"] += 1
+            expanded_depths[depth] += 1
+            if node.state.winner is not None:
+                stats["terminal_nodes"] += 1
+            else:
+                stats["nn_evaluations"] += 1
+                evaluated_depths[depth] += 1
+            return self._expand(node)
+
         root = Node(state)
-        self._expand(root)
+        expand_tracked(root)
 
         if add_root_noise and root.edges:
             import torch
@@ -209,13 +236,16 @@ class MCTS:
 
             while node.expanded and node.edges:
                 self._widen(node)
+                depth = node.state.ply - state.ply
+                selection_depths[depth] += 1
                 action, edge = self._select(node)
                 if edge.child is None:
                     edge.child = Node(apply_action_index(node.state, action))
                 path.append((node, edge))
                 node = edge.child
 
-            value = self._expand(node) if not node.expanded else (
+            leaf_depths.append(node.state.ply - state.ply)
+            value = expand_tracked(node) if not node.expanded else (
                 1.0 if node.state.winner == node.state.current_player else -1.0
             )
             for parent, edge in reversed(path):
@@ -228,16 +258,47 @@ class MCTS:
         total = sum(edge.visits for edge in all_root_edges.values())
         if total == 0:
             prior_total = sum(edge.prior for edge in all_root_edges.values())
-            if prior_total <= 0:
-                return {action: 0.0 for action in all_root_edges}
-            return {
-                action: edge.prior / prior_total
+            probabilities = (
+                {action: 0.0 for action in all_root_edges}
+                if prior_total <= 0
+                else {
+                    action: edge.prior / prior_total
+                    for action, edge in all_root_edges.items()
+                }
+            )
+        else:
+            probabilities = {
+                action: edge.visits / total
                 for action, edge in all_root_edges.items()
             }
-        return {
-            action: edge.visits / total
+
+        pawn_visits = sum(
+            edge.visits
             for action, edge in all_root_edges.items()
-        }
+            if action < MOVE_ACTIONS
+        )
+        wall_visits = total - pawn_visits
+        stats.update({
+            "max_leaf_depth": max(leaf_depths, default=0),
+            "average_leaf_depth": (
+                sum(leaf_depths) / len(leaf_depths) if leaf_depths else 0.0
+            ),
+            "expanded_nodes_by_depth": dict(sorted(expanded_depths.items())),
+            "nn_evaluations_by_depth": dict(sorted(evaluated_depths.items())),
+            "selection_calls_by_depth": dict(sorted(selection_depths.items())),
+            "root_legal_actions": len(all_root_edges),
+            "root_active_actions": len(root.edges),
+            "root_active_wall_actions": sum(
+                action >= MOVE_ACTIONS for action in root.edges
+            ),
+            "root_pending_wall_actions": len(root.pending_walls),
+            "pawn_visits": pawn_visits,
+            "wall_visits": wall_visits,
+            "pawn_visit_ratio": pawn_visits / total if total else 0.0,
+            "wall_visit_ratio": wall_visits / total if total else 0.0,
+        })
+        self.last_search_stats = stats
+        return probabilities
 
     def choose_action(
         self,
@@ -255,8 +316,9 @@ class MCTS:
             action = max(visits, key=visits.get)
         else:
             weights = {
-                action: max(probability, 1e-12) ** (1.0 / temperature)
+                action: probability ** (1.0 / temperature)
                 for action, probability in visits.items()
+                if probability > 0
             }
             total = sum(weights.values())
             threshold = random.random() * total
