@@ -93,3 +93,24 @@ model-vs-model promotion gates, or crash-resumable partial-game trajectories.
 Random-network self-play is only a bootstrap smoke test; meaningful strength
 requires many iterations and evaluation against fixed opponents. The existing
 heuristic is retained for that purpose.
+
+
+## Action-category prior experiment
+
+The optional `--pawn-prior-fraction` changes the total policy prior mass assigned
+to pawn actions while preserving relative network preferences within pawn and wall
+categories. The default `None` keeps the raw network policy.
+
+```bash
+# Baseline: raw policy
+python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 256 --output data/eval_raw.json
+# Balanced: 50% pawn / 50% wall prior mass
+python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 256 --pawn-prior-fraction 0.5 --output data/eval_balanced.json
+# Pawn-biased: 70% pawn / 30% wall prior mass
+python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 256 --pawn-prior-fraction 0.7 --output data/eval_pawn70.json
+```
+
+The same option is available in `training.self_play`. This changes the search
+prior only, not network weights or training targets. Compare visit ratios,
+search depth, and paired-seat win rates; a higher pawn visit ratio alone is
+not evidence of stronger play.
