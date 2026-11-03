@@ -1,6 +1,6 @@
 from quoridor.engine import GameState
 from quoridor.neural_ai.encoder import legal_action_indices
-from quoridor.neural_ai.mcts import MOVE_ACTIONS, MCTS, Node
+from quoridor.neural_ai.mcts import MOVE_ACTIONS, Edge, MCTS, Node
 
 
 class UniformPolicy:
@@ -102,29 +102,28 @@ def test_disabling_progressive_widening_keeps_all_actions_active():
     assert node.pending_walls == []
 
 
-def test_category_balancing_sets_requested_mass_and_preserves_relative_preferences():
-    from quoridor.neural_ai.mcts import balance_category_priors
-    priors = {0: 0.1, 1: 0.3, 81: 0.2, 82: 0.4}
-    balanced = balance_category_priors(priors, pawn_fraction=0.5)
-    assert abs(sum(balanced.values()) - 1.0) < 1e-9
-    assert abs(balanced[0] + balanced[1] - 0.5) < 1e-9
-    assert abs(balanced[81] + balanced[82] - 0.5) < 1e-9
-    assert balanced[1] > balanced[0] and balanced[82] > balanced[81]
+def test_category_exploration_bonus_favors_less_visited_category():
+    state = GameState.initial()
+    mcts = make_mcts(category_exploration=0.5)
+    node = Node(state, visits=20)
+    node.edges = {0: Edge(prior=0.5), 81: Edge(prior=0.5, visits=20)}
+    action, _ = mcts._select(node)
+    assert action == 0
 
 
-def test_category_balancing_supports_pawn_biased_fraction():
-    from quoridor.neural_ai.mcts import balance_category_priors
-    balanced = balance_category_priors({0: 0.1, 1: 0.3, 81: 0.2, 82: 0.4}, 0.7)
-    assert abs(balanced[0] + balanced[1] - 0.7) < 1e-9
-    assert abs(balanced[81] + balanced[82] - 0.3) < 1e-9
+def test_zero_category_exploration_disables_category_bonus():
+    state = GameState.initial()
+    mcts = make_mcts(category_exploration=0.0)
+    node = Node(state, visits=20)
+    node.edges = {0: Edge(prior=0.5), 81: Edge(prior=0.5, visits=20)}
+    action, _ = mcts._select(node)
+    assert action == 0
 
 
-def test_category_balancing_normalizes_when_only_one_category_exists():
-    from quoridor.neural_ai.mcts import balance_category_priors
-    balanced = balance_category_priors({81: 0.2, 82: 0.8}, 0.5)
-    assert abs(sum(balanced.values()) - 1.0) < 1e-9
-    assert balanced == {81: 0.2, 82: 0.8}
-
+def test_category_exploration_rejects_negative_value():
+    import pytest
+    with pytest.raises(ValueError, match='category_exploration'):
+        make_mcts(category_exploration=-0.1)
 
 def test_choose_action_uses_seeded_rng_for_equal_visit_ties():
     import random
