@@ -14,7 +14,11 @@ MOVE_ACTIONS = 9 * 9
 
 
 def balance_category_priors(priors: dict[int, float], pawn_fraction: float) -> dict[int, float]:
-    """Set total prior mass per action category, preserving within-category ratios."""
+    """Balance category mass across the supplied active actions.
+
+    Call this with the current node's active edges, not every legal action.
+    Relative network preferences are preserved within each active category.
+    """
     if not 0.0 < pawn_fraction < 1.0:
         raise ValueError("pawn_fraction must be in (0, 1)")
     pawn = {a: p for a, p in priors.items() if a < MOVE_ACTIONS}
@@ -111,8 +115,9 @@ class MCTS:
             mask[legal] = logits[legal]
             probs = torch.softmax(mask, dim=0)
             priors = {action: float(probs[action].item()) for action in legal}
-            if self.pawn_prior_fraction is not None:
-                priors = balance_category_priors(priors, self.pawn_prior_fraction)
+            # Keep raw network priors here. Category balancing belongs in
+            # _select(), where it can see the actions currently admitted by
+            # progressive widening at this particular node.
             return priors, float(value[0].item())
 
     def _expand(self, node: Node) -> float:
@@ -175,15 +180,31 @@ class MCTS:
 
     def _select(self, node: Node) -> tuple[int, Edge]:
         scale = math.sqrt(max(1, node.visits))
-        prior_total = sum(edge.prior for edge in node.edges.values())
-        if prior_total <= 0:
-            prior_total = 1.0
+        active_priors = {action: edge.prior for action, edge in node.edges.items()}
+        if self.pawn_prior_fraction is not None:
+            # Balance only the active set. Pending walls must not dilute the
+            # wall category's mass before progressive widening admits them.
+            normalized_priors = balance_category_priors(
+                active_priors, self.pawn_prior_fraction
+            )
+        else:
+            prior_total = sum(active_priors.values())
+            if prior_total > 0:
+                normalized_priors = {
+                    action: prior / prior_total
+                    for action, prior in active_priors.items()
+                }
+            else:
+                uniform = 1.0 / len(active_priors) if active_priors else 0.0
+                normalized_priors = {
+                    action: uniform for action in active_priors
+                }
 
         best_action = -1
         best_edge = None
         best_score = -float("inf")
         for action, edge in node.edges.items():
-            normalized_prior = edge.prior / prior_total
+            normalized_prior = normalized_priors[action]
             u = (
                 self.c_puct
                 * normalized_prior
@@ -312,10 +333,35 @@ class MCTS:
             "selection_calls_by_depth": dict(sorted(selection_depths.items())),
             "root_legal_actions": len(all_root_edges),
             "root_active_actions": len(root.edges),
+            "root_active_pawn_actions": sum(
+                action < MOVE_ACTIONS for action in root.edges
+            ),
             "root_active_wall_actions": sum(
                 action >= MOVE_ACTIONS for action in root.edges
             ),
             "root_pending_wall_actions": len(root.pending_walls),
+            "root_active_pawn_prior_mass": sum(
+                balance_category_priors(
+                    {action: edge.prior for action, edge in root.edges.items()},
+                    self.pawn_prior_fraction,
+                ).get(action, 0.0)
+                for action in root.edges if action < MOVE_ACTIONS
+            ) if self.pawn_prior_fraction is not None else (
+                sum(edge.prior for action, edge in root.edges.items() if action < MOVE_ACTIONS)
+                / sum(edge.prior for edge in root.edges.values())
+                if sum(edge.prior for edge in root.edges.values()) > 0 else 0.0
+            ),
+            "root_active_wall_prior_mass": sum(
+                balance_category_priors(
+                    {action: edge.prior for action, edge in root.edges.items()},
+                    self.pawn_prior_fraction,
+                ).get(action, 0.0)
+                for action in root.edges if action >= MOVE_ACTIONS
+            ) if self.pawn_prior_fraction is not None else (
+                sum(edge.prior for action, edge in root.edges.items() if action >= MOVE_ACTIONS)
+                / sum(edge.prior for edge in root.edges.values())
+                if sum(edge.prior for edge in root.edges.values()) > 0 else 0.0
+            ),
             "pawn_visits": pawn_visits,
             "wall_visits": wall_visits,
             "pawn_visit_ratio": pawn_visits / total if total else 0.0,
