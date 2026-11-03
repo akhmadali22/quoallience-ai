@@ -50,6 +50,7 @@ class MCTS:
         widening_coefficient: float = 2.0,
         widening_exponent: float = 0.5,
         category_exploration: float = 0.35,
+        pawn_prior_fraction: float | None = None,
     ):
         if simulations < 1:
             raise ValueError("simulations must be positive")
