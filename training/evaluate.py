@@ -9,8 +9,8 @@ from pathlib import Path
 
 from quoridor.advanced_ai import AIConfig, QuoridorAI
 from quoridor.engine import GameState
-from quoridor.neural_ai.encoder import MOVE_ACTIONS, apply_action_index, encode_action
-from quoridor.neural_ai.mcts import MCTS
+from quoridor.neural_ai.encoder import apply_action_index, encode_action
+from quoridor.neural_ai.mcts import MOVE_ACTIONS, MCTS
 from quoridor.neural_ai.policy import load_model
 
 
