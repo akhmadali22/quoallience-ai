@@ -102,22 +102,29 @@ def test_disabling_progressive_widening_keeps_all_actions_active():
     assert node.pending_walls == []
 
 
-def test_category_exploration_bonus_favors_less_visited_category():
-    state = GameState.initial()
-    mcts = make_mcts(category_exploration=0.5)
-    node = Node(state, visits=20)
-    node.edges = {0: Edge(prior=0.5), 81: Edge(prior=0.5, visits=20)}
-    action, _ = mcts._select(node)
+def _category_selection_node():
+    node = Node(GameState.initial(), visits=100)
+    # Raw PUCT prefers wall action 81 due to its higher prior. A second
+    # wall edge has 100 visits, so the aggregate wall category is visited
+    # heavily while the pawn category remains unexplored.
+    node.edges = {
+        0: Edge(prior=0.2),
+        81: Edge(prior=0.8),
+        82: Edge(prior=0.0, visits=100),
+    }
+    return node
+
+
+def test_category_exploration_bonus_can_override_raw_puct_preference():
+    mcts = make_mcts(category_exploration=0.5, c_puct=0.1)
+    action, _ = mcts._select(_category_selection_node())
     assert action == 0
 
 
-def test_zero_category_exploration_disables_category_bonus():
-    state = GameState.initial()
-    mcts = make_mcts(category_exploration=0.0)
-    node = Node(state, visits=20)
-    node.edges = {0: Edge(prior=0.5), 81: Edge(prior=0.5, visits=20)}
-    action, _ = mcts._select(node)
-    assert action == 0
+def test_zero_category_exploration_preserves_raw_puct_preference():
+    mcts = make_mcts(category_exploration=0.0, c_puct=0.1)
+    action, _ = mcts._select(_category_selection_node())
+    assert action == 81
 
 
 def test_category_exploration_rejects_negative_value():
