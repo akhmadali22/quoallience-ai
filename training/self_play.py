@@ -74,7 +74,8 @@ def main() -> int:
     parser.add_argument("--output-dir", default="data/neural_self_play")
     parser.add_argument("--channels", type=int, default=64)
     parser.add_argument("--residual-blocks", type=int, default=4)
-    parser.add_argument("--pawn-prior-fraction", type=float, default=None, help="Adaptive exploration bonus for the less-visited action category.")
+    parser.add_argument("--pawn-prior-fraction", type=float, default=None, help="Deprecated legacy option.")
+    parser.add_argument("--category-exploration", type=float, default=0.35, help="Adaptive exploration bonus for the less-visited action category.")
     args = parser.parse_args()
 
     if args.games < 1 or args.simulations < 1 or args.max_plies < 1:
