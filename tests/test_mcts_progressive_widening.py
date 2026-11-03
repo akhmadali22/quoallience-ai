@@ -164,4 +164,6 @@ def test_search_reports_per_action_root_diagnostics():
     assert stats['root_action_stats']
     assert stats['root_pawn_visits'] + stats['root_wall_visits'] == 8
     assert 0.0 <= stats['root_pawn_visit_ratio'] <= 1.0
+    assert stats['root_value'] == 0.0
+    assert stats['root_policy_entropy'] >= 0.0
     assert all({'category', 'prior', 'q', 'visits', 'active'} <= set(item) for item in stats['root_action_stats'].values())
