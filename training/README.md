@@ -80,7 +80,7 @@ functional gate, not a full Elo system or a significance test.
   64 vertical wall slots. Legal-action masking is applied before policy softmax.
 - Network: residual CNN with policy logits and a tanh value estimate.
 - Search: PUCT MCTS, optional root Dirichlet noise, temperature sampling early
-  in self-play, deterministic visit-count selection during evaluation.
+  in self-play, visit-count selection with seeded random tie-breaking during evaluation.
 - Training: cross-entropy against normalized MCTS visit counts plus MSE against
   final game outcome.
 
@@ -114,3 +114,17 @@ The same option is available in `training.self_play`. This changes the search
 prior only, not network weights or training targets. Compare visit ratios,
 search depth, and paired-seat win rates; a higher pawn visit ratio alone is
 not evidence of stronger play.
+
+### Reproducible evaluation
+
+Evaluation assigns each game a distinct seed (`--seed` is the base seed; game N uses base seed + N - 1). With the same checkpoint and base seed, each configuration gets the same game-seed sequence, allowing paired comparisons. Equal-visit MCTS actions are selected with that game's seeded RNG rather than always choosing the first action. The JSON report records the full evaluation configuration, per-game seeds, seat-specific wins/losses/draws, and the neural agent's pawn-versus-wall action counts.
+
+Use the same seed for each prior configuration:
+
+```bash
+python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 64 --seed 2026 --output data/eval_raw.json
+python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 64 --seed 2026 --pawn-prior-fraction 0.5 --output data/eval_balanced.json
+python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 64 --seed 2026 --pawn-prior-fraction 0.7 --output data/eval_pawn70.json
+```
+
+For a more robust estimate, repeat the paired comparison with several base seeds and a larger game count. Seeded tie-breaking does not make the heuristic search stochastic; it only prevents equal-visit neural choices from always being resolved by action-index order.
