@@ -9,7 +9,7 @@ from pathlib import Path
 
 from quoridor.advanced_ai import AIConfig, QuoridorAI
 from quoridor.engine import GameState
-from quoridor.neural_ai.encoder import apply_action_index, encode_action
+from quoridor.neural_ai.encoder import apply_action_index, encode_action, legal_action_indices
 from quoridor.neural_ai.mcts import MOVE_ACTIONS, MCTS
 from quoridor.neural_ai.policy import load_model
 
@@ -24,13 +24,15 @@ def main() -> int:
     parser.add_argument("--max-plies", type=int, default=200)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--seed", type=int, default=2026, help="Base seed; each game uses seed + game index.")
-    parser.add_argument("--pawn-prior-fraction", type=float, default=None, help="Total prior mass for pawn actions; e.g. 0.5 or 0.7. Default keeps raw network priors.")
+    parser.add_argument("--category-exploration", type=float, default=0.35)
+    parser.add_argument("--selection-temperature", type=float, default=0.2)
+    parser.add_argument("--opponent", choices=("heuristic", "random"), default="heuristic")
     parser.add_argument("--output", type=Path, default=Path("data/neural_evaluation.json"))
     args = parser.parse_args()
     if args.games < 2 or args.simulations < 1 or args.max_plies < 1:
         parser.error("--games must be >= 2; simulations and max-plies must be positive")
-    if args.pawn_prior_fraction is not None and not 0.0 < args.pawn_prior_fraction < 1.0:
-        parser.error("--pawn-prior-fraction must be between 0 and 1")
+    if args.category_exploration < 0 or args.selection_temperature < 0:
+        parser.error("category exploration and selection temperature cannot be negative")
 
     model = load_model(args.checkpoint, device=args.device)
     model.eval()
@@ -46,24 +48,31 @@ def main() -> int:
             model,
             simulations=args.simulations,
             device=args.device,
-            pawn_prior_fraction=args.pawn_prior_fraction,
+            category_exploration=args.category_exploration,
         )
         heuristic = QuoridorAI(heuristic_config)
+        opponent_rng = random.Random(game_seed ^ 0x5EED5EED)
+        action_trace = []
         neural_pawn_actions = 0
         neural_wall_actions = 0
 
         while state.winner is None and state.ply < args.max_plies:
             if state.current_player == neural_player:
-                action_index, _ = search.choose_action(state, temperature=0.0, rng=rng)
+                action_index, _ = search.choose_action(state, temperature=args.selection_temperature, rng=rng)
+                selected = search.last_search_stats.get('root_action_stats', {}).get(str(action_index), {})
+                action_trace.append({'ply': state.ply, 'player': state.current_player, 'action': action_index, 'category': selected.get('category'), 'prior': selected.get('prior'), 'q': selected.get('q'), 'visits': selected.get('visits'), 'root_pawn_visits': search.last_search_stats.get('root_pawn_visits'), 'root_wall_visits': search.last_search_stats.get('root_wall_visits'), 'root_pawn_visit_ratio': search.last_search_stats.get('root_pawn_visit_ratio')})
                 if action_index < MOVE_ACTIONS:
                     neural_pawn_actions += 1
                 else:
                     neural_wall_actions += 1
             else:
-                result = heuristic.choose_action(state)
-                action = result.action
-                payload = action.destination if action.kind == "move" else action.wall
-                action_index = encode_action((action.kind, payload))
+                if args.opponent == "random":
+                    action_index = opponent_rng.choice(legal_action_indices(state))
+                else:
+                    result = heuristic.choose_action(state)
+                    action = result.action
+                    payload = action.destination if action.kind == "move" else action.wall
+                    action_index = encode_action((action.kind, payload))
             state = apply_action_index(state, action_index)
 
         winner = state.winner
@@ -72,6 +81,8 @@ def main() -> int:
             "game": game + 1,
             "seed": game_seed,
             "neural_player": neural_player,
+            "opponent": args.opponent,
+            "action_trace": action_trace,
             "winner": winner,
             "neural_win": neural_win,
             "plies": state.ply,
@@ -119,9 +130,10 @@ def main() -> int:
             "device": args.device,
             "base_seed": args.seed,
             "game_seeds": [row["seed"] for row in rows],
-            "pawn_prior_fraction": args.pawn_prior_fraction,
+            "category_exploration": args.category_exploration,
+            "opponent": args.opponent,
             "progressive_widening": True,
-            "selection_temperature": 0.0,
+            "selection_temperature": args.selection_temperature,
             "tie_breaking": "seeded_random",
         },
         "neural_wins": wins,
@@ -139,7 +151,7 @@ def main() -> int:
             ),
         },
         "results": rows,
-        "note": "Seeded paired-seat evaluation. Use the same base seed across configurations for paired comparisons; this smoke evaluation is not a statistically conclusive rating.",
+        "note": "Seeded paired-seat evaluation with stochastic action sampling when temperature is nonzero. This smoke evaluation is not a statistically conclusive rating.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
