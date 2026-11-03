@@ -124,3 +124,17 @@ def test_category_balancing_normalizes_when_only_one_category_exists():
     balanced = balance_category_priors({81: 0.2, 82: 0.8}, 0.5)
     assert abs(sum(balanced.values()) - 1.0) < 1e-9
     assert balanced == {81: 0.2, 82: 0.8}
+
+
+def test_choose_action_uses_seeded_rng_for_equal_visit_ties():
+    import random
+
+    state = GameState.initial()
+    mcts = make_mcts(simulations=1)
+    mcts.search = lambda state, add_root_noise=False: {10: 0.5, 20: 0.5}
+
+    first, _ = mcts.choose_action(state, rng=random.Random(1234))
+    second, _ = mcts.choose_action(state, rng=random.Random(1234))
+
+    assert first == second
+    assert first in {10, 20}
