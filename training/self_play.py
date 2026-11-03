@@ -30,11 +30,15 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
             temperature=temperature,
             add_root_noise=config.dirichlet_noise,
         )
+        search_stats = search.last_search_stats
         samples.append({
             "state": encode_state(state),
             "policy": {str(key): value for key, value in visits.items()},
             "player": player,
             "ply": state.ply,
+            "root_value": search_stats.get("root_value"),
+            "root_policy_entropy": search_stats.get("root_policy_entropy"),
+            "root_pawn_visit_ratio": search_stats.get("root_pawn_visit_ratio"),
         })
         next_state = apply_action_index(state, action)
         action_log.append({"ply": state.ply, "player": player, "action": action})
