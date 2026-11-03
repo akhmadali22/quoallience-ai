@@ -330,14 +330,22 @@ class MCTS:
         *,
         temperature: float = 0.0,
         add_root_noise: bool = False,
+        rng: Any | None = None,
     ) -> tuple[int, dict[int, float]]:
+        """Choose from root visits; an optional RNG makes ties reproducible per game."""
         import random
 
+        rng = rng or random
         visits = self.search(state, add_root_noise=add_root_noise)
         if not visits:
             raise ValueError("Cannot choose an action from a terminal state")
         if temperature <= 1e-8:
-            action = max(visits, key=visits.get)
+            max_visits = max(visits.values())
+            best_actions = [
+                action for action, count in visits.items()
+                if count == max_visits
+            ]
+            action = rng.choice(best_actions)
         else:
             weights = {
                 action: probability ** (1.0 / temperature)
@@ -345,7 +353,7 @@ class MCTS:
                 if probability > 0
             }
             total = sum(weights.values())
-            threshold = random.random() * total
+            threshold = rng.random() * total
             action = next(
                 action
                 for action, weight in weights.items()
