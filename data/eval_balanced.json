@@ -1,0 +1,174 @@
+{
+  "checkpoint": "models/checkpoints/neural_v1.pt",
+  "games": 20,
+  "neural_wins": 0,
+  "decided_games": 20,
+  "neural_win_rate": 0.0,
+  "seat_split": {
+    "0": 0,
+    "1": 0
+  },
+  "results": [
+    {
+      "game": 1,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "result": "win"
+    },
+    {
+      "game": 2,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 17,
+      "result": "win"
+    },
+    {
+      "game": 3,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "result": "win"
+    },
+    {
+      "game": 4,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 17,
+      "result": "win"
+    },
+    {
+      "game": 5,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "result": "win"
+    },
+    {
+      "game": 6,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 17,
+      "result": "win"
+    },
+    {
+      "game": 7,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "result": "win"
+    },
+    {
+      "game": 8,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 17,
+      "result": "win"
+    },
+    {
+      "game": 9,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "result": "win"
+    },
+    {
+      "game": 10,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 17,
+      "result": "win"
+    },
+    {
+      "game": 11,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "result": "win"
+    },
+    {
+      "game": 12,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 17,
+      "result": "win"
+    },
+    {
+      "game": 13,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "result": "win"
+    },
+    {
+      "game": 14,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 17,
+      "result": "win"
+    },
+    {
+      "game": 15,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "result": "win"
+    },
+    {
+      "game": 16,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 17,
+      "result": "win"
+    },
+    {
+      "game": 17,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "result": "win"
+    },
+    {
+      "game": 18,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 17,
+      "result": "win"
+    },
+    {
+      "game": 19,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "result": "win"
+    },
+    {
+      "game": 20,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 17,
+      "result": "win"
+    }
+  ],
+  "note": "This is a small paired-seat smoke evaluation, not a statistically conclusive rating."
+}
