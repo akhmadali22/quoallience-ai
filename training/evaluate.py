@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Paired-seat evaluation: neural MCTS agent versus the existing heuristic AI."""
+"""Seeded paired-seat evaluation: neural MCTS agent versus heuristic AI."""
 from __future__ import annotations
 
 import argparse
 import json
+import random
 from pathlib import Path
 
 from quoridor.advanced_ai import AIConfig, QuoridorAI
 from quoridor.engine import GameState
-from quoridor.neural_ai.encoder import apply_action_index, encode_action
+from quoridor.neural_ai.encoder import MOVE_ACTIONS, apply_action_index, encode_action
 from quoridor.neural_ai.mcts import MCTS
 from quoridor.neural_ai.policy import load_model
 
@@ -22,6 +23,7 @@ def main() -> int:
     parser.add_argument("--heuristic-depth", type=int, default=3)
     parser.add_argument("--max-plies", type=int, default=200)
     parser.add_argument("--device", default="cpu")
+    parser.add_argument("--seed", type=int, default=2026, help="Base seed; each game uses seed + game index.")
     parser.add_argument("--pawn-prior-fraction", type=float, default=None, help="Total prior mass for pawn actions; e.g. 0.5 or 0.7. Default keeps raw network priors.")
     parser.add_argument("--output", type=Path, default=Path("data/neural_evaluation.json"))
     args = parser.parse_args()
@@ -37,12 +39,26 @@ def main() -> int:
 
     for game in range(args.games):
         neural_player = game % 2
+        game_seed = args.seed + game
+        rng = random.Random(game_seed)
         state = GameState.initial()
-        search = MCTS(model, simulations=args.simulations, device=args.device, pawn_prior_fraction=args.pawn_prior_fraction)
+        search = MCTS(
+            model,
+            simulations=args.simulations,
+            device=args.device,
+            pawn_prior_fraction=args.pawn_prior_fraction,
+        )
         heuristic = QuoridorAI(heuristic_config)
+        neural_pawn_actions = 0
+        neural_wall_actions = 0
+
         while state.winner is None and state.ply < args.max_plies:
             if state.current_player == neural_player:
-                action_index, _ = search.choose_action(state, temperature=0.0)
+                action_index, _ = search.choose_action(state, temperature=0.0, rng=rng)
+                if action_index < MOVE_ACTIONS:
+                    neural_pawn_actions += 1
+                else:
+                    neural_wall_actions += 1
             else:
                 result = heuristic.choose_action(state)
                 action = result.action
@@ -51,34 +67,79 @@ def main() -> int:
             state = apply_action_index(state, action_index)
 
         winner = state.winner
+        neural_win = winner == neural_player if winner is not None else None
         rows.append({
             "game": game + 1,
+            "seed": game_seed,
             "neural_player": neural_player,
             "winner": winner,
-            "neural_win": winner == neural_player if winner is not None else None,
+            "neural_win": neural_win,
             "plies": state.ply,
-            "result": "win" if winner is not None else "draw_max_plies",
+            "neural_pawn_actions": neural_pawn_actions,
+            "neural_wall_actions": neural_wall_actions,
+            "neural_pawn_action_ratio": (
+                neural_pawn_actions / (neural_pawn_actions + neural_wall_actions)
+                if neural_pawn_actions + neural_wall_actions else 0.0
+            ),
+            "result": "win" if neural_win else (
+                "loss" if winner is not None else "draw_max_plies"
+            ),
         })
         print(
-            f"[{game + 1}/{args.games}] neural=P{neural_player} "
-            f"winner={winner} plies={state.ply}",
+            f"[{game + 1}/{args.games}] seed={game_seed} neural=P{neural_player} "
+            f"winner={winner} plies={state.ply} "
+            f"neural_moves={neural_pawn_actions}/{neural_pawn_actions + neural_wall_actions}",
             flush=True,
         )
 
     decided = [row for row in rows if row["neural_win"] is not None]
     wins = sum(row["neural_win"] for row in decided)
+    seat_results = {}
+    for player in (0, 1):
+        seat_rows = [row for row in rows if row["neural_player"] == player]
+        seat_results[str(player)] = {
+            "wins": sum(row["result"] == "win" for row in seat_rows),
+            "losses": sum(row["result"] == "loss" for row in seat_rows),
+            "draws": sum(row["result"] == "draw_max_plies" for row in seat_rows),
+            "games": len(seat_rows),
+        }
+
+    total_neural_actions = sum(
+        row["neural_pawn_actions"] + row["neural_wall_actions"] for row in rows
+    )
+    total_neural_pawn_actions = sum(row["neural_pawn_actions"] for row in rows)
     report = {
         "checkpoint": str(args.checkpoint),
-        "games": len(rows),
+        "config": {
+            "games": args.games,
+            "simulations": args.simulations,
+            "heuristic_time": args.heuristic_time,
+            "heuristic_depth": args.heuristic_depth,
+            "max_plies": args.max_plies,
+            "device": args.device,
+            "base_seed": args.seed,
+            "game_seeds": [row["seed"] for row in rows],
+            "pawn_prior_fraction": args.pawn_prior_fraction,
+            "progressive_widening": True,
+            "selection_temperature": 0.0,
+            "tie_breaking": "seeded_random",
+        },
         "neural_wins": wins,
+        "neural_losses": sum(row["result"] == "loss" for row in rows),
+        "draws": sum(row["result"] == "draw_max_plies" for row in rows),
         "decided_games": len(decided),
         "neural_win_rate": wins / len(decided) if decided else None,
-        "seat_split": {
-            str(player): sum(row["neural_win"] is True for row in rows if row["neural_player"] == player)
-            for player in (0, 1)
+        "seat_results": seat_results,
+        "neural_action_totals": {
+            "pawn_actions": total_neural_pawn_actions,
+            "wall_actions": total_neural_actions - total_neural_pawn_actions,
+            "pawn_action_ratio": (
+                total_neural_pawn_actions / total_neural_actions
+                if total_neural_actions else 0.0
+            ),
         },
         "results": rows,
-        "note": "This is a small paired-seat smoke evaluation, not a statistically conclusive rating.",
+        "note": "Seeded paired-seat evaluation. Use the same base seed across configurations for paired comparisons; this smoke evaluation is not a statistically conclusive rating.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
