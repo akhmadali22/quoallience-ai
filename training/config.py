@@ -8,7 +8,7 @@ class SelfPlayConfig:
     temperature_moves: int = 12
     temperature: float = 1.0
     dirichlet_noise: bool = True
-    pawn_prior_fraction: float | None = None
+    category_exploration: float = 0.35
 
 
 @dataclass(frozen=True)
