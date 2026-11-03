@@ -32,6 +32,10 @@ def balance_category_priors(priors: dict[int, float], pawn_fraction: float) -> d
         result.update({a: p / pawn_total for a, p in pawn.items()})
     elif walls and wall_total > 0:
         result.update({a: p / wall_total for a, p in walls.items()})
+    elif priors:
+        # Defensive fallback for malformed/all-zero policy priors.
+        uniform = 1.0 / len(priors)
+        result.update({action: uniform for action in priors})
     return result
 
 
@@ -323,6 +327,26 @@ class MCTS:
             if action < MOVE_ACTIONS
         )
         wall_visits = total - pawn_visits
+        active_root_priors = {
+            action: edge.prior for action, edge in root.edges.items()
+        }
+        if self.pawn_prior_fraction is not None:
+            active_root_selection_priors = balance_category_priors(
+                active_root_priors, self.pawn_prior_fraction
+            )
+        else:
+            active_prior_total = sum(active_root_priors.values())
+            active_root_selection_priors = (
+                {
+                    action: prior / active_prior_total
+                    for action, prior in active_root_priors.items()
+                }
+                if active_prior_total > 0
+                else {
+                    action: 1.0 / len(active_root_priors)
+                    for action in active_root_priors
+                }
+            )
         stats.update({
             "max_leaf_depth": max(leaf_depths, default=0),
             "average_leaf_depth": (
@@ -341,26 +365,12 @@ class MCTS:
             ),
             "root_pending_wall_actions": len(root.pending_walls),
             "root_active_pawn_prior_mass": sum(
-                balance_category_priors(
-                    {action: edge.prior for action, edge in root.edges.items()},
-                    self.pawn_prior_fraction,
-                ).get(action, 0.0)
-                for action in root.edges if action < MOVE_ACTIONS
-            ) if self.pawn_prior_fraction is not None else (
-                sum(edge.prior for action, edge in root.edges.items() if action < MOVE_ACTIONS)
-                / sum(edge.prior for edge in root.edges.values())
-                if sum(edge.prior for edge in root.edges.values()) > 0 else 0.0
+                prior for action, prior in active_root_selection_priors.items()
+                if action < MOVE_ACTIONS
             ),
             "root_active_wall_prior_mass": sum(
-                balance_category_priors(
-                    {action: edge.prior for action, edge in root.edges.items()},
-                    self.pawn_prior_fraction,
-                ).get(action, 0.0)
-                for action in root.edges if action >= MOVE_ACTIONS
-            ) if self.pawn_prior_fraction is not None else (
-                sum(edge.prior for action, edge in root.edges.items() if action >= MOVE_ACTIONS)
-                / sum(edge.prior for edge in root.edges.values())
-                if sum(edge.prior for edge in root.edges.values()) > 0 else 0.0
+                prior for action, prior in active_root_selection_priors.items()
+                if action >= MOVE_ACTIONS
             ),
             "pawn_visits": pawn_visits,
             "wall_visits": wall_visits,
