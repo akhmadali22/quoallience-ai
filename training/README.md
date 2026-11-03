@@ -97,9 +97,13 @@ heuristic is retained for that purpose.
 
 ## Action-category prior experiment
 
-The optional `--pawn-prior-fraction` changes the total policy prior mass assigned
-to pawn actions while preserving relative network preferences within pawn and wall
-categories. The default `None` keeps the raw network policy.
+The optional `--pawn-prior-fraction` controls the total prior mass assigned to
+pawn actions versus wall actions during PUCT selection. Importantly, this balancing
+is recalculated over the actions currently active at each node. With progressive
+widening, pending wall candidates do not dilute the wall category's share before
+they are admitted. Raw network priors are retained to rank pending wall candidates,
+and relative network preferences are preserved within each active category. The
+default `None` keeps raw network priors and the original PUCT normalization.
 
 ```bash
 # Baseline: raw policy
@@ -110,10 +114,11 @@ python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulat
 python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 256 --pawn-prior-fraction 0.7 --output data/eval_pawn70.json
 ```
 
-The same option is available in `training.self_play`. This changes the search
-prior only, not network weights or training targets. Compare visit ratios,
-search depth, and paired-seat win rates; a higher pawn visit ratio alone is
-not evidence of stronger play.
+The same option is available in `training.self_play`. This changes category allocation in the search only, not network weights or
+training targets. The setting is applied at every selected node using its current
+active edge set. Search telemetry includes the active pawn/wall counts and their
+effective prior mass. Compare visit ratios, search depth, and paired-seat win
+rates; a higher pawn visit ratio alone is not evidence of stronger play.
 
 ### Reproducible evaluation
 
