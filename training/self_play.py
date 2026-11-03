@@ -18,7 +18,7 @@ from training.config import SelfPlayConfig
 def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device: str) -> tuple[list[dict], dict]:
     random.seed(seed)
     state = GameState.initial()
-    search = MCTS(model, simulations=config.simulations, device=device, pawn_prior_fraction=config.pawn_prior_fraction)
+    search = MCTS(model, simulations=config.simulations, device=device, category_exploration=config.category_exploration)
     samples: list[dict] = []
     action_log: list[dict] = []
 
@@ -74,12 +74,12 @@ def main() -> int:
     parser.add_argument("--output-dir", default="data/neural_self_play")
     parser.add_argument("--channels", type=int, default=64)
     parser.add_argument("--residual-blocks", type=int, default=4)
-    parser.add_argument("--pawn-prior-fraction", type=float, default=None, help="Total prior mass for pawn actions; e.g. 0.5 or 0.7. Default keeps raw network priors.")
+    parser.add_argument("--pawn-prior-fraction", type=float, default=None, help="Adaptive exploration bonus for the less-visited action category.")
     args = parser.parse_args()
 
     if args.games < 1 or args.simulations < 1 or args.max_plies < 1:
         parser.error("--games, --simulations, and --max-plies must be positive")
-    if args.pawn_prior_fraction is not None and not 0.0 < args.pawn_prior_fraction < 1.0:
+    if args.category_exploration < 0:
         parser.error("--pawn-prior-fraction must be between 0 and 1")
 
     import torch
@@ -102,7 +102,7 @@ def main() -> int:
     if samples_path.exists() or games_path.exists():
         parser.error(f"Output already contains replay data: {output}. Use a new --output-dir.")
     save_checkpoint(model, snapshot_path, extra={"source_checkpoint": args.checkpoint, "seed": args.seed})
-    config = SelfPlayConfig(simulations=args.simulations, max_plies=args.max_plies, pawn_prior_fraction=args.pawn_prior_fraction)
+    config = SelfPlayConfig(simulations=args.simulations, max_plies=args.max_plies, category_exploration=args.category_exploration)
 
     with samples_path.open("a", encoding="utf-8") as samples_file, games_path.open("a", encoding="utf-8") as games_file:
         for index in range(args.games):
