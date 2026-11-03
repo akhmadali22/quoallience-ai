@@ -127,3 +127,8 @@ Run the same base seed across configurations for paired comparisons. A nonzero
 temperature is part of the evaluation protocol and must be kept identical when
 comparing checkpoints. A smoke run is diagnostic, not a statistically conclusive
 strength rating.
+
+
+### Diagnosing pawn progress and value predictions
+
+Evaluation reports record, for each neural turn, pawn coordinates before and after the action, shortest-path distances for both players, whether a pawn move reverses the preceding pawn move, the root value prediction, and visit-policy entropy. Per-game summaries include pawn progress, regression, reversal, and own shortest-distance change counters. Self-play replay samples also retain root value, policy entropy, and pawn visit ratio as diagnostic metadata. Training targets remain the MCTS visit distribution and final game outcome.
