@@ -230,7 +230,7 @@ class MCTS:
             return self._expand(node)
 
         root = Node(state)
-        expand_tracked(root)
+        root_value = expand_tracked(root)
 
         if add_root_noise and root.edges:
             import torch
@@ -315,7 +315,14 @@ class MCTS:
             }
             for action, edge in all_root_edges.items()
         }
+        policy_entropy = -sum(
+            probability * math.log(probability)
+            for probability in probabilities.values()
+            if probability > 0
+        )
         stats.update({
+            "root_value": root_value,
+            "root_policy_entropy": policy_entropy,
             "max_leaf_depth": max(leaf_depths, default=0),
             "average_leaf_depth": (
                 sum(leaf_depths) / len(leaf_depths) if leaf_depths else 0.0
