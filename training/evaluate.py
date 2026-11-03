@@ -8,7 +8,7 @@ import random
 from pathlib import Path
 
 from quoridor.advanced_ai import AIConfig, QuoridorAI
-from quoridor.engine import GameState
+from quoridor.engine import GameState, shortest_distance
 from quoridor.neural_ai.encoder import apply_action_index, encode_action, legal_action_indices
 from quoridor.neural_ai.mcts import MOVE_ACTIONS, MCTS
 from quoridor.neural_ai.policy import load_model
@@ -55,16 +55,73 @@ def main() -> int:
         action_trace = []
         neural_pawn_actions = 0
         neural_wall_actions = 0
+        pawn_progress_moves = 0
+        pawn_regression_moves = 0
+        pawn_reversal_moves = 0
+        own_distance_improvements = 0
+        own_distance_regressions = 0
+        pawn_position_history = [state.pawns[neural_player]]
 
         while state.winner is None and state.ply < args.max_plies:
             if state.current_player == neural_player:
                 action_index, _ = search.choose_action(state, temperature=args.selection_temperature, rng=rng)
                 selected = search.last_search_stats.get('root_action_stats', {}).get(str(action_index), {})
-                action_trace.append({'ply': state.ply, 'player': state.current_player, 'action': action_index, 'category': selected.get('category'), 'prior': selected.get('prior'), 'q': selected.get('q'), 'visits': selected.get('visits'), 'root_pawn_visits': search.last_search_stats.get('root_pawn_visits'), 'root_wall_visits': search.last_search_stats.get('root_wall_visits'), 'root_pawn_visit_ratio': search.last_search_stats.get('root_pawn_visit_ratio')})
+                before_own = state.pawns[neural_player]
+                before_opponent = state.pawns[1 - neural_player]
+                own_distance_before = shortest_distance(state, neural_player)
+                opponent_distance_before = shortest_distance(state, 1 - neural_player)
+                next_state = apply_action_index(state, action_index)
+                own_distance_after = shortest_distance(next_state, neural_player)
+                opponent_distance_after = shortest_distance(next_state, 1 - neural_player)
+                pawn_reversal = (
+                    action_index < MOVE_ACTIONS
+                    and len(pawn_position_history) >= 2
+                    and next_state.pawns[neural_player] == pawn_position_history[-2]
+                )
                 if action_index < MOVE_ACTIONS:
                     neural_pawn_actions += 1
+                    if own_distance_after is not None and own_distance_before is not None:
+                        if own_distance_after < own_distance_before:
+                            pawn_progress_moves += 1
+                        elif own_distance_after > own_distance_before:
+                            pawn_regression_moves += 1
+                    if pawn_reversal:
+                        pawn_reversal_moves += 1
+                    pawn_position_history.append(next_state.pawns[neural_player])
                 else:
                     neural_wall_actions += 1
+                if own_distance_after is not None and own_distance_before is not None:
+                    if own_distance_after < own_distance_before:
+                        own_distance_improvements += 1
+                    elif own_distance_after > own_distance_before:
+                        own_distance_regressions += 1
+                action_trace.append({
+                    'ply': state.ply,
+                    'player': state.current_player,
+                    'action': action_index,
+                    'category': selected.get('category'),
+                    'prior': selected.get('prior'),
+                    'q': selected.get('q'),
+                    'visits': selected.get('visits'),
+                    'root_value': search.last_search_stats.get('root_value'),
+                    'root_policy_entropy': search.last_search_stats.get('root_policy_entropy'),
+                    'root_pawn_visits': search.last_search_stats.get('root_pawn_visits'),
+                    'root_wall_visits': search.last_search_stats.get('root_wall_visits'),
+                    'root_pawn_visit_ratio': search.last_search_stats.get('root_pawn_visit_ratio'),
+                    'pawn_before': before_own,
+                    'pawn_after': next_state.pawns[neural_player],
+                    'opponent_pawn': before_opponent,
+                    'own_distance_before': own_distance_before,
+                    'own_distance_after': own_distance_after,
+                    'opponent_distance_before': opponent_distance_before,
+                    'opponent_distance_after': opponent_distance_after,
+                    'pawn_distance_delta': (
+                        None if own_distance_before is None or own_distance_after is None
+                        else own_distance_before - own_distance_after
+                    ),
+                    'pawn_reversal': pawn_reversal,
+                })
+                state = next_state
             else:
                 if args.opponent == "random":
                     action_index = opponent_rng.choice(legal_action_indices(state))
@@ -73,7 +130,7 @@ def main() -> int:
                     action = result.action
                     payload = action.destination if action.kind == "move" else action.wall
                     action_index = encode_action((action.kind, payload))
-            state = apply_action_index(state, action_index)
+                state = apply_action_index(state, action_index)
 
         winner = state.winner
         neural_win = winner == neural_player if winner is not None else None
@@ -88,6 +145,11 @@ def main() -> int:
             "plies": state.ply,
             "neural_pawn_actions": neural_pawn_actions,
             "neural_wall_actions": neural_wall_actions,
+            "pawn_progress_moves": pawn_progress_moves,
+            "pawn_regression_moves": pawn_regression_moves,
+            "pawn_reversal_moves": pawn_reversal_moves,
+            "own_distance_improvements": own_distance_improvements,
+            "own_distance_regressions": own_distance_regressions,
             "neural_pawn_action_ratio": (
                 neural_pawn_actions / (neural_pawn_actions + neural_wall_actions)
                 if neural_pawn_actions + neural_wall_actions else 0.0
