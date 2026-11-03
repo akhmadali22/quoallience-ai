@@ -13,32 +13,6 @@ from .encoder import ACTION_SIZE, apply_action_index, encode_state, legal_action
 MOVE_ACTIONS = 9 * 9
 
 
-def balance_category_priors(priors: dict[int, float], pawn_fraction: float) -> dict[int, float]:
-    """Balance category mass across the supplied active actions.
-
-    Call this with the current node's active edges, not every legal action.
-    Relative network preferences are preserved within each active category.
-    """
-    if not 0.0 < pawn_fraction < 1.0:
-        raise ValueError("pawn_fraction must be in (0, 1)")
-    pawn = {a: p for a, p in priors.items() if a < MOVE_ACTIONS}
-    walls = {a: p for a, p in priors.items() if a >= MOVE_ACTIONS}
-    pawn_total, wall_total = sum(pawn.values()), sum(walls.values())
-    result: dict[int, float] = {}
-    if pawn and walls and pawn_total > 0 and wall_total > 0:
-        result.update({a: pawn_fraction * p / pawn_total for a, p in pawn.items()})
-        result.update({a: (1.0 - pawn_fraction) * p / wall_total for a, p in walls.items()})
-    elif pawn and pawn_total > 0:
-        result.update({a: p / pawn_total for a, p in pawn.items()})
-    elif walls and wall_total > 0:
-        result.update({a: p / wall_total for a, p in walls.items()})
-    elif priors:
-        # Defensive fallback for malformed/all-zero policy priors.
-        uniform = 1.0 / len(priors)
-        result.update({action: uniform for action in priors})
-    return result
-
-
 @dataclass
 class Edge:
     prior: float
@@ -75,7 +49,7 @@ class MCTS:
         initial_wall_candidates: int = 8,
         widening_coefficient: float = 2.0,
         widening_exponent: float = 0.5,
-        pawn_prior_fraction: float | None = None,
+        category_exploration: float = 0.35,
     ):
         if simulations < 1:
             raise ValueError("simulations must be positive")
@@ -94,9 +68,9 @@ class MCTS:
         self.progressive_widening = progressive_widening
         self.initial_wall_candidates = initial_wall_candidates
         self.widening_coefficient = widening_coefficient
-        if pawn_prior_fraction is not None and not 0.0 < pawn_prior_fraction < 1.0:
-            raise ValueError("pawn_prior_fraction must be in (0, 1) or None")
-        self.pawn_prior_fraction = pawn_prior_fraction
+        if category_exploration < 0:
+            raise ValueError("category_exploration cannot be negative")
+        self.category_exploration = category_exploration
         self.widening_exponent = widening_exponent
         self.last_search_stats: dict[str, Any] = {}
 
@@ -185,25 +159,21 @@ class MCTS:
     def _select(self, node: Node) -> tuple[int, Edge]:
         scale = math.sqrt(max(1, node.visits))
         active_priors = {action: edge.prior for action, edge in node.edges.items()}
-        if self.pawn_prior_fraction is not None:
-            # Balance only the active set. Pending walls must not dilute the
-            # wall category's mass before progressive widening admits them.
-            normalized_priors = balance_category_priors(
-                active_priors, self.pawn_prior_fraction
-            )
+        prior_total = sum(active_priors.values())
+        if prior_total > 0:
+            normalized_priors = {action: prior / prior_total for action, prior in active_priors.items()}
         else:
-            prior_total = sum(active_priors.values())
-            if prior_total > 0:
-                normalized_priors = {
-                    action: prior / prior_total
-                    for action, prior in active_priors.items()
-                }
-            else:
-                uniform = 1.0 / len(active_priors) if active_priors else 0.0
-                normalized_priors = {
-                    action: uniform for action in active_priors
-                }
+            uniform = 1.0 / len(active_priors) if active_priors else 0.0
+            normalized_priors = {action: uniform for action in active_priors}
 
+        category_visits = {
+            "pawn": sum(edge.visits for action, edge in node.edges.items() if action < MOVE_ACTIONS),
+            "wall": sum(edge.visits for action, edge in node.edges.items() if action >= MOVE_ACTIONS),
+        }
+        category_bonus = {
+            name: self.category_exploration * math.sqrt(math.log1p(node.visits) / (1 + count))
+            for name, count in category_visits.items()
+        }
         best_action = -1
         best_edge = None
         best_score = -float("inf")
@@ -215,7 +185,8 @@ class MCTS:
                 * scale
                 / (1 + edge.visits)
             )
-            score = edge.q + u
+            category = "pawn" if action < MOVE_ACTIONS else "wall"
+            score = edge.q + u + category_bonus[category]
             if score > best_score:
                 best_action, best_edge, best_score = action, edge, score
         assert best_edge is not None
@@ -327,26 +298,23 @@ class MCTS:
             if action < MOVE_ACTIONS
         )
         wall_visits = total - pawn_visits
-        active_root_priors = {
-            action: edge.prior for action, edge in root.edges.items()
+        active_root_priors = {action: edge.prior for action, edge in root.edges.items()}
+        active_prior_total = sum(active_root_priors.values())
+        active_root_selection_priors = (
+            {action: prior / active_prior_total for action, prior in active_root_priors.items()}
+            if active_prior_total > 0 else
+            {action: 1.0 / len(active_root_priors) for action in active_root_priors}
+        )
+        root_pawn_visits = sum(edge.visits for action, edge in all_root_edges.items() if action < MOVE_ACTIONS)
+        root_wall_visits = total - root_pawn_visits
+        root_action_stats = {
+            str(action): {
+                "category": "pawn" if action < MOVE_ACTIONS else "wall",
+                "prior": edge.prior, "q": edge.q, "visits": edge.visits,
+                "active": action in root.edges,
+            }
+            for action, edge in all_root_edges.items()
         }
-        if self.pawn_prior_fraction is not None:
-            active_root_selection_priors = balance_category_priors(
-                active_root_priors, self.pawn_prior_fraction
-            )
-        else:
-            active_prior_total = sum(active_root_priors.values())
-            active_root_selection_priors = (
-                {
-                    action: prior / active_prior_total
-                    for action, prior in active_root_priors.items()
-                }
-                if active_prior_total > 0
-                else {
-                    action: 1.0 / len(active_root_priors)
-                    for action in active_root_priors
-                }
-            )
         stats.update({
             "max_leaf_depth": max(leaf_depths, default=0),
             "average_leaf_depth": (
@@ -372,6 +340,12 @@ class MCTS:
                 prior for action, prior in active_root_selection_priors.items()
                 if action >= MOVE_ACTIONS
             ),
+            "category_exploration": self.category_exploration,
+            "root_pawn_visits": root_pawn_visits,
+            "root_wall_visits": root_wall_visits,
+            "root_pawn_visit_ratio": root_pawn_visits / total if total else 0.0,
+            "root_wall_visit_ratio": root_wall_visits / total if total else 0.0,
+            "root_action_stats": root_action_stats,
             "pawn_visits": pawn_visits,
             "wall_visits": wall_visits,
             "pawn_visit_ratio": pawn_visits / total if total else 0.0,
