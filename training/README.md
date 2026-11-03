@@ -95,41 +95,35 @@ requires many iterations and evaluation against fixed opponents. The existing
 heuristic is retained for that purpose.
 
 
-## Action-category prior experiment
+## Adaptive category exploration
 
-The optional `--pawn-prior-fraction` controls the total prior mass assigned to
-pawn actions versus wall actions during PUCT selection. Importantly, this balancing
-is recalculated over the actions currently active at each node. With progressive
-widening, pending wall candidates do not dilute the wall category's share before
-they are admitted. Raw network priors are retained to rank pending wall candidates,
-and relative network preferences are preserved within each active category. The
-default `None` keeps raw network priors and the original PUCT normalization.
+The optional `--category-exploration` adds an exploration bonus to the less-visited
+action category (pawn moves or wall placements). It does not force a fixed pawn/wall
+prior split. Raw network priors still rank actions inside each category, while the
+category bonus helps prevent a large number of wall actions from completely
+suppressing pawn-move exploration. Set it to `0` to disable the bonus.
 
 ```bash
-# Baseline: raw policy
-python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 256 --output data/eval_raw.json
-# Balanced: 50% pawn / 50% wall prior mass
-python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 256 --pawn-prior-fraction 0.5 --output data/eval_balanced.json
-# Pawn-biased: 70% pawn / 30% wall prior mass
-python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 256 --pawn-prior-fraction 0.7 --output data/eval_pawn70.json
+# Compare baseline PUCT with adaptive category exploration
+python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 256 --category-exploration 0 --output data/eval_no_category_bonus.json
+python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 256 --category-exploration 0.35 --output data/eval_category_bonus.json
+
+# Evaluate against random and heuristic opponents
+python -m training.evaluate models/checkpoints/neural_v1.pt --opponent random --games 20 --simulations 128 --seed 2026 --output data/eval_random.json
+python -m training.evaluate models/checkpoints/neural_v1.pt --opponent heuristic --games 20 --simulations 128 --seed 2026 --output data/eval_heuristic.json
 ```
 
-The same option is available in `training.self_play`. This changes category allocation in the search only, not network weights or
-training targets. The setting is applied at every selected node using its current
-active edge set. Search telemetry includes the active pawn/wall counts and their
-effective prior mass. Compare visit ratios, search depth, and paired-seat win
-rates; a higher pawn visit ratio alone is not evidence of stronger play.
+## Evaluation diagnostics and reproducibility
 
-### Reproducible evaluation
+Each game gets `base_seed + game_index`. The default selection temperature is
+`0.2`, so root visits are sampled stochastically with the per-game RNG. Set
+`--selection-temperature 0` for deterministic max-visit selection (random only
+among exact ties). The report records per-ply neural actions, selected prior, Q,
+visit count, and root pawn/wall visit counts. Use the trace to inspect whether
+the search is exploring both categories, rather than judging only the final
+pawn-action ratio.
 
-Evaluation assigns each game a distinct seed (`--seed` is the base seed; game N uses base seed + N - 1). With the same checkpoint and base seed, each configuration gets the same game-seed sequence, allowing paired comparisons. Equal-visit MCTS actions are selected with that game's seeded RNG rather than always choosing the first action. The JSON report records the full evaluation configuration, per-game seeds, seat-specific wins/losses/draws, and the neural agent's pawn-versus-wall action counts.
-
-Use the same seed for each prior configuration:
-
-```bash
-python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 64 --seed 2026 --output data/eval_raw.json
-python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 64 --seed 2026 --pawn-prior-fraction 0.5 --output data/eval_balanced.json
-python -m training.evaluate models/checkpoints/neural_v1.pt --games 20 --simulations 64 --seed 2026 --pawn-prior-fraction 0.7 --output data/eval_pawn70.json
-```
-
-For a more robust estimate, repeat the paired comparison with several base seeds and a larger game count. Seeded tie-breaking does not make the heuristic search stochastic; it only prevents equal-visit neural choices from always being resolved by action-index order.
+Run the same base seed across configurations for paired comparisons. A nonzero
+temperature is part of the evaluation protocol and must be kept identical when
+comparing checkpoints. A smoke run is diagnostic, not a statistically conclusive
+strength rating.
