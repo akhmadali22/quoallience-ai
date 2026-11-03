@@ -138,3 +138,47 @@ def test_choose_action_uses_seeded_rng_for_equal_visit_ties():
 
     assert first == second
     assert first in {10, 20}
+
+def test_category_prior_fraction_is_applied_to_active_set_not_all_legal_actions():
+    state = GameState.initial()
+    mcts = make_mcts(
+        simulations=16,
+        progressive_widening=True,
+        initial_wall_candidates=8,
+        pawn_prior_fraction=0.5,
+    )
+
+    mcts.search(state)
+
+    stats = mcts.last_search_stats
+    assert stats["root_active_pawn_actions"] == 3
+    assert stats["root_active_wall_actions"] == 8
+    assert abs(stats["root_active_pawn_prior_mass"] - 0.5) < 1e-9
+    assert abs(stats["root_active_wall_prior_mass"] - 0.5) < 1e-9
+    assert stats["root_pending_wall_actions"] > 0
+
+
+def test_pawn_biased_fraction_is_applied_to_current_active_edges():
+    state = GameState.initial()
+    mcts = make_mcts(
+        simulations=16,
+        progressive_widening=True,
+        initial_wall_candidates=8,
+        pawn_prior_fraction=0.7,
+    )
+
+    mcts.search(state)
+
+    stats = mcts.last_search_stats
+    assert abs(stats["root_active_pawn_prior_mass"] - 0.7) < 1e-9
+    assert abs(stats["root_active_wall_prior_mass"] - 0.3) < 1e-9
+
+
+def test_category_prior_falls_back_to_available_category():
+    from quoridor.neural_ai.mcts import balance_category_priors
+
+    pawn_only = balance_category_priors({0: 0.2, 1: 0.8}, 0.5)
+    wall_only = balance_category_priors({81: 0.25, 82: 0.75}, 0.5)
+
+    assert pawn_only == {0: 0.2, 1: 0.8}
+    assert wall_only == {81: 0.25, 82: 0.75}
