@@ -51,7 +51,7 @@ class MCTS:
         widening_exponent: float = 0.5,
         category_exploration: float = 0.35,
         repetition_penalty: float = 0.75,
-        pawn_progress_bonus: float = 0.10,
+        pawn_progress_bonus: float = 0.0,
         repetition_window: int = 4,
     ):
         if simulations < 1:
