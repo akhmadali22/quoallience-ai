@@ -64,7 +64,10 @@ def main() -> int:
 
         while state.winner is None and state.ply < args.max_plies:
             if state.current_player == neural_player:
-                action_index, _ = search.choose_action(state, temperature=args.selection_temperature, rng=rng)
+                action_index, _ = search.choose_action(
+                    state, temperature=args.selection_temperature, rng=rng,
+                    recent_pawn_positions=pawn_position_history,
+                )
                 selected = search.last_search_stats.get('root_action_stats', {}).get(str(action_index), {})
                 before_own = state.pawns[neural_player]
                 before_opponent = state.pawns[1 - neural_player]
@@ -105,6 +108,8 @@ def main() -> int:
                     'visits': selected.get('visits'),
                     'root_value': search.last_search_stats.get('root_value'),
                     'root_policy_entropy': search.last_search_stats.get('root_policy_entropy'),
+                    'root_repetition_adjusted_actions': search.last_search_stats.get('root_repetition_adjusted_actions'),
+                    'selection_adjustment': selected.get('selection_adjustment'),
                     'root_pawn_visits': search.last_search_stats.get('root_pawn_visits'),
                     'root_wall_visits': search.last_search_stats.get('root_wall_visits'),
                     'root_pawn_visit_ratio': search.last_search_stats.get('root_pawn_visit_ratio'),
@@ -193,6 +198,9 @@ def main() -> int:
             "base_seed": args.seed,
             "game_seeds": [row["seed"] for row in rows],
             "category_exploration": args.category_exploration,
+            "repetition_penalty": search.repetition_penalty,
+            "pawn_progress_bonus": search.pawn_progress_bonus,
+            "repetition_window": search.repetition_window,
             "opponent": args.opponent,
             "progressive_widening": True,
             "selection_temperature": args.selection_temperature,
