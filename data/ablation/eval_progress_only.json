@@ -1,0 +1,6487 @@
+{
+  "checkpoint": "models/checkpoints/neural_v1.pt",
+  "config": {
+    "games": 20,
+    "simulations": 128,
+    "heuristic_time": 0.2,
+    "heuristic_depth": 3,
+    "max_plies": 200,
+    "device": "cpu",
+    "base_seed": 2026,
+    "game_seeds": [
+      2026,
+      2027,
+      2028,
+      2029,
+      2030,
+      2031,
+      2032,
+      2033,
+      2034,
+      2035,
+      2036,
+      2037,
+      2038,
+      2039,
+      2040,
+      2041,
+      2042,
+      2043,
+      2044,
+      2045
+    ],
+    "category_exploration": 0.35,
+    "repetition_penalty": 0.0,
+    "pawn_progress_bonus": 0.1,
+    "repetition_window": 4,
+    "opponent": "heuristic",
+    "progressive_widening": true,
+    "selection_temperature": 0.2,
+    "tie_breaking": "seeded_random"
+  },
+  "neural_wins": 0,
+  "neural_losses": 20,
+  "draws": 0,
+  "decided_games": 20,
+  "neural_win_rate": 0.0,
+  "seat_results": {
+    "0": {
+      "wins": 0,
+      "losses": 10,
+      "draws": 0,
+      "games": 10
+    },
+    "1": {
+      "wins": 0,
+      "losses": 10,
+      "draws": 0,
+      "games": 10
+    }
+  },
+  "neural_action_totals": {
+    "pawn_actions": 159,
+    "wall_actions": 1,
+    "pawn_action_ratio": 0.99375
+  },
+  "strategic_diagnostics": {
+    "pawn_progress_moves": 159,
+    "pawn_regression_moves": 0,
+    "pawn_reversal_moves": 0,
+    "own_distance_improvements": 159,
+    "own_distance_regressions": 0,
+    "opponent_distance_increases": 0,
+    "opponent_distance_decreases": 0,
+    "opponent_distance_changed_actions": 0,
+    "opponent_distance_delta_sum": 0,
+    "mean_opponent_distance_delta": 0.0
+  },
+  "value_calibration": {
+    "samples": 160,
+    "mean_absolute_error": 1.007901443168521,
+    "mean_squared_error": 1.0605326156261508,
+    "mean_root_value": 0.007901443168520927
+  },
+  "results": [
+    {
+      "game": 1,
+      "seed": 2026,
+      "neural_player": 0,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.00367015996016562,
+          "q": 0.21136224952836832,
+          "visits": 24,
+          "root_value": 0.23755258321762085,
+          "root_policy_entropy": 3.034417239951934,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            8
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            0
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 8,
+          "opponent_distance_after": 8,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2375525832176208
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.002527206437662244,
+          "q": 0.217432685436741,
+          "visits": 31,
+          "root_value": 0.2350529134273529,
+          "root_policy_entropy": 2.9100652374459433,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.235052913427353
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0029100377578288317,
+          "q": 0.19494236328385092,
+          "visits": 22,
+          "root_value": 0.2768555283546448,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2768555283546448
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.002609121846035123,
+          "q": 0.19473165682246607,
+          "visits": 31,
+          "root_value": 0.21050304174423218,
+          "root_policy_entropy": 2.897979805867726,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            4
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 4,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2105030417442322
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0011349695269018412,
+          "q": 0.1843343505805189,
+          "visits": 22,
+          "root_value": 0.25426748394966125,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            4
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 4,
+          "own_distance_after": 3,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2542674839496613
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.0013203918933868408,
+          "q": 0.21313764630920357,
+          "visits": 36,
+          "root_value": 0.21293674409389496,
+          "root_policy_entropy": 2.8157973300972574,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 36,
+          "root_wall_visits": 92,
+          "root_pawn_visit_ratio": 0.28125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.212936744093895
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0016713632503524423,
+          "q": 0.12408816241301023,
+          "visits": 13,
+          "root_value": 0.29262036085128784,
+          "root_policy_entropy": 3.0952505100450063,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 13,
+          "root_wall_visits": 115,
+          "root_pawn_visit_ratio": 0.1015625,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2926203608512878
+        }
+      ],
+      "winner": 1,
+      "neural_win": false,
+      "plies": 14,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 7,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 7,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 2,
+      "seed": 2027,
+      "neural_player": 1,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 1,
+          "player": 1,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0028845251072198153,
+          "q": -0.22737026435357552,
+          "visits": 27,
+          "root_value": -0.20849740505218506,
+          "root_policy_entropy": 3.0113724780707263,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            4,
+            0
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7915025949478149
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.001383960247039795,
+          "q": -0.22424971759319307,
+          "visits": 25,
+          "root_value": -0.21643616259098053,
+          "root_policy_entropy": 3.0511242440883257,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            4,
+            1
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7835638374090195
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0008440276142209768,
+          "q": -0.19798706085593612,
+          "visits": 27,
+          "root_value": -0.1789478361606598,
+          "root_policy_entropy": 3.026570545535966,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 30,
+          "root_wall_visits": 98,
+          "root_pawn_visit_ratio": 0.234375,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8210521638393402
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0016457020537927747,
+          "q": -0.22589078830911757,
+          "visits": 47,
+          "root_value": -0.157594233751297,
+          "root_policy_entropy": 2.6664057790629294,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.2,
+          "root_pawn_visits": 49,
+          "root_wall_visits": 79,
+          "root_pawn_visit_ratio": 0.3828125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            4
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 3,
+          "opponent_distance_before": 4,
+          "opponent_distance_after": 4,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 2,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.842405766248703
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.0020687696523964405,
+          "q": -0.18888014477902446,
+          "visits": 29,
+          "root_value": -0.17967082560062408,
+          "root_policy_entropy": 2.999951108716487,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 32,
+          "root_wall_visits": 96,
+          "root_pawn_visit_ratio": 0.25,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8203291743993759
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.0026531165931373835,
+          "q": -0.22380288131535053,
+          "visits": 24,
+          "root_value": -0.14737874269485474,
+          "root_policy_entropy": 3.0283405082881782,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8526212573051453
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "action": 66,
+          "category": "pawn",
+          "prior": 0.0021387748420238495,
+          "q": -0.22996411696076394,
+          "visits": 20,
+          "root_value": -0.14046452939510345,
+          "root_policy_entropy": 3.0334232591510255,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            3,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8595354706048965
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "action": 65,
+          "category": "pawn",
+          "prior": 0.0016190141905099154,
+          "q": -0.24381060125651183,
+          "visits": 27,
+          "root_value": -0.19000007212162018,
+          "root_policy_entropy": 2.98332159226337,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            3,
+            7
+          ],
+          "pawn_after": [
+            2,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8099999278783798
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "action": 64,
+          "category": "pawn",
+          "prior": 0.0008936900412663817,
+          "q": -0.1991866918710562,
+          "visits": 26,
+          "root_value": -0.1743757575750351,
+          "root_policy_entropy": 3.007580554055009,
+          "root_repetition_adjusted_actions": 2,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            2,
+            7
+          ],
+          "pawn_after": [
+            1,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8256242424249649
+        }
+      ],
+      "winner": 0,
+      "neural_win": false,
+      "plies": 19,
+      "neural_pawn_actions": 9,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 9,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 9,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 3,
+      "seed": 2028,
+      "neural_player": 0,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.00367015996016562,
+          "q": 0.21136224952836832,
+          "visits": 24,
+          "root_value": 0.23755258321762085,
+          "root_policy_entropy": 3.034417239951934,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            8
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            0
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 8,
+          "opponent_distance_after": 8,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2375525832176208
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.002527206437662244,
+          "q": 0.217432685436741,
+          "visits": 31,
+          "root_value": 0.2350529134273529,
+          "root_policy_entropy": 2.9100652374459433,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.235052913427353
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0029100377578288317,
+          "q": 0.19494236328385092,
+          "visits": 22,
+          "root_value": 0.2768555283546448,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2768555283546448
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.002609121846035123,
+          "q": 0.19473165682246607,
+          "visits": 31,
+          "root_value": 0.21050304174423218,
+          "root_policy_entropy": 2.897979805867726,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            4
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 4,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2105030417442322
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0011349695269018412,
+          "q": 0.1843343505805189,
+          "visits": 22,
+          "root_value": 0.25426748394966125,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            4
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 4,
+          "own_distance_after": 3,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2542674839496613
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.0013203918933868408,
+          "q": 0.21313764630920357,
+          "visits": 36,
+          "root_value": 0.21293674409389496,
+          "root_policy_entropy": 2.8157973300972574,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 36,
+          "root_wall_visits": 92,
+          "root_pawn_visit_ratio": 0.28125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.212936744093895
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0016713632503524423,
+          "q": 0.12408816241301023,
+          "visits": 13,
+          "root_value": 0.29262036085128784,
+          "root_policy_entropy": 3.0952505100450063,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 13,
+          "root_wall_visits": 115,
+          "root_pawn_visit_ratio": 0.1015625,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2926203608512878
+        }
+      ],
+      "winner": 1,
+      "neural_win": false,
+      "plies": 14,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 7,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 7,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 4,
+      "seed": 2029,
+      "neural_player": 1,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 1,
+          "player": 1,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0028845251072198153,
+          "q": -0.22737026435357552,
+          "visits": 27,
+          "root_value": -0.20849740505218506,
+          "root_policy_entropy": 3.0113724780707263,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            4,
+            0
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7915025949478149
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.001383960247039795,
+          "q": -0.22424971759319307,
+          "visits": 25,
+          "root_value": -0.21643616259098053,
+          "root_policy_entropy": 3.0511242440883257,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            4,
+            1
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7835638374090195
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0008440276142209768,
+          "q": -0.19798706085593612,
+          "visits": 27,
+          "root_value": -0.1789478361606598,
+          "root_policy_entropy": 3.026570545535966,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 30,
+          "root_wall_visits": 98,
+          "root_pawn_visit_ratio": 0.234375,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8210521638393402
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0016457020537927747,
+          "q": -0.22589078830911757,
+          "visits": 47,
+          "root_value": -0.157594233751297,
+          "root_policy_entropy": 2.6664057790629294,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.2,
+          "root_pawn_visits": 49,
+          "root_wall_visits": 79,
+          "root_pawn_visit_ratio": 0.3828125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            4
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 3,
+          "opponent_distance_before": 4,
+          "opponent_distance_after": 4,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 2,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.842405766248703
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.0020687696523964405,
+          "q": -0.18888014477902446,
+          "visits": 29,
+          "root_value": -0.17967082560062408,
+          "root_policy_entropy": 2.999951108716487,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 32,
+          "root_wall_visits": 96,
+          "root_pawn_visit_ratio": 0.25,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8203291743993759
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.0026531165931373835,
+          "q": -0.22380288131535053,
+          "visits": 24,
+          "root_value": -0.14737874269485474,
+          "root_policy_entropy": 3.0283405082881782,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8526212573051453
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "action": 66,
+          "category": "pawn",
+          "prior": 0.0021387748420238495,
+          "q": -0.22996411696076394,
+          "visits": 20,
+          "root_value": -0.14046452939510345,
+          "root_policy_entropy": 3.0334232591510255,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            3,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8595354706048965
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "action": 65,
+          "category": "pawn",
+          "prior": 0.0016190141905099154,
+          "q": -0.24381060125651183,
+          "visits": 27,
+          "root_value": -0.19000007212162018,
+          "root_policy_entropy": 2.98332159226337,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            3,
+            7
+          ],
+          "pawn_after": [
+            2,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8099999278783798
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "action": 64,
+          "category": "pawn",
+          "prior": 0.0008936900412663817,
+          "q": -0.1991866918710562,
+          "visits": 26,
+          "root_value": -0.1743757575750351,
+          "root_policy_entropy": 3.007580554055009,
+          "root_repetition_adjusted_actions": 2,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            2,
+            7
+          ],
+          "pawn_after": [
+            1,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8256242424249649
+        }
+      ],
+      "winner": 0,
+      "neural_win": false,
+      "plies": 19,
+      "neural_pawn_actions": 9,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 9,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 9,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 5,
+      "seed": 2030,
+      "neural_player": 0,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.00367015996016562,
+          "q": 0.21136224952836832,
+          "visits": 24,
+          "root_value": 0.23755258321762085,
+          "root_policy_entropy": 3.034417239951934,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            8
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            0
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 8,
+          "opponent_distance_after": 8,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2375525832176208
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.002527206437662244,
+          "q": 0.217432685436741,
+          "visits": 31,
+          "root_value": 0.2350529134273529,
+          "root_policy_entropy": 2.9100652374459433,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.235052913427353
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0029100377578288317,
+          "q": 0.19494236328385092,
+          "visits": 22,
+          "root_value": 0.2768555283546448,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2768555283546448
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.002609121846035123,
+          "q": 0.19473165682246607,
+          "visits": 31,
+          "root_value": 0.21050304174423218,
+          "root_policy_entropy": 2.897979805867726,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            4
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 4,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2105030417442322
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0011349695269018412,
+          "q": 0.1843343505805189,
+          "visits": 22,
+          "root_value": 0.25426748394966125,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            4
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 4,
+          "own_distance_after": 3,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2542674839496613
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.0013203918933868408,
+          "q": 0.21313764630920357,
+          "visits": 36,
+          "root_value": 0.21293674409389496,
+          "root_policy_entropy": 2.8157973300972574,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 36,
+          "root_wall_visits": 92,
+          "root_pawn_visit_ratio": 0.28125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.212936744093895
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "action": 168,
+          "category": "wall",
+          "prior": 0.025866780430078506,
+          "q": 0.27460517548024654,
+          "visits": 8,
+          "root_value": 0.29262036085128784,
+          "root_policy_entropy": 3.0952505100450063,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.0,
+          "root_pawn_visits": 13,
+          "root_wall_visits": 115,
+          "root_pawn_visit_ratio": 0.1015625,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 2,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 0,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2926203608512878
+        }
+      ],
+      "winner": 1,
+      "neural_win": false,
+      "plies": 14,
+      "neural_pawn_actions": 6,
+      "neural_wall_actions": 1,
+      "pawn_progress_moves": 6,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 6,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 0.8571428571428571,
+      "result": "loss"
+    },
+    {
+      "game": 6,
+      "seed": 2031,
+      "neural_player": 1,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 1,
+          "player": 1,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0028845251072198153,
+          "q": -0.22737026435357552,
+          "visits": 27,
+          "root_value": -0.20849740505218506,
+          "root_policy_entropy": 3.0113724780707263,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            4,
+            0
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7915025949478149
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.001383960247039795,
+          "q": -0.22424971759319307,
+          "visits": 25,
+          "root_value": -0.21643616259098053,
+          "root_policy_entropy": 3.0511242440883257,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            4,
+            1
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7835638374090195
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0008440276142209768,
+          "q": -0.19798706085593612,
+          "visits": 27,
+          "root_value": -0.1789478361606598,
+          "root_policy_entropy": 3.026570545535966,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 30,
+          "root_wall_visits": 98,
+          "root_pawn_visit_ratio": 0.234375,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8210521638393402
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0016457020537927747,
+          "q": -0.22589078830911757,
+          "visits": 47,
+          "root_value": -0.157594233751297,
+          "root_policy_entropy": 2.6664057790629294,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.2,
+          "root_pawn_visits": 49,
+          "root_wall_visits": 79,
+          "root_pawn_visit_ratio": 0.3828125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            4
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 3,
+          "opponent_distance_before": 4,
+          "opponent_distance_after": 4,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 2,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.842405766248703
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.0020687696523964405,
+          "q": -0.18888014477902446,
+          "visits": 29,
+          "root_value": -0.17967082560062408,
+          "root_policy_entropy": 2.999951108716487,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 32,
+          "root_wall_visits": 96,
+          "root_pawn_visit_ratio": 0.25,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8203291743993759
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.0026531165931373835,
+          "q": -0.22380288131535053,
+          "visits": 24,
+          "root_value": -0.14737874269485474,
+          "root_policy_entropy": 3.0283405082881782,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8526212573051453
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "action": 66,
+          "category": "pawn",
+          "prior": 0.0021387748420238495,
+          "q": -0.22996411696076394,
+          "visits": 20,
+          "root_value": -0.14046452939510345,
+          "root_policy_entropy": 3.0334232591510255,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            3,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8595354706048965
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "action": 65,
+          "category": "pawn",
+          "prior": 0.0016190141905099154,
+          "q": -0.24381060125651183,
+          "visits": 27,
+          "root_value": -0.19000007212162018,
+          "root_policy_entropy": 2.98332159226337,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            3,
+            7
+          ],
+          "pawn_after": [
+            2,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8099999278783798
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "action": 64,
+          "category": "pawn",
+          "prior": 0.0008936900412663817,
+          "q": -0.1991866918710562,
+          "visits": 26,
+          "root_value": -0.1743757575750351,
+          "root_policy_entropy": 3.007580554055009,
+          "root_repetition_adjusted_actions": 2,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            2,
+            7
+          ],
+          "pawn_after": [
+            1,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8256242424249649
+        }
+      ],
+      "winner": 0,
+      "neural_win": false,
+      "plies": 19,
+      "neural_pawn_actions": 9,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 9,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 9,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 7,
+      "seed": 2032,
+      "neural_player": 0,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.00367015996016562,
+          "q": 0.21136224952836832,
+          "visits": 24,
+          "root_value": 0.23755258321762085,
+          "root_policy_entropy": 3.034417239951934,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            8
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            0
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 8,
+          "opponent_distance_after": 8,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2375525832176208
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.002527206437662244,
+          "q": 0.217432685436741,
+          "visits": 31,
+          "root_value": 0.2350529134273529,
+          "root_policy_entropy": 2.9100652374459433,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.235052913427353
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0029100377578288317,
+          "q": 0.19494236328385092,
+          "visits": 22,
+          "root_value": 0.2768555283546448,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2768555283546448
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.002609121846035123,
+          "q": 0.19473165682246607,
+          "visits": 31,
+          "root_value": 0.21050304174423218,
+          "root_policy_entropy": 2.897979805867726,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            4
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 4,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2105030417442322
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0011349695269018412,
+          "q": 0.1843343505805189,
+          "visits": 22,
+          "root_value": 0.25426748394966125,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            4
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 4,
+          "own_distance_after": 3,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2542674839496613
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.0013203918933868408,
+          "q": 0.21313764630920357,
+          "visits": 36,
+          "root_value": 0.21293674409389496,
+          "root_policy_entropy": 2.8157973300972574,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 36,
+          "root_wall_visits": 92,
+          "root_pawn_visit_ratio": 0.28125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.212936744093895
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0016713632503524423,
+          "q": 0.12408816241301023,
+          "visits": 13,
+          "root_value": 0.29262036085128784,
+          "root_policy_entropy": 3.0952505100450063,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 13,
+          "root_wall_visits": 115,
+          "root_pawn_visit_ratio": 0.1015625,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2926203608512878
+        }
+      ],
+      "winner": 1,
+      "neural_win": false,
+      "plies": 14,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 7,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 7,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 8,
+      "seed": 2033,
+      "neural_player": 1,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 1,
+          "player": 1,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0028845251072198153,
+          "q": -0.22737026435357552,
+          "visits": 27,
+          "root_value": -0.20849740505218506,
+          "root_policy_entropy": 3.0113724780707263,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            4,
+            0
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7915025949478149
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.001383960247039795,
+          "q": -0.22424971759319307,
+          "visits": 25,
+          "root_value": -0.21643616259098053,
+          "root_policy_entropy": 3.0511242440883257,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            4,
+            1
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7835638374090195
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0008440276142209768,
+          "q": -0.19798706085593612,
+          "visits": 27,
+          "root_value": -0.1789478361606598,
+          "root_policy_entropy": 3.026570545535966,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 30,
+          "root_wall_visits": 98,
+          "root_pawn_visit_ratio": 0.234375,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8210521638393402
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0016457020537927747,
+          "q": -0.22589078830911757,
+          "visits": 47,
+          "root_value": -0.157594233751297,
+          "root_policy_entropy": 2.6664057790629294,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.2,
+          "root_pawn_visits": 49,
+          "root_wall_visits": 79,
+          "root_pawn_visit_ratio": 0.3828125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            4
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 3,
+          "opponent_distance_before": 4,
+          "opponent_distance_after": 4,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 2,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.842405766248703
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.0020687696523964405,
+          "q": -0.18888014477902446,
+          "visits": 29,
+          "root_value": -0.17967082560062408,
+          "root_policy_entropy": 2.999951108716487,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 32,
+          "root_wall_visits": 96,
+          "root_pawn_visit_ratio": 0.25,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8203291743993759
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.0026531165931373835,
+          "q": -0.22380288131535053,
+          "visits": 24,
+          "root_value": -0.14737874269485474,
+          "root_policy_entropy": 3.0283405082881782,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8526212573051453
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "action": 66,
+          "category": "pawn",
+          "prior": 0.0021387748420238495,
+          "q": -0.22996411696076394,
+          "visits": 20,
+          "root_value": -0.14046452939510345,
+          "root_policy_entropy": 3.0334232591510255,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            3,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8595354706048965
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "action": 65,
+          "category": "pawn",
+          "prior": 0.0016190141905099154,
+          "q": -0.24381060125651183,
+          "visits": 27,
+          "root_value": -0.19000007212162018,
+          "root_policy_entropy": 2.98332159226337,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            3,
+            7
+          ],
+          "pawn_after": [
+            2,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8099999278783798
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "action": 64,
+          "category": "pawn",
+          "prior": 0.0008936900412663817,
+          "q": -0.1991866918710562,
+          "visits": 26,
+          "root_value": -0.1743757575750351,
+          "root_policy_entropy": 3.007580554055009,
+          "root_repetition_adjusted_actions": 2,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            2,
+            7
+          ],
+          "pawn_after": [
+            1,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8256242424249649
+        }
+      ],
+      "winner": 0,
+      "neural_win": false,
+      "plies": 19,
+      "neural_pawn_actions": 9,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 9,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 9,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 9,
+      "seed": 2034,
+      "neural_player": 0,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.00367015996016562,
+          "q": 0.21136224952836832,
+          "visits": 24,
+          "root_value": 0.23755258321762085,
+          "root_policy_entropy": 3.034417239951934,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            8
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            0
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 8,
+          "opponent_distance_after": 8,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2375525832176208
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.002527206437662244,
+          "q": 0.217432685436741,
+          "visits": 31,
+          "root_value": 0.2350529134273529,
+          "root_policy_entropy": 2.9100652374459433,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.235052913427353
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0029100377578288317,
+          "q": 0.19494236328385092,
+          "visits": 22,
+          "root_value": 0.2768555283546448,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2768555283546448
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.002609121846035123,
+          "q": 0.19473165682246607,
+          "visits": 31,
+          "root_value": 0.21050304174423218,
+          "root_policy_entropy": 2.897979805867726,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            4
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 4,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2105030417442322
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0011349695269018412,
+          "q": 0.1843343505805189,
+          "visits": 22,
+          "root_value": 0.25426748394966125,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            4
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 4,
+          "own_distance_after": 3,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2542674839496613
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.0013203918933868408,
+          "q": 0.21313764630920357,
+          "visits": 36,
+          "root_value": 0.21293674409389496,
+          "root_policy_entropy": 2.8157973300972574,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 36,
+          "root_wall_visits": 92,
+          "root_pawn_visit_ratio": 0.28125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.212936744093895
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0016713632503524423,
+          "q": 0.12408816241301023,
+          "visits": 13,
+          "root_value": 0.29262036085128784,
+          "root_policy_entropy": 3.0952505100450063,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 13,
+          "root_wall_visits": 115,
+          "root_pawn_visit_ratio": 0.1015625,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2926203608512878
+        }
+      ],
+      "winner": 1,
+      "neural_win": false,
+      "plies": 14,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 7,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 7,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 10,
+      "seed": 2035,
+      "neural_player": 1,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 1,
+          "player": 1,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0028845251072198153,
+          "q": -0.22737026435357552,
+          "visits": 27,
+          "root_value": -0.20849740505218506,
+          "root_policy_entropy": 3.0113724780707263,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            4,
+            0
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7915025949478149
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.001383960247039795,
+          "q": -0.22424971759319307,
+          "visits": 25,
+          "root_value": -0.21643616259098053,
+          "root_policy_entropy": 3.0511242440883257,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            4,
+            1
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7835638374090195
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0008440276142209768,
+          "q": -0.19798706085593612,
+          "visits": 27,
+          "root_value": -0.1789478361606598,
+          "root_policy_entropy": 3.026570545535966,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 30,
+          "root_wall_visits": 98,
+          "root_pawn_visit_ratio": 0.234375,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8210521638393402
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0016457020537927747,
+          "q": -0.22589078830911757,
+          "visits": 47,
+          "root_value": -0.157594233751297,
+          "root_policy_entropy": 2.6664057790629294,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.2,
+          "root_pawn_visits": 49,
+          "root_wall_visits": 79,
+          "root_pawn_visit_ratio": 0.3828125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            4
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 3,
+          "opponent_distance_before": 4,
+          "opponent_distance_after": 4,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 2,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.842405766248703
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.0020687696523964405,
+          "q": -0.18888014477902446,
+          "visits": 29,
+          "root_value": -0.17967082560062408,
+          "root_policy_entropy": 2.999951108716487,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 32,
+          "root_wall_visits": 96,
+          "root_pawn_visit_ratio": 0.25,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8203291743993759
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.0026531165931373835,
+          "q": -0.22380288131535053,
+          "visits": 24,
+          "root_value": -0.14737874269485474,
+          "root_policy_entropy": 3.0283405082881782,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8526212573051453
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "action": 66,
+          "category": "pawn",
+          "prior": 0.0021387748420238495,
+          "q": -0.22996411696076394,
+          "visits": 20,
+          "root_value": -0.14046452939510345,
+          "root_policy_entropy": 3.0334232591510255,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            3,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8595354706048965
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "action": 65,
+          "category": "pawn",
+          "prior": 0.0016190141905099154,
+          "q": -0.24381060125651183,
+          "visits": 27,
+          "root_value": -0.19000007212162018,
+          "root_policy_entropy": 2.98332159226337,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            3,
+            7
+          ],
+          "pawn_after": [
+            2,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8099999278783798
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "action": 64,
+          "category": "pawn",
+          "prior": 0.0008936900412663817,
+          "q": -0.1991866918710562,
+          "visits": 26,
+          "root_value": -0.1743757575750351,
+          "root_policy_entropy": 3.007580554055009,
+          "root_repetition_adjusted_actions": 2,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            2,
+            7
+          ],
+          "pawn_after": [
+            1,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8256242424249649
+        }
+      ],
+      "winner": 0,
+      "neural_win": false,
+      "plies": 19,
+      "neural_pawn_actions": 9,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 9,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 9,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 11,
+      "seed": 2036,
+      "neural_player": 0,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.00367015996016562,
+          "q": 0.21136224952836832,
+          "visits": 24,
+          "root_value": 0.23755258321762085,
+          "root_policy_entropy": 3.034417239951934,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            8
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            0
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 8,
+          "opponent_distance_after": 8,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2375525832176208
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.002527206437662244,
+          "q": 0.217432685436741,
+          "visits": 31,
+          "root_value": 0.2350529134273529,
+          "root_policy_entropy": 2.9100652374459433,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.235052913427353
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0029100377578288317,
+          "q": 0.19494236328385092,
+          "visits": 22,
+          "root_value": 0.2768555283546448,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2768555283546448
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.002609121846035123,
+          "q": 0.19473165682246607,
+          "visits": 31,
+          "root_value": 0.21050304174423218,
+          "root_policy_entropy": 2.897979805867726,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            4
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 4,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2105030417442322
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0011349695269018412,
+          "q": 0.1843343505805189,
+          "visits": 22,
+          "root_value": 0.25426748394966125,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            4
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 4,
+          "own_distance_after": 3,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2542674839496613
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.0013203918933868408,
+          "q": 0.21313764630920357,
+          "visits": 36,
+          "root_value": 0.21293674409389496,
+          "root_policy_entropy": 2.8157973300972574,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 36,
+          "root_wall_visits": 92,
+          "root_pawn_visit_ratio": 0.28125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.212936744093895
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0016713632503524423,
+          "q": 0.12408816241301023,
+          "visits": 13,
+          "root_value": 0.29262036085128784,
+          "root_policy_entropy": 3.0952505100450063,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 13,
+          "root_wall_visits": 115,
+          "root_pawn_visit_ratio": 0.1015625,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2926203608512878
+        }
+      ],
+      "winner": 1,
+      "neural_win": false,
+      "plies": 14,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 7,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 7,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 12,
+      "seed": 2037,
+      "neural_player": 1,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 1,
+          "player": 1,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0028845251072198153,
+          "q": -0.22737026435357552,
+          "visits": 27,
+          "root_value": -0.20849740505218506,
+          "root_policy_entropy": 3.0113724780707263,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            4,
+            0
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7915025949478149
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.001383960247039795,
+          "q": -0.22424971759319307,
+          "visits": 25,
+          "root_value": -0.21643616259098053,
+          "root_policy_entropy": 3.0511242440883257,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            4,
+            1
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7835638374090195
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0008440276142209768,
+          "q": -0.19798706085593612,
+          "visits": 27,
+          "root_value": -0.1789478361606598,
+          "root_policy_entropy": 3.026570545535966,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 30,
+          "root_wall_visits": 98,
+          "root_pawn_visit_ratio": 0.234375,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8210521638393402
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0016457020537927747,
+          "q": -0.22589078830911757,
+          "visits": 47,
+          "root_value": -0.157594233751297,
+          "root_policy_entropy": 2.6664057790629294,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.2,
+          "root_pawn_visits": 49,
+          "root_wall_visits": 79,
+          "root_pawn_visit_ratio": 0.3828125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            4
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 3,
+          "opponent_distance_before": 4,
+          "opponent_distance_after": 4,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 2,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.842405766248703
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.0020687696523964405,
+          "q": -0.18888014477902446,
+          "visits": 29,
+          "root_value": -0.17967082560062408,
+          "root_policy_entropy": 2.999951108716487,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 32,
+          "root_wall_visits": 96,
+          "root_pawn_visit_ratio": 0.25,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8203291743993759
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.0026531165931373835,
+          "q": -0.22380288131535053,
+          "visits": 24,
+          "root_value": -0.14737874269485474,
+          "root_policy_entropy": 3.0283405082881782,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8526212573051453
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "action": 66,
+          "category": "pawn",
+          "prior": 0.0021387748420238495,
+          "q": -0.22996411696076394,
+          "visits": 20,
+          "root_value": -0.14046452939510345,
+          "root_policy_entropy": 3.0334232591510255,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            3,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8595354706048965
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "action": 65,
+          "category": "pawn",
+          "prior": 0.0016190141905099154,
+          "q": -0.24381060125651183,
+          "visits": 27,
+          "root_value": -0.19000007212162018,
+          "root_policy_entropy": 2.98332159226337,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            3,
+            7
+          ],
+          "pawn_after": [
+            2,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8099999278783798
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "action": 64,
+          "category": "pawn",
+          "prior": 0.0008936900412663817,
+          "q": -0.1991866918710562,
+          "visits": 26,
+          "root_value": -0.1743757575750351,
+          "root_policy_entropy": 3.007580554055009,
+          "root_repetition_adjusted_actions": 2,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            2,
+            7
+          ],
+          "pawn_after": [
+            1,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8256242424249649
+        }
+      ],
+      "winner": 0,
+      "neural_win": false,
+      "plies": 19,
+      "neural_pawn_actions": 9,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 9,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 9,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 13,
+      "seed": 2038,
+      "neural_player": 0,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.00367015996016562,
+          "q": 0.21136224952836832,
+          "visits": 24,
+          "root_value": 0.23755258321762085,
+          "root_policy_entropy": 3.034417239951934,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            8
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            0
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 8,
+          "opponent_distance_after": 8,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2375525832176208
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.002527206437662244,
+          "q": 0.217432685436741,
+          "visits": 31,
+          "root_value": 0.2350529134273529,
+          "root_policy_entropy": 2.9100652374459433,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.235052913427353
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0029100377578288317,
+          "q": 0.19494236328385092,
+          "visits": 22,
+          "root_value": 0.2768555283546448,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2768555283546448
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.002609121846035123,
+          "q": 0.19473165682246607,
+          "visits": 31,
+          "root_value": 0.21050304174423218,
+          "root_policy_entropy": 2.897979805867726,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            4
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 4,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2105030417442322
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0011349695269018412,
+          "q": 0.1843343505805189,
+          "visits": 22,
+          "root_value": 0.25426748394966125,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            4
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 4,
+          "own_distance_after": 3,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2542674839496613
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.0013203918933868408,
+          "q": 0.21313764630920357,
+          "visits": 36,
+          "root_value": 0.21293674409389496,
+          "root_policy_entropy": 2.8157973300972574,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 36,
+          "root_wall_visits": 92,
+          "root_pawn_visit_ratio": 0.28125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.212936744093895
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0016713632503524423,
+          "q": 0.12408816241301023,
+          "visits": 13,
+          "root_value": 0.29262036085128784,
+          "root_policy_entropy": 3.0952505100450063,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 13,
+          "root_wall_visits": 115,
+          "root_pawn_visit_ratio": 0.1015625,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2926203608512878
+        }
+      ],
+      "winner": 1,
+      "neural_win": false,
+      "plies": 14,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 7,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 7,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 14,
+      "seed": 2039,
+      "neural_player": 1,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 1,
+          "player": 1,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0028845251072198153,
+          "q": -0.22737026435357552,
+          "visits": 27,
+          "root_value": -0.20849740505218506,
+          "root_policy_entropy": 3.0113724780707263,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            4,
+            0
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7915025949478149
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.001383960247039795,
+          "q": -0.22424971759319307,
+          "visits": 25,
+          "root_value": -0.21643616259098053,
+          "root_policy_entropy": 3.0511242440883257,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            4,
+            1
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7835638374090195
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0008440276142209768,
+          "q": -0.19798706085593612,
+          "visits": 27,
+          "root_value": -0.1789478361606598,
+          "root_policy_entropy": 3.026570545535966,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 30,
+          "root_wall_visits": 98,
+          "root_pawn_visit_ratio": 0.234375,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8210521638393402
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0016457020537927747,
+          "q": -0.22589078830911757,
+          "visits": 47,
+          "root_value": -0.157594233751297,
+          "root_policy_entropy": 2.6664057790629294,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.2,
+          "root_pawn_visits": 49,
+          "root_wall_visits": 79,
+          "root_pawn_visit_ratio": 0.3828125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            4
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 3,
+          "opponent_distance_before": 4,
+          "opponent_distance_after": 4,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 2,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.842405766248703
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.0020687696523964405,
+          "q": -0.18888014477902446,
+          "visits": 29,
+          "root_value": -0.17967082560062408,
+          "root_policy_entropy": 2.999951108716487,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 32,
+          "root_wall_visits": 96,
+          "root_pawn_visit_ratio": 0.25,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8203291743993759
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.0026531165931373835,
+          "q": -0.22380288131535053,
+          "visits": 24,
+          "root_value": -0.14737874269485474,
+          "root_policy_entropy": 3.0283405082881782,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8526212573051453
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "action": 66,
+          "category": "pawn",
+          "prior": 0.0021387748420238495,
+          "q": -0.22996411696076394,
+          "visits": 20,
+          "root_value": -0.14046452939510345,
+          "root_policy_entropy": 3.0334232591510255,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            3,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8595354706048965
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "action": 65,
+          "category": "pawn",
+          "prior": 0.0016190141905099154,
+          "q": -0.24381060125651183,
+          "visits": 27,
+          "root_value": -0.19000007212162018,
+          "root_policy_entropy": 2.98332159226337,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            3,
+            7
+          ],
+          "pawn_after": [
+            2,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8099999278783798
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "action": 64,
+          "category": "pawn",
+          "prior": 0.0008936900412663817,
+          "q": -0.1991866918710562,
+          "visits": 26,
+          "root_value": -0.1743757575750351,
+          "root_policy_entropy": 3.007580554055009,
+          "root_repetition_adjusted_actions": 2,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            2,
+            7
+          ],
+          "pawn_after": [
+            1,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8256242424249649
+        }
+      ],
+      "winner": 0,
+      "neural_win": false,
+      "plies": 19,
+      "neural_pawn_actions": 9,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 9,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 9,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 15,
+      "seed": 2040,
+      "neural_player": 0,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.00367015996016562,
+          "q": 0.21136224952836832,
+          "visits": 24,
+          "root_value": 0.23755258321762085,
+          "root_policy_entropy": 3.034417239951934,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            8
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            0
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 8,
+          "opponent_distance_after": 8,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2375525832176208
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.002527206437662244,
+          "q": 0.217432685436741,
+          "visits": 31,
+          "root_value": 0.2350529134273529,
+          "root_policy_entropy": 2.9100652374459433,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.235052913427353
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0029100377578288317,
+          "q": 0.19494236328385092,
+          "visits": 22,
+          "root_value": 0.2768555283546448,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2768555283546448
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.002609121846035123,
+          "q": 0.19473165682246607,
+          "visits": 31,
+          "root_value": 0.21050304174423218,
+          "root_policy_entropy": 2.897979805867726,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            4
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 4,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2105030417442322
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0011349695269018412,
+          "q": 0.1843343505805189,
+          "visits": 22,
+          "root_value": 0.25426748394966125,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            4
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 4,
+          "own_distance_after": 3,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2542674839496613
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.0013203918933868408,
+          "q": 0.21313764630920357,
+          "visits": 36,
+          "root_value": 0.21293674409389496,
+          "root_policy_entropy": 2.8157973300972574,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 36,
+          "root_wall_visits": 92,
+          "root_pawn_visit_ratio": 0.28125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.212936744093895
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0016713632503524423,
+          "q": 0.12408816241301023,
+          "visits": 13,
+          "root_value": 0.29262036085128784,
+          "root_policy_entropy": 3.0952505100450063,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 13,
+          "root_wall_visits": 115,
+          "root_pawn_visit_ratio": 0.1015625,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2926203608512878
+        }
+      ],
+      "winner": 1,
+      "neural_win": false,
+      "plies": 14,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 7,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 7,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 16,
+      "seed": 2041,
+      "neural_player": 1,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 1,
+          "player": 1,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0028845251072198153,
+          "q": -0.22737026435357552,
+          "visits": 27,
+          "root_value": -0.20849740505218506,
+          "root_policy_entropy": 3.0113724780707263,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            4,
+            0
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7915025949478149
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.001383960247039795,
+          "q": -0.22424971759319307,
+          "visits": 25,
+          "root_value": -0.21643616259098053,
+          "root_policy_entropy": 3.0511242440883257,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            4,
+            1
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7835638374090195
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0008440276142209768,
+          "q": -0.19798706085593612,
+          "visits": 27,
+          "root_value": -0.1789478361606598,
+          "root_policy_entropy": 3.026570545535966,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 30,
+          "root_wall_visits": 98,
+          "root_pawn_visit_ratio": 0.234375,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8210521638393402
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0016457020537927747,
+          "q": -0.22589078830911757,
+          "visits": 47,
+          "root_value": -0.157594233751297,
+          "root_policy_entropy": 2.6664057790629294,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.2,
+          "root_pawn_visits": 49,
+          "root_wall_visits": 79,
+          "root_pawn_visit_ratio": 0.3828125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            4
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 3,
+          "opponent_distance_before": 4,
+          "opponent_distance_after": 4,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 2,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.842405766248703
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.0020687696523964405,
+          "q": -0.18888014477902446,
+          "visits": 29,
+          "root_value": -0.17967082560062408,
+          "root_policy_entropy": 2.999951108716487,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 32,
+          "root_wall_visits": 96,
+          "root_pawn_visit_ratio": 0.25,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8203291743993759
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.0026531165931373835,
+          "q": -0.22380288131535053,
+          "visits": 24,
+          "root_value": -0.14737874269485474,
+          "root_policy_entropy": 3.0283405082881782,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8526212573051453
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "action": 66,
+          "category": "pawn",
+          "prior": 0.0021387748420238495,
+          "q": -0.22996411696076394,
+          "visits": 20,
+          "root_value": -0.14046452939510345,
+          "root_policy_entropy": 3.0334232591510255,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            3,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8595354706048965
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "action": 65,
+          "category": "pawn",
+          "prior": 0.0016190141905099154,
+          "q": -0.24381060125651183,
+          "visits": 27,
+          "root_value": -0.19000007212162018,
+          "root_policy_entropy": 2.98332159226337,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            3,
+            7
+          ],
+          "pawn_after": [
+            2,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8099999278783798
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "action": 64,
+          "category": "pawn",
+          "prior": 0.0008936900412663817,
+          "q": -0.1991866918710562,
+          "visits": 26,
+          "root_value": -0.1743757575750351,
+          "root_policy_entropy": 3.007580554055009,
+          "root_repetition_adjusted_actions": 2,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            2,
+            7
+          ],
+          "pawn_after": [
+            1,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8256242424249649
+        }
+      ],
+      "winner": 0,
+      "neural_win": false,
+      "plies": 19,
+      "neural_pawn_actions": 9,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 9,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 9,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 17,
+      "seed": 2042,
+      "neural_player": 0,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.00367015996016562,
+          "q": 0.21136224952836832,
+          "visits": 24,
+          "root_value": 0.23755258321762085,
+          "root_policy_entropy": 3.034417239951934,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            8
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            0
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 8,
+          "opponent_distance_after": 8,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2375525832176208
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.002527206437662244,
+          "q": 0.217432685436741,
+          "visits": 31,
+          "root_value": 0.2350529134273529,
+          "root_policy_entropy": 2.9100652374459433,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.235052913427353
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0029100377578288317,
+          "q": 0.19494236328385092,
+          "visits": 22,
+          "root_value": 0.2768555283546448,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2768555283546448
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.002609121846035123,
+          "q": 0.19473165682246607,
+          "visits": 31,
+          "root_value": 0.21050304174423218,
+          "root_policy_entropy": 2.897979805867726,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            4
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 4,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2105030417442322
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0011349695269018412,
+          "q": 0.1843343505805189,
+          "visits": 22,
+          "root_value": 0.25426748394966125,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            4
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 4,
+          "own_distance_after": 3,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2542674839496613
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.0013203918933868408,
+          "q": 0.21313764630920357,
+          "visits": 36,
+          "root_value": 0.21293674409389496,
+          "root_policy_entropy": 2.8157973300972574,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 36,
+          "root_wall_visits": 92,
+          "root_pawn_visit_ratio": 0.28125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.212936744093895
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0016713632503524423,
+          "q": 0.12408816241301023,
+          "visits": 13,
+          "root_value": 0.29262036085128784,
+          "root_policy_entropy": 3.0952505100450063,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 13,
+          "root_wall_visits": 115,
+          "root_pawn_visit_ratio": 0.1015625,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2926203608512878
+        }
+      ],
+      "winner": 1,
+      "neural_win": false,
+      "plies": 14,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 7,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 7,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 18,
+      "seed": 2043,
+      "neural_player": 1,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 1,
+          "player": 1,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0028845251072198153,
+          "q": -0.22737026435357552,
+          "visits": 27,
+          "root_value": -0.20849740505218506,
+          "root_policy_entropy": 3.0113724780707263,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            4,
+            0
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7915025949478149
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.001383960247039795,
+          "q": -0.22424971759319307,
+          "visits": 25,
+          "root_value": -0.21643616259098053,
+          "root_policy_entropy": 3.0511242440883257,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            4,
+            1
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7835638374090195
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0008440276142209768,
+          "q": -0.19798706085593612,
+          "visits": 27,
+          "root_value": -0.1789478361606598,
+          "root_policy_entropy": 3.026570545535966,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 30,
+          "root_wall_visits": 98,
+          "root_pawn_visit_ratio": 0.234375,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8210521638393402
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0016457020537927747,
+          "q": -0.22589078830911757,
+          "visits": 47,
+          "root_value": -0.157594233751297,
+          "root_policy_entropy": 2.6664057790629294,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.2,
+          "root_pawn_visits": 49,
+          "root_wall_visits": 79,
+          "root_pawn_visit_ratio": 0.3828125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            4
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 3,
+          "opponent_distance_before": 4,
+          "opponent_distance_after": 4,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 2,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.842405766248703
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.0020687696523964405,
+          "q": -0.18888014477902446,
+          "visits": 29,
+          "root_value": -0.17967082560062408,
+          "root_policy_entropy": 2.999951108716487,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 32,
+          "root_wall_visits": 96,
+          "root_pawn_visit_ratio": 0.25,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8203291743993759
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.0026531165931373835,
+          "q": -0.22380288131535053,
+          "visits": 24,
+          "root_value": -0.14737874269485474,
+          "root_policy_entropy": 3.0283405082881782,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8526212573051453
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "action": 66,
+          "category": "pawn",
+          "prior": 0.0021387748420238495,
+          "q": -0.22996411696076394,
+          "visits": 20,
+          "root_value": -0.14046452939510345,
+          "root_policy_entropy": 3.0334232591510255,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            3,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8595354706048965
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "action": 65,
+          "category": "pawn",
+          "prior": 0.0016190141905099154,
+          "q": -0.24381060125651183,
+          "visits": 27,
+          "root_value": -0.19000007212162018,
+          "root_policy_entropy": 2.98332159226337,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            3,
+            7
+          ],
+          "pawn_after": [
+            2,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8099999278783798
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "action": 64,
+          "category": "pawn",
+          "prior": 0.0008936900412663817,
+          "q": -0.1991866918710562,
+          "visits": 26,
+          "root_value": -0.1743757575750351,
+          "root_policy_entropy": 3.007580554055009,
+          "root_repetition_adjusted_actions": 2,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            2,
+            7
+          ],
+          "pawn_after": [
+            1,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8256242424249649
+        }
+      ],
+      "winner": 0,
+      "neural_win": false,
+      "plies": 19,
+      "neural_pawn_actions": 9,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 9,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 9,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 19,
+      "seed": 2044,
+      "neural_player": 0,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.00367015996016562,
+          "q": 0.21136224952836832,
+          "visits": 24,
+          "root_value": 0.23755258321762085,
+          "root_policy_entropy": 3.034417239951934,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            8
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            0
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 8,
+          "opponent_distance_after": 8,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2375525832176208
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.002527206437662244,
+          "q": 0.217432685436741,
+          "visits": 31,
+          "root_value": 0.2350529134273529,
+          "root_policy_entropy": 2.9100652374459433,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.235052913427353
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0029100377578288317,
+          "q": 0.19494236328385092,
+          "visits": 22,
+          "root_value": 0.2768555283546448,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2768555283546448
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.002609121846035123,
+          "q": 0.19473165682246607,
+          "visits": 31,
+          "root_value": 0.21050304174423218,
+          "root_policy_entropy": 2.897979805867726,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 31,
+          "root_wall_visits": 97,
+          "root_pawn_visit_ratio": 0.2421875,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            4
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 4,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2105030417442322
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0011349695269018412,
+          "q": 0.1843343505805189,
+          "visits": 22,
+          "root_value": 0.25426748394966125,
+          "root_policy_entropy": 3.0207743949828565,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            4
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 4,
+          "own_distance_after": 3,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2542674839496613
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.0013203918933868408,
+          "q": 0.21313764630920357,
+          "visits": 36,
+          "root_value": 0.21293674409389496,
+          "root_policy_entropy": 2.8157973300972574,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 36,
+          "root_wall_visits": 92,
+          "root_pawn_visit_ratio": 0.28125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.212936744093895
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0016713632503524423,
+          "q": 0.12408816241301023,
+          "visits": 13,
+          "root_value": 0.29262036085128784,
+          "root_policy_entropy": 3.0952505100450063,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 13,
+          "root_wall_visits": 115,
+          "root_pawn_visit_ratio": 0.1015625,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 1.2926203608512878
+        }
+      ],
+      "winner": 1,
+      "neural_win": false,
+      "plies": 14,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 7,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 7,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 20,
+      "seed": 2045,
+      "neural_player": 1,
+      "opponent": "heuristic",
+      "action_trace": [
+        {
+          "ply": 1,
+          "player": 1,
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.0028845251072198153,
+          "q": -0.22737026435357552,
+          "visits": 27,
+          "root_value": -0.20849740505218506,
+          "root_policy_entropy": 3.0113724780707263,
+          "root_repetition_adjusted_actions": 0,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            4,
+            0
+          ],
+          "pawn_after": [
+            4,
+            1
+          ],
+          "opponent_pawn": [
+            4,
+            7
+          ],
+          "own_distance_before": 8,
+          "own_distance_after": 7,
+          "opponent_distance_before": 7,
+          "opponent_distance_after": 7,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7915025949478149
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.001383960247039795,
+          "q": -0.22424971759319307,
+          "visits": 25,
+          "root_value": -0.21643616259098053,
+          "root_policy_entropy": 3.0511242440883257,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            4,
+            1
+          ],
+          "pawn_after": [
+            4,
+            2
+          ],
+          "opponent_pawn": [
+            4,
+            6
+          ],
+          "own_distance_before": 7,
+          "own_distance_after": 6,
+          "opponent_distance_before": 6,
+          "opponent_distance_after": 6,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.7835638374090195
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "action": 31,
+          "category": "pawn",
+          "prior": 0.0008440276142209768,
+          "q": -0.19798706085593612,
+          "visits": 27,
+          "root_value": -0.1789478361606598,
+          "root_policy_entropy": 3.026570545535966,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 30,
+          "root_wall_visits": 98,
+          "root_pawn_visit_ratio": 0.234375,
+          "pawn_before": [
+            4,
+            2
+          ],
+          "pawn_after": [
+            4,
+            3
+          ],
+          "opponent_pawn": [
+            4,
+            5
+          ],
+          "own_distance_before": 6,
+          "own_distance_after": 5,
+          "opponent_distance_before": 5,
+          "opponent_distance_after": 5,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8210521638393402
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "action": 49,
+          "category": "pawn",
+          "prior": 0.0016457020537927747,
+          "q": -0.22589078830911757,
+          "visits": 47,
+          "root_value": -0.157594233751297,
+          "root_policy_entropy": 2.6664057790629294,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.2,
+          "root_pawn_visits": 49,
+          "root_wall_visits": 79,
+          "root_pawn_visit_ratio": 0.3828125,
+          "pawn_before": [
+            4,
+            3
+          ],
+          "pawn_after": [
+            4,
+            5
+          ],
+          "opponent_pawn": [
+            4,
+            4
+          ],
+          "own_distance_before": 5,
+          "own_distance_after": 3,
+          "opponent_distance_before": 4,
+          "opponent_distance_after": 4,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 2,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.842405766248703
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.0020687696523964405,
+          "q": -0.18888014477902446,
+          "visits": 29,
+          "root_value": -0.17967082560062408,
+          "root_policy_entropy": 2.999951108716487,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 32,
+          "root_wall_visits": 96,
+          "root_pawn_visit_ratio": 0.25,
+          "pawn_before": [
+            4,
+            5
+          ],
+          "pawn_after": [
+            4,
+            6
+          ],
+          "opponent_pawn": [
+            4,
+            3
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 3,
+          "opponent_distance_after": 3,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8203291743993759
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "action": 67,
+          "category": "pawn",
+          "prior": 0.0026531165931373835,
+          "q": -0.22380288131535053,
+          "visits": 24,
+          "root_value": -0.14737874269485474,
+          "root_policy_entropy": 3.0283405082881782,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 27,
+          "root_wall_visits": 101,
+          "root_pawn_visit_ratio": 0.2109375,
+          "pawn_before": [
+            4,
+            6
+          ],
+          "pawn_after": [
+            4,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8526212573051453
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "action": 66,
+          "category": "pawn",
+          "prior": 0.0021387748420238495,
+          "q": -0.22996411696076394,
+          "visits": 20,
+          "root_value": -0.14046452939510345,
+          "root_policy_entropy": 3.0334232591510255,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 22,
+          "root_wall_visits": 106,
+          "root_pawn_visit_ratio": 0.171875,
+          "pawn_before": [
+            4,
+            7
+          ],
+          "pawn_after": [
+            3,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8595354706048965
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "action": 65,
+          "category": "pawn",
+          "prior": 0.0016190141905099154,
+          "q": -0.24381060125651183,
+          "visits": 27,
+          "root_value": -0.19000007212162018,
+          "root_policy_entropy": 2.98332159226337,
+          "root_repetition_adjusted_actions": 1,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 29,
+          "root_wall_visits": 99,
+          "root_pawn_visit_ratio": 0.2265625,
+          "pawn_before": [
+            3,
+            7
+          ],
+          "pawn_after": [
+            2,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            2
+          ],
+          "own_distance_before": 3,
+          "own_distance_after": 2,
+          "opponent_distance_before": 2,
+          "opponent_distance_after": 2,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8099999278783798
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "action": 64,
+          "category": "pawn",
+          "prior": 0.0008936900412663817,
+          "q": -0.1991866918710562,
+          "visits": 26,
+          "root_value": -0.1743757575750351,
+          "root_policy_entropy": 3.007580554055009,
+          "root_repetition_adjusted_actions": 2,
+          "selection_adjustment": 0.1,
+          "root_pawn_visits": 28,
+          "root_wall_visits": 100,
+          "root_pawn_visit_ratio": 0.21875,
+          "pawn_before": [
+            2,
+            7
+          ],
+          "pawn_after": [
+            1,
+            7
+          ],
+          "opponent_pawn": [
+            4,
+            1
+          ],
+          "own_distance_before": 2,
+          "own_distance_after": 1,
+          "opponent_distance_before": 1,
+          "opponent_distance_after": 1,
+          "opponent_distance_delta": 0,
+          "pawn_distance_delta": 1,
+          "pawn_reversal": false,
+          "value_target": -1.0,
+          "root_value_error": 0.8256242424249649
+        }
+      ],
+      "winner": 0,
+      "neural_win": false,
+      "plies": 19,
+      "neural_pawn_actions": 9,
+      "neural_wall_actions": 0,
+      "pawn_progress_moves": 9,
+      "pawn_regression_moves": 0,
+      "pawn_reversal_moves": 0,
+      "own_distance_improvements": 9,
+      "own_distance_regressions": 0,
+      "opponent_distance_increases": 0,
+      "opponent_distance_decreases": 0,
+      "opponent_distance_changed_actions": 0,
+      "opponent_distance_delta_sum": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    }
+  ],
+  "note": "Seeded paired-seat evaluation with stochastic action sampling when temperature is nonzero. This smoke evaluation is not a statistically conclusive rating."
+}
