@@ -70,6 +70,13 @@ def main() -> int:
         opponent_distance_decreases = 0
         opponent_distance_delta_sum = 0
         opponent_distance_changed_actions = 0
+        wall_opponent_path_increases = 0
+        wall_opponent_path_decreases = 0
+        wall_opponent_distance_delta_sum = 0
+        wall_own_path_increases = 0
+        wall_own_path_decreases = 0
+        wall_own_distance_delta_sum = 0
+        wall_actions_with_distance_effect = 0
         pawn_position_history = [state.pawns[neural_player]]
 
         while state.winner is None and state.ply < args.max_plies:
@@ -120,6 +127,25 @@ def main() -> int:
                     elif opponent_distance_delta < 0:
                         opponent_distance_decreases += 1
                         opponent_distance_changed_actions += 1
+
+                wall_opponent_delta = None
+                wall_own_delta = None
+                if action_index >= MOVE_ACTIONS:
+                    if opponent_distance_delta is not None:
+                        wall_opponent_delta = opponent_distance_delta
+                        wall_actions_with_distance_effect += int(opponent_distance_delta != 0)
+                        wall_opponent_distance_delta_sum += opponent_distance_delta
+                        if opponent_distance_delta > 0:
+                            wall_opponent_path_increases += 1
+                        elif opponent_distance_delta < 0:
+                            wall_opponent_path_decreases += 1
+                    if own_distance_before is not None and own_distance_after is not None:
+                        wall_own_delta = own_distance_after - own_distance_before
+                        wall_own_distance_delta_sum += wall_own_delta
+                        if wall_own_delta > 0:
+                            wall_own_path_increases += 1
+                        elif wall_own_delta < 0:
+                            wall_own_path_decreases += 1
                 action_trace.append({
                     'ply': state.ply,
                     'player': state.current_player,
@@ -143,6 +169,8 @@ def main() -> int:
                     'opponent_distance_before': opponent_distance_before,
                     'opponent_distance_after': opponent_distance_after,
                     'opponent_distance_delta': opponent_distance_delta,
+                    'wall_opponent_distance_delta': wall_opponent_delta,
+                    'wall_own_distance_delta': wall_own_delta,
                     'pawn_distance_delta': (
                         None if own_distance_before is None or own_distance_after is None
                         else own_distance_before - own_distance_after
@@ -189,6 +217,13 @@ def main() -> int:
             "opponent_distance_decreases": opponent_distance_decreases,
             "opponent_distance_changed_actions": opponent_distance_changed_actions,
             "opponent_distance_delta_sum": opponent_distance_delta_sum,
+            "wall_opponent_path_increases": wall_opponent_path_increases,
+            "wall_opponent_path_decreases": wall_opponent_path_decreases,
+            "wall_opponent_distance_delta_sum": wall_opponent_distance_delta_sum,
+            "wall_own_path_increases": wall_own_path_increases,
+            "wall_own_path_decreases": wall_own_path_decreases,
+            "wall_own_distance_delta_sum": wall_own_distance_delta_sum,
+            "wall_actions_with_distance_effect": wall_actions_with_distance_effect,
             "neural_pawn_action_ratio": (
                 neural_pawn_actions / (neural_pawn_actions + neural_wall_actions)
                 if neural_pawn_actions + neural_wall_actions else 0.0
@@ -280,6 +315,13 @@ def main() -> int:
             "mean_opponent_distance_delta": (
                 sum(opponent_deltas) / len(opponent_deltas) if opponent_deltas else None
             ),
+            "wall_opponent_path_increases": sum(row["wall_opponent_path_increases"] for row in rows),
+            "wall_opponent_path_decreases": sum(row["wall_opponent_path_decreases"] for row in rows),
+            "wall_opponent_distance_delta_sum": sum(row["wall_opponent_distance_delta_sum"] for row in rows),
+            "wall_own_path_increases": sum(row["wall_own_path_increases"] for row in rows),
+            "wall_own_path_decreases": sum(row["wall_own_path_decreases"] for row in rows),
+            "wall_own_distance_delta_sum": sum(row["wall_own_distance_delta_sum"] for row in rows),
+            "wall_actions_with_distance_effect": sum(row["wall_actions_with_distance_effect"] for row in rows),
         },
         "value_calibration": {
             "samples": len(value_errors),
