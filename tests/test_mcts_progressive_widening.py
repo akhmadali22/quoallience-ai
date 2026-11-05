@@ -167,3 +167,34 @@ def test_search_reports_per_action_root_diagnostics():
     assert stats['root_value'] == 0.0
     assert stats['root_policy_entropy'] >= 0.0
     assert all({'category', 'prior', 'q', 'visits', 'active'} <= set(item) for item in stats['root_action_stats'].values())
+
+
+def test_root_action_adjustments_penalize_recent_pawn_reversal_and_reward_progress():
+    from quoridor.neural_ai.encoder import encode_action
+
+    mcts = make_mcts(repetition_penalty=0.75, pawn_progress_bonus=0.10)
+    state = GameState.initial()
+    # The current pawn is at (4, 8); (4, 7) is a recent prior square.
+    adjustments = mcts._root_action_adjustments(
+        state, [(4, 7), (4, 8)]
+    )
+    backward = encode_action(("move", (4, 7)))
+    forward = encode_action(("move", (4, 7)))
+    assert adjustments[backward] < 0
+    assert backward == forward
+
+
+def test_root_adjustments_are_empty_without_history():
+    mcts = make_mcts()
+    assert mcts._root_action_adjustments(GameState.initial(), None) == {}
+
+
+def test_choose_action_accepts_recent_pawn_history():
+    import random
+    mcts = make_mcts(simulations=4)
+    action, visits = mcts.choose_action(
+        GameState.initial(), rng=random.Random(7),
+        recent_pawn_positions=[(4, 7), (4, 8)],
+    )
+    assert action in visits
+    assert mcts.last_search_stats["root_repetition_adjusted_actions"] >= 1
