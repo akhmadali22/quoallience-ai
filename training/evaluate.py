@@ -25,14 +25,17 @@ def main() -> int:
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--seed", type=int, default=2026, help="Base seed; each game uses seed + game index.")
     parser.add_argument("--category-exploration", type=float, default=0.35)
+    parser.add_argument("--repetition-penalty", type=float, default=0.75)
+    parser.add_argument("--pawn-progress-bonus", type=float, default=0.10)
+    parser.add_argument("--repetition-window", type=int, default=4)
     parser.add_argument("--selection-temperature", type=float, default=0.2)
     parser.add_argument("--opponent", choices=("heuristic", "random"), default="heuristic")
     parser.add_argument("--output", type=Path, default=Path("data/neural_evaluation.json"))
     args = parser.parse_args()
     if args.games < 2 or args.simulations < 1 or args.max_plies < 1:
         parser.error("--games must be >= 2; simulations and max-plies must be positive")
-    if args.category_exploration < 0 or args.selection_temperature < 0:
-        parser.error("category exploration and selection temperature cannot be negative")
+    if args.category_exploration < 0 or args.selection_temperature < 0 or args.repetition_penalty < 0 or args.pawn_progress_bonus < 0 or args.repetition_window < 1:
+        parser.error("exploration, temperature and penalty values must be non-negative; repetition-window must be positive")
 
     model = load_model(args.checkpoint, device=args.device)
     model.eval()
@@ -49,6 +52,9 @@ def main() -> int:
             simulations=args.simulations,
             device=args.device,
             category_exploration=args.category_exploration,
+            repetition_penalty=args.repetition_penalty,
+            pawn_progress_bonus=args.pawn_progress_bonus,
+            repetition_window=args.repetition_window,
         )
         heuristic = QuoridorAI(heuristic_config)
         opponent_rng = random.Random(game_seed ^ 0x5EED5EED)
@@ -139,6 +145,13 @@ def main() -> int:
 
         winner = state.winner
         neural_win = winner == neural_player if winner is not None else None
+        value_target = 0.0 if winner is None else (1.0 if winner == neural_player else -1.0)
+        for trace in action_trace:
+            trace["value_target"] = value_target
+            trace["root_value_error"] = (
+                None if trace["root_value"] is None
+                else abs(float(trace["root_value"]) - value_target)
+            )
         rows.append({
             "game": game + 1,
             "seed": game_seed,
