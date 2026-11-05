@@ -9,6 +9,9 @@ class SelfPlayConfig:
     temperature: float = 1.0
     dirichlet_noise: bool = True
     category_exploration: float = 0.35
+    repetition_penalty: float = 0.75
+    pawn_progress_bonus: float = 0.10
+    repetition_window: int = 4
 
 
 @dataclass(frozen=True)
