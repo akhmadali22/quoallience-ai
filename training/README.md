@@ -141,3 +141,27 @@ Neural MCTS accepts the current player's recent pawn-position history. At the ro
 Defaults: `--repetition-penalty 0.75`, `--pawn-progress-bonus 0.10`, and `--repetition-window 4`. Both self-play and evaluation accept these flags. Evaluation also reports root-value mean absolute and squared error against the final game outcome, allowing value calibration to be measured rather than guessed.
 
 Example ablation: set `--repetition-penalty 0 --pawn-progress-bonus 0` to disable both root preferences while keeping the same checkpoint, seeds, and simulation budget.
+
+
+## Four-way repetition/progress ablation
+
+Run all four combinations with the same checkpoint, seeds, opponent, MCTS
+simulation budget, and sampling temperature. The runner executes them sequentially
+and writes one JSON report per configuration:
+
+```bash
+python -m training.run_ablation models/checkpoints/neural_v1.pt \\
+  --games 20 --simulations 128 --seed 2026 \\
+  --opponent heuristic --device cpu \\
+  --output-dir data/ablation
+```
+
+The four reports are `eval_baseline.json`, `eval_repetition_only.json`,
+`eval_progress_only.json`, and `eval_combined.json`. Increase to 100 or more
+games for a stronger validation after inspecting the initial 20-game results.
+
+Evaluation traces now include `opponent_distance_delta` (positive means the
+neural action lengthened the opponent's shortest path). Per-game and aggregate
+`strategic_diagnostics` summarize opponent path increases/decreases alongside
+own pawn progress, regressions, and reversals. The report also contains aggregate
+`value_calibration` MAE/MSE and mean root value.
