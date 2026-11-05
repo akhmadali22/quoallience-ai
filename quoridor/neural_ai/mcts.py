@@ -6,11 +6,11 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from quoridor.engine import GameState
-from .encoder import ACTION_SIZE, apply_action_index, encode_state, legal_action_indices
+from quoridor.engine import GameState, shortest_distance
+from .encoder import ACTION_SIZE, MOVE_ACTIONS as ENCODER_MOVE_ACTIONS, apply_action_index, encode_state, legal_action_indices
 
 
-MOVE_ACTIONS = 9 * 9
+MOVE_ACTIONS = ENCODER_MOVE_ACTIONS
 
 
 @dataclass
@@ -50,6 +50,9 @@ class MCTS:
         widening_coefficient: float = 2.0,
         widening_exponent: float = 0.5,
         category_exploration: float = 0.35,
+        repetition_penalty: float = 0.75,
+        pawn_progress_bonus: float = 0.10,
+        repetition_window: int = 4,
     ):
         if simulations < 1:
             raise ValueError("simulations must be positive")
@@ -71,6 +74,13 @@ class MCTS:
         if category_exploration < 0:
             raise ValueError("category_exploration cannot be negative")
         self.category_exploration = category_exploration
+        if repetition_penalty < 0 or pawn_progress_bonus < 0:
+            raise ValueError("repetition_penalty and pawn_progress_bonus cannot be negative")
+        if repetition_window < 1:
+            raise ValueError("repetition_window must be positive")
+        self.repetition_penalty = repetition_penalty
+        self.pawn_progress_bonus = pawn_progress_bonus
+        self.repetition_window = repetition_window
         self.widening_exponent = widening_exponent
         self.last_search_stats: dict[str, Any] = {}
 
@@ -156,7 +166,9 @@ class MCTS:
             node.edges[action] = edge
             active_wall_count += 1
 
-    def _select(self, node: Node) -> tuple[int, Edge]:
+    def _select(
+        self, node: Node, action_adjustments: dict[int, float] | None = None
+    ) -> tuple[int, Edge]:
         scale = math.sqrt(max(1, node.visits))
         active_priors = {action: edge.prior for action, edge in node.edges.items()}
         prior_total = sum(active_priors.values())
@@ -187,6 +199,8 @@ class MCTS:
             )
             category = "pawn" if action < MOVE_ACTIONS else "wall"
             score = edge.q + u + category_bonus[category]
+            if action_adjustments is not None:
+                score += action_adjustments.get(action, 0.0)
             if score > best_score:
                 best_action, best_edge, best_score = action, edge, score
         assert best_edge is not None
@@ -197,11 +211,45 @@ class MCTS:
         result.update(root.pending_walls)
         return result
 
+    def _root_action_adjustments(
+        self, state: GameState, recent_pawn_positions: list[tuple[int, int]] | None
+    ) -> dict[int, float]:
+        """Apply small root-only preferences against recent pawn cycles.
+
+        Positions are from the current player's own pawn history. The current
+        square is excluded; earlier squares in the configured window are
+        discouraged, not made illegal. A mild shortest-path delta bonus keeps
+        forward progress visible without forbidding tactical sideways moves.
+        """
+        if not recent_pawn_positions:
+            return {}
+        history = recent_pawn_positions[-(self.repetition_window + 1):-1]
+        repeated = set(history)
+        player = state.current_player
+        before = shortest_distance(state, player)
+        adjustments: dict[int, float] = {}
+        from .encoder import decode_action
+        for action in legal_action_indices(state):
+            if action >= MOVE_ACTIONS:
+                continue
+            _, destination = decode_action(action)
+            next_state = apply_action_index(state, action)
+            after = shortest_distance(next_state, player)
+            adjustment = 0.0
+            if destination in repeated:
+                adjustment -= self.repetition_penalty
+            if before is not None and after is not None:
+                adjustment += self.pawn_progress_bonus * (before - after)
+            if adjustment:
+                adjustments[action] = adjustment
+        return adjustments
+
     def search(
         self,
         state: GameState,
         *,
         add_root_noise: bool = False,
+        recent_pawn_positions: list[tuple[int, int]] | None = None,
     ) -> dict[int, float]:
         if state.winner is not None:
             self.last_search_stats = {}
@@ -231,6 +279,7 @@ class MCTS:
 
         root = Node(state)
         root_value = expand_tracked(root)
+        root_action_adjustments = self._root_action_adjustments(state, recent_pawn_positions)
 
         if add_root_noise and root.edges:
             import torch
@@ -258,7 +307,9 @@ class MCTS:
                 self._widen(node)
                 depth = node.state.ply - state.ply
                 selection_depths[depth] += 1
-                action, edge = self._select(node)
+                action, edge = self._select(
+                    node, root_action_adjustments if node is root else None
+                )
                 if edge.child is None:
                     edge.child = Node(apply_action_index(node.state, action))
                 path.append((node, edge))
@@ -312,6 +363,7 @@ class MCTS:
                 "category": "pawn" if action < MOVE_ACTIONS else "wall",
                 "prior": edge.prior, "q": edge.q, "visits": edge.visits,
                 "active": action in root.edges,
+                "selection_adjustment": root_action_adjustments.get(action, 0.0),
             }
             for action, edge in all_root_edges.items()
         }
@@ -322,6 +374,9 @@ class MCTS:
         )
         stats.update({
             "root_value": root_value,
+            "root_repetition_penalty": self.repetition_penalty,
+            "root_pawn_progress_bonus": self.pawn_progress_bonus,
+            "root_repetition_adjusted_actions": sum(1 for v in root_action_adjustments.values() if v < 0),
             "root_policy_entropy": policy_entropy,
             "max_leaf_depth": max(leaf_depths, default=0),
             "average_leaf_depth": (
@@ -368,12 +423,16 @@ class MCTS:
         temperature: float = 0.0,
         add_root_noise: bool = False,
         rng: Any | None = None,
+        recent_pawn_positions: list[tuple[int, int]] | None = None,
     ) -> tuple[int, dict[int, float]]:
         """Choose from root visits; an optional RNG makes ties reproducible per game."""
         import random
 
         rng = rng or random
-        visits = self.search(state, add_root_noise=add_root_noise)
+        visits = self.search(
+            state, add_root_noise=add_root_noise,
+            recent_pawn_positions=recent_pawn_positions,
+        )
         if not visits:
             raise ValueError("Cannot choose an action from a terminal state")
         if temperature <= 1e-8:
