@@ -26,7 +26,7 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=2026, help="Base seed; each game uses seed + game index.")
     parser.add_argument("--category-exploration", type=float, default=0.35)
     parser.add_argument("--repetition-penalty", type=float, default=0.75)
-    parser.add_argument("--pawn-progress-bonus", type=float, default=0.10)
+    parser.add_argument("--pawn-progress-bonus", type=float, default=0.0)
     parser.add_argument("--repetition-window", type=int, default=4)
     parser.add_argument("--selection-temperature", type=float, default=0.2)
     parser.add_argument("--opponent", choices=("heuristic", "random"), default="heuristic")
