@@ -91,7 +91,7 @@ def main() -> int:
     parser.add_argument("--residual-blocks", type=int, default=4)
     parser.add_argument("--category-exploration", type=float, default=0.35, help="Adaptive exploration bonus for the less-visited action category.")
     parser.add_argument("--repetition-penalty", type=float, default=0.75)
-    parser.add_argument("--pawn-progress-bonus", type=float, default=0.10)
+    parser.add_argument("--pawn-progress-bonus", type=float, default=0.0)
     parser.add_argument("--repetition-window", type=int, default=4)
     args = parser.parse_args()
 
