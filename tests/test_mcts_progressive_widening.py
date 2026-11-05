@@ -178,10 +178,12 @@ def test_root_action_adjustments_penalize_recent_pawn_reversal_and_reward_progre
     adjustments = mcts._root_action_adjustments(
         state, [(4, 7), (4, 8)]
     )
-    backward = encode_action(("move", (4, 7)))
-    forward = encode_action(("move", (4, 7)))
-    assert adjustments[backward] < 0
-    assert backward == forward
+    repeated_destination = encode_action(("move", (4, 7)))
+    progress_state_history = mcts._root_action_adjustments(
+        state, [(3, 8), (4, 8)]
+    )
+    assert adjustments[repeated_destination] < 0
+    assert progress_state_history[repeated_destination] > 0
 
 
 def test_root_adjustments_are_empty_without_history():
