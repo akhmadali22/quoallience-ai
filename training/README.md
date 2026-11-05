@@ -165,3 +165,34 @@ neural action lengthened the opponent's shortest path). Per-game and aggregate
 `strategic_diagnostics` summarize opponent path increases/decreases alongside
 own pawn progress, regressions, and reversals. The report also contains aggregate
 `value_calibration` MAE/MSE and mean root value.
+
+
+## Small progress-bonus sweep and wall-effect diagnostics
+
+The 20-game ablation showed that a progress bonus of 0.10 overwhelms wall
+selection. Do not use that value as a default. With repetition avoidance enabled,
+sweep smaller values using identical seeds and settings:
+
+```bash
+python -m training.run_progress_sweep models/checkpoints/neural_v1.pt \\
+  --games 50 --simulations 128 --seed 3026 \\
+  --repetition-penalty 0.75 --progress-values 0 0.01 0.02 0.05 \\
+  --opponent heuristic --device cpu \\
+  --output-dir data/progress_sweep
+```
+
+The runner writes one report per progress value. Use at least 50 games for this
+screening run, then increase promising configurations to 100–200 games.
+
+Evaluation reports now separate wall placement effects from pawn movement:
+- `wall_opponent_distance_delta`: opponent shortest-path increase caused by
+  this wall (positive is strategically useful; negative helps the opponent).
+- `wall_own_distance_delta`: own shortest-path change caused by this wall
+  (positive means the wall also lengthened our route).
+- Aggregate counters report wall placements that increased/decreased each
+  player's shortest path and the total distance deltas.
+
+These are immediate shortest-path effects, not a complete measure of wall
+quality. A wall can be useful by changing future tactical options even when the
+opponent's shortest path does not immediately increase. Inspect these metrics
+alongside game outcomes and action traces.
