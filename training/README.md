@@ -138,7 +138,7 @@ Evaluation reports record, for each neural turn, pawn coordinates before and aft
 
 Neural MCTS accepts the current player's recent pawn-position history. At the root only, pawn actions that return to one of the previous positions inside the configured window receive a configurable selection penalty. Pawn actions that reduce the player's shortest path distance receive a small configurable bonus. These are soft search preferences, not legality rules; tactical moves remain available.
 
-Defaults: `--repetition-penalty 0.75`, `--pawn-progress-bonus 0.10`, and `--repetition-window 4`. Both self-play and evaluation accept these flags. Evaluation also reports root-value mean absolute and squared error against the final game outcome, allowing value calibration to be measured rather than guessed.
+Defaults: `--repetition-penalty 0.75`, `--pawn-progress-bonus 0.0` (disabled until a smaller value is validated), and `--repetition-window 4`. Both self-play and evaluation accept these flags. Evaluation also reports root-value mean absolute and squared error against the final game outcome, allowing value calibration to be measured rather than guessed.
 
 Example ablation: set `--repetition-penalty 0 --pawn-progress-bonus 0` to disable both root preferences while keeping the same checkpoint, seeds, and simulation budget.
 
