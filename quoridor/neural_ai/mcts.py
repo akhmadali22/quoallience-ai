@@ -429,10 +429,13 @@ class MCTS:
         import random
 
         rng = rng or random
-        visits = self.search(
-            state, add_root_noise=add_root_noise,
-            recent_pawn_positions=recent_pawn_positions,
-        )
+        if recent_pawn_positions is None:
+            visits = self.search(state, add_root_noise=add_root_noise)
+        else:
+            visits = self.search(
+                state, add_root_noise=add_root_noise,
+                recent_pawn_positions=recent_pawn_positions,
+            )
         if not visits:
             raise ValueError("Cannot choose an action from a terminal state")
         if temperature <= 1e-8:
