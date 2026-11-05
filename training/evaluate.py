@@ -66,6 +66,10 @@ def main() -> int:
         pawn_reversal_moves = 0
         own_distance_improvements = 0
         own_distance_regressions = 0
+        opponent_distance_increases = 0
+        opponent_distance_decreases = 0
+        opponent_distance_delta_sum = 0
+        opponent_distance_changed_actions = 0
         pawn_position_history = [state.pawns[neural_player]]
 
         while state.winner is None and state.ply < args.max_plies:
@@ -104,6 +108,18 @@ def main() -> int:
                         own_distance_improvements += 1
                     elif own_distance_after > own_distance_before:
                         own_distance_regressions += 1
+                opponent_distance_delta = (
+                    None if opponent_distance_before is None or opponent_distance_after is None
+                    else opponent_distance_before - opponent_distance_after
+                )
+                if opponent_distance_delta is not None:
+                    opponent_distance_delta_sum += opponent_distance_delta
+                    if opponent_distance_delta > 0:
+                        opponent_distance_increases += 1
+                        opponent_distance_changed_actions += 1
+                    elif opponent_distance_delta < 0:
+                        opponent_distance_decreases += 1
+                        opponent_distance_changed_actions += 1
                 action_trace.append({
                     'ply': state.ply,
                     'player': state.current_player,
@@ -126,6 +142,7 @@ def main() -> int:
                     'own_distance_after': own_distance_after,
                     'opponent_distance_before': opponent_distance_before,
                     'opponent_distance_after': opponent_distance_after,
+                    'opponent_distance_delta': opponent_distance_delta,
                     'pawn_distance_delta': (
                         None if own_distance_before is None or own_distance_after is None
                         else own_distance_before - own_distance_after
@@ -168,6 +185,10 @@ def main() -> int:
             "pawn_reversal_moves": pawn_reversal_moves,
             "own_distance_improvements": own_distance_improvements,
             "own_distance_regressions": own_distance_regressions,
+            "opponent_distance_increases": opponent_distance_increases,
+            "opponent_distance_decreases": opponent_distance_decreases,
+            "opponent_distance_changed_actions": opponent_distance_changed_actions,
+            "opponent_distance_delta_sum": opponent_distance_delta_sum,
             "neural_pawn_action_ratio": (
                 neural_pawn_actions / (neural_pawn_actions + neural_wall_actions)
                 if neural_pawn_actions + neural_wall_actions else 0.0
@@ -199,6 +220,19 @@ def main() -> int:
         row["neural_pawn_actions"] + row["neural_wall_actions"] for row in rows
     )
     total_neural_pawn_actions = sum(row["neural_pawn_actions"] for row in rows)
+    all_traces = [trace for row in rows for trace in row["action_trace"]]
+    value_errors = [
+        trace["root_value_error"] for trace in all_traces
+        if trace["root_value_error"] is not None
+    ]
+    root_values = [
+        trace["root_value"] for trace in all_traces
+        if trace["root_value"] is not None
+    ]
+    opponent_deltas = [
+        trace["opponent_distance_delta"] for trace in all_traces
+        if trace["opponent_distance_delta"] is not None
+    ]
     report = {
         "checkpoint": str(args.checkpoint),
         "config": {
@@ -231,6 +265,33 @@ def main() -> int:
             "pawn_action_ratio": (
                 total_neural_pawn_actions / total_neural_actions
                 if total_neural_actions else 0.0
+            ),
+        },
+        "strategic_diagnostics": {
+            "pawn_progress_moves": sum(row["pawn_progress_moves"] for row in rows),
+            "pawn_regression_moves": sum(row["pawn_regression_moves"] for row in rows),
+            "pawn_reversal_moves": sum(row["pawn_reversal_moves"] for row in rows),
+            "own_distance_improvements": sum(row["own_distance_improvements"] for row in rows),
+            "own_distance_regressions": sum(row["own_distance_regressions"] for row in rows),
+            "opponent_distance_increases": sum(row["opponent_distance_increases"] for row in rows),
+            "opponent_distance_decreases": sum(row["opponent_distance_decreases"] for row in rows),
+            "opponent_distance_changed_actions": sum(row["opponent_distance_changed_actions"] for row in rows),
+            "opponent_distance_delta_sum": sum(row["opponent_distance_delta_sum"] for row in rows),
+            "mean_opponent_distance_delta": (
+                sum(opponent_deltas) / len(opponent_deltas) if opponent_deltas else None
+            ),
+        },
+        "value_calibration": {
+            "samples": len(value_errors),
+            "mean_absolute_error": (
+                sum(value_errors) / len(value_errors) if value_errors else None
+            ),
+            "mean_squared_error": (
+                sum(error * error for error in value_errors) / len(value_errors)
+                if value_errors else None
+            ),
+            "mean_root_value": (
+                sum(root_values) / len(root_values) if root_values else None
             ),
         },
         "results": rows,
