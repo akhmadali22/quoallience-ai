@@ -9,7 +9,7 @@ from pathlib import Path
 
 from quoridor.engine import GameState
 from quoridor.neural_ai.encoder import apply_action_index, encode_state
-from quoridor.neural_ai.mcts import MCTS
+from quoridor.neural_ai.mcts import MOVE_ACTIONS, MCTS
 from quoridor.neural_ai.network import QuoridorNet
 from quoridor.neural_ai.policy import load_model, save_checkpoint
 from training.config import SelfPlayConfig
@@ -18,7 +18,13 @@ from training.config import SelfPlayConfig
 def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device: str) -> tuple[list[dict], dict]:
     random.seed(seed)
     state = GameState.initial()
-    search = MCTS(model, simulations=config.simulations, device=device, category_exploration=config.category_exploration)
+    search = MCTS(
+        model, simulations=config.simulations, device=device,
+        category_exploration=config.category_exploration,
+        repetition_penalty=config.repetition_penalty,
+        pawn_progress_bonus=config.pawn_progress_bonus,
+        repetition_window=config.repetition_window,
+    )
     samples: list[dict] = []
     action_log: list[dict] = []
     pawn_positions = {0: [state.pawns[0]], 1: [state.pawns[1]]}
@@ -44,7 +50,7 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
             "root_repetition_adjusted_actions": search_stats.get("root_repetition_adjusted_actions"),
         })
         next_state = apply_action_index(state, action)
-        if action < 81:
+        if action < MOVE_ACTIONS:
             pawn_positions[player].append(next_state.pawns[player])
         action_log.append({"ply": state.ply, "player": player, "action": action})
         state = next_state
@@ -84,12 +90,15 @@ def main() -> int:
     parser.add_argument("--channels", type=int, default=64)
     parser.add_argument("--residual-blocks", type=int, default=4)
     parser.add_argument("--category-exploration", type=float, default=0.35, help="Adaptive exploration bonus for the less-visited action category.")
+    parser.add_argument("--repetition-penalty", type=float, default=0.75)
+    parser.add_argument("--pawn-progress-bonus", type=float, default=0.10)
+    parser.add_argument("--repetition-window", type=int, default=4)
     args = parser.parse_args()
 
     if args.games < 1 or args.simulations < 1 or args.max_plies < 1:
         parser.error("--games, --simulations, and --max-plies must be positive")
-    if args.category_exploration < 0:
-        parser.error("--category-exploration cannot be negative")
+    if args.category_exploration < 0 or args.repetition_penalty < 0 or args.pawn_progress_bonus < 0 or args.repetition_window < 1:
+        parser.error("exploration and penalty values must be non-negative; repetition-window must be positive")
 
     import torch
     torch.manual_seed(args.seed)
@@ -111,7 +120,13 @@ def main() -> int:
     if samples_path.exists() or games_path.exists():
         parser.error(f"Output already contains replay data: {output}. Use a new --output-dir.")
     save_checkpoint(model, snapshot_path, extra={"source_checkpoint": args.checkpoint, "seed": args.seed})
-    config = SelfPlayConfig(simulations=args.simulations, max_plies=args.max_plies, category_exploration=args.category_exploration)
+    config = SelfPlayConfig(
+        simulations=args.simulations, max_plies=args.max_plies,
+        category_exploration=args.category_exploration,
+        repetition_penalty=args.repetition_penalty,
+        pawn_progress_bonus=args.pawn_progress_bonus,
+        repetition_window=args.repetition_window,
+    )
 
     with samples_path.open("a", encoding="utf-8") as samples_file, games_path.open("a", encoding="utf-8") as games_file:
         for index in range(args.games):
