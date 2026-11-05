@@ -21,6 +21,7 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
     search = MCTS(model, simulations=config.simulations, device=device, category_exploration=config.category_exploration)
     samples: list[dict] = []
     action_log: list[dict] = []
+    pawn_positions = {0: [state.pawns[0]], 1: [state.pawns[1]]}
 
     while state.winner is None and state.ply < config.max_plies:
         player = state.current_player
@@ -29,6 +30,7 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
             state,
             temperature=temperature,
             add_root_noise=config.dirichlet_noise,
+            recent_pawn_positions=pawn_positions[player],
         )
         search_stats = search.last_search_stats
         samples.append({
@@ -39,8 +41,11 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
             "root_value": search_stats.get("root_value"),
             "root_policy_entropy": search_stats.get("root_policy_entropy"),
             "root_pawn_visit_ratio": search_stats.get("root_pawn_visit_ratio"),
+            "root_repetition_adjusted_actions": search_stats.get("root_repetition_adjusted_actions"),
         })
         next_state = apply_action_index(state, action)
+        if action < 81:
+            pawn_positions[player].append(next_state.pawns[player])
         action_log.append({"ply": state.ply, "player": player, "action": action})
         state = next_state
         if state.ply % 10 == 0:
