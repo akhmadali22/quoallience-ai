@@ -200,3 +200,13 @@ def test_choose_action_accepts_recent_pawn_history():
     )
     assert action in visits
     assert mcts.last_search_stats["root_repetition_adjusted_actions"] >= 1
+
+
+def test_root_selection_adjustment_can_avoid_a_recent_reversal():
+    node = Node(GameState.initial(), visits=10)
+    node.edges = {0: Edge(prior=0.9), 1: Edge(prior=0.1)}
+    mcts = make_mcts(c_puct=1.5)
+    raw_action, _ = mcts._select(node)
+    adjusted_action, _ = mcts._select(node, action_adjustments={0: -5.0})
+    assert raw_action == 0
+    assert adjusted_action == 1
