@@ -1,0 +1,97 @@
+{
+  "checkpoint": "models/checkpoints/neural_v1.pt",
+  "config": {
+    "games": 4,
+    "simulations": 64,
+    "heuristic_time": 0.2,
+    "heuristic_depth": 3,
+    "max_plies": 200,
+    "device": "cpu",
+    "base_seed": 2026,
+    "game_seeds": [
+      2026,
+      2027,
+      2028,
+      2029
+    ],
+    "pawn_prior_fraction": 0.7,
+    "progressive_widening": true,
+    "selection_temperature": 0.0,
+    "tie_breaking": "seeded_random"
+  },
+  "neural_wins": 0,
+  "neural_losses": 4,
+  "draws": 0,
+  "decided_games": 4,
+  "neural_win_rate": 0.0,
+  "seat_results": {
+    "0": {
+      "wins": 0,
+      "losses": 2,
+      "draws": 0,
+      "games": 2
+    },
+    "1": {
+      "wins": 0,
+      "losses": 2,
+      "draws": 0,
+      "games": 2
+    }
+  },
+  "neural_action_totals": {
+    "pawn_actions": 30,
+    "wall_actions": 0,
+    "pawn_action_ratio": 1.0
+  },
+  "results": [
+    {
+      "game": 1,
+      "seed": 2026,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "neural_pawn_actions": 8,
+      "neural_wall_actions": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 2,
+      "seed": 2027,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 15,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 3,
+      "seed": 2028,
+      "neural_player": 0,
+      "winner": 1,
+      "neural_win": false,
+      "plies": 16,
+      "neural_pawn_actions": 8,
+      "neural_wall_actions": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    },
+    {
+      "game": 4,
+      "seed": 2029,
+      "neural_player": 1,
+      "winner": 0,
+      "neural_win": false,
+      "plies": 15,
+      "neural_pawn_actions": 7,
+      "neural_wall_actions": 0,
+      "neural_pawn_action_ratio": 1.0,
+      "result": "loss"
+    }
+  ],
+  "note": "Seeded paired-seat evaluation. Use the same base seed across configurations for paired comparisons; this smoke evaluation is not a statistically conclusive rating."
+}
