@@ -179,8 +179,6 @@ class MCTS:
         if not root.pending_walls or self.wall_distance_weight <= 0:
             return {}
 
-        from .encoder import decode_action
-
         player = state.current_player
         own_before = shortest_distance(state, player)
         opponent_before = shortest_distance(state, 1 - player)
@@ -326,7 +324,6 @@ class MCTS:
 
         root = Node(state)
         root_value = expand_tracked(root)
-        root_wall_ranking_stats = self._rank_root_wall_candidates(state, root)
         root_action_adjustments = self._root_action_adjustments(state, recent_pawn_positions)
 
         if add_root_noise and root.edges:
@@ -346,6 +343,8 @@ class MCTS:
             root.pending_walls.sort(
                 key=lambda item: item[1].prior, reverse=True
             )
+
+        root_wall_ranking_stats = self._rank_root_wall_candidates(state, root)
 
         for _ in range(self.simulations):
             node = root
