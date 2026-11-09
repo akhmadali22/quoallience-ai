@@ -116,7 +116,7 @@ class MCTS:
             # progressive widening at this particular node.
             return priors, float(value[0].item())
 
-    def _expand(self, node: Node) -> float:
+    def _expand(self, node: Node, *, defer_widen: bool = False) -> float:
         if node.state.winner is not None:
             node.expanded = True
             return 1.0 if node.state.winner == node.state.current_player else -1.0
@@ -141,7 +141,7 @@ class MCTS:
         if not self.progressive_widening:
             node.edges.update(node.pending_walls)
             node.pending_walls.clear()
-        else:
+        elif not defer_widen:
             self._widen(node)
         return value
 
@@ -262,6 +262,16 @@ class MCTS:
         assert best_edge is not None
         return best_action, best_edge
 
+    @staticmethod
+    def _backup(path: list[tuple[Node, Edge]], leaf: Node, value: float) -> None:
+        """Back up a leaf value, updating visits for every node on the path."""
+        leaf.visits += 1
+        for parent, edge in reversed(path):
+            value = -value
+            edge.visits += 1
+            edge.value_sum += value
+            parent.visits += 1
+
     def _all_root_edges(self, root: Node) -> dict[int, Edge]:
         result = dict(root.edges)
         result.update(root.pending_walls)
@@ -334,7 +344,12 @@ class MCTS:
             return self._expand(node)
 
         root = Node(state)
-        root_value = expand_tracked(root)
+        depth = root.state.ply - state.ply
+        stats["expanded_nodes"] += 1
+        expanded_depths[depth] += 1
+        stats["nn_evaluations"] += 1
+        evaluated_depths[depth] += 1
+        root_value = self._expand(root, defer_widen=True)
         root_action_adjustments = self._root_action_adjustments(state, recent_pawn_positions)
 
         if add_root_noise and root.edges:
@@ -356,6 +371,8 @@ class MCTS:
             )
 
         root_wall_ranking_stats = self._rank_root_wall_candidates(state, root)
+        # Admit the initial wall candidates only after root noise and ranking.
+        self._widen(root)
 
         for _ in range(self.simulations):
             node = root
@@ -377,11 +394,7 @@ class MCTS:
             value = expand_tracked(node) if not node.expanded else (
                 1.0 if node.state.winner == node.state.current_player else -1.0
             )
-            for parent, edge in reversed(path):
-                value = -value
-                edge.visits += 1
-                edge.value_sum += value
-                parent.visits += 1
+            self._backup(path, node, value)
 
         all_root_edges = self._all_root_edges(root)
         total = sum(edge.visits for edge in all_root_edges.values())
@@ -469,6 +482,8 @@ class MCTS:
             "root_pawn_visit_ratio": root_pawn_visits / total if total else 0.0,
             "root_wall_visit_ratio": root_wall_visits / total if total else 0.0,
             "root_action_stats": root_action_stats,
+            # Only active actions were eligible for this search's policy target.
+            "root_policy_mask": sorted(root.edges),
             "pawn_visits": pawn_visits,
             "wall_visits": wall_visits,
             "pawn_visit_ratio": pawn_visits / total if total else 0.0,
