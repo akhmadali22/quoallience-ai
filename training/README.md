@@ -250,6 +250,21 @@ for weight in 0 0.01 0.02 0.05; do
 done
 ```
 
+Evaluation reports also measure the route impact of each wall actually
+selected by the neural agent:
+- `wall_opponent_route_reduction`: log1p(shortest routes before) minus
+  log1p(shortest routes after). Positive means the wall removes opponent routes.
+- `wall_own_route_reduction`: the same reduction for our own routes. Positive
+  means the wall sacrifices our alternatives.
+- `wall_net_route_score`: opponent route reduction minus own route reduction.
+- Per-game and aggregate counters report how often either player's shortest
+  route count was reduced or increased, plus summed route scores.
+
+These diagnostics use the same capped shortest-route count as candidate ranking.
+They are computed only for wall actions actually selected by the neural agent,
+so they do not add route-count BFS work to pawn actions. Compare the selected
+wall route metrics with candidate-ranking scores and game outcomes.
+
 Compare action traces, route-score diagnostics, wall path effects, and wins.
 Do not promote a weight based only on fewer own routes being sacrificed; it must
 also improve opponent disruption and eventually head-to-head outcomes.
