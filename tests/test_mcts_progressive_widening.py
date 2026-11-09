@@ -210,3 +210,40 @@ def test_root_selection_adjustment_can_avoid_a_recent_reversal():
     adjusted_action, _ = mcts._select(node, action_adjustments={0: -5.0})
     assert raw_action == 0
     assert adjusted_action == 1
+
+
+
+def test_root_noise_and_ranking_run_before_initial_wall_admission():
+    state = GameState.initial()
+    legal_walls = [action for action in legal_action_indices(state) if action >= MOVE_ACTIONS]
+    mcts = make_mcts(simulations=1, initial_wall_candidates=1)
+
+    def rank_before_widening(search_state, root):
+        assert not any(action >= MOVE_ACTIONS for action in root.edges)
+        assert {action for action, _ in root.pending_walls} == set(legal_walls)
+        root.pending_walls.reverse()
+        return {}
+
+    mcts._rank_root_wall_candidates = rank_before_widening
+    mcts.search(state)
+
+    active_walls = [
+        int(action) for action, stats in mcts.last_search_stats["root_action_stats"].items()
+        if stats["category"] == "wall" and stats["active"]
+    ]
+    assert active_walls == [legal_walls[-1]]
+
+
+def test_backup_updates_leaf_and_all_ancestor_visits_with_alternating_values():
+    root = Node(GameState.initial())
+    middle = Node(GameState.initial())
+    leaf = Node(GameState.initial())
+    root_edge = Edge(prior=1.0)
+    middle_edge = Edge(prior=1.0)
+
+    MCTS._backup([(root, root_edge), (middle, middle_edge)], leaf, 0.6)
+
+    assert root.visits == middle.visits == leaf.visits == 1
+    assert root_edge.visits == middle_edge.visits == 1
+    assert root_edge.value_sum == 0.6
+    assert middle_edge.value_sum == -0.6
