@@ -83,3 +83,11 @@ def test_ablation_tournament_executes_a_short_mcts_game():
     assert result["agent_metrics"]["uniform_policy"]["turns"] == 1
     assert result["result_for_a"] == "draw"
     assert len(result["action_trace"]) == 2
+    assert result["termination"]["draw_reason"] == "max_plies"
+    assert result["termination"]["max_plies_reached"] is True
+    assert len(result["diagnostics"]["final_shortest_distances"]) == 2
+    assert result["diagnostics"]["no_progress_plies"] + result["diagnostics"]["progress_plies"] == 2
+    assert all(
+        "shortest_distance_before" in ply and "shortest_distance_after" in ply
+        for ply in result["action_trace"]
+    )

@@ -5,12 +5,15 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import os
+from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 from statistics import mean
 
 import torch
 
-from quoridor.engine import GameState
+from quoridor.engine import GameState, shortest_distance
 from quoridor.neural_ai.encoder import apply_action_index
 from quoridor.neural_ai.mcts import MCTS
 from quoridor.neural_ai.policy import load_model
@@ -106,6 +109,27 @@ def play_game(
     }
     state = GameState.initial()
     trace = []
+    state_seen = Counter()
+    action_ngrams = {size: Counter() for size in (4, 6, 8)}
+    pawn_history = {0: [], 1: []}
+    pawn_position_repeats = {0: 0, 1: 0}
+    consecutive_no_progress = 0
+    max_consecutive_no_progress = 0
+    no_progress_plies = 0
+    progress_plies = 0
+    previous_distances = [shortest_distance(state, 0), shortest_distance(state, 1)]
+
+    def state_fingerprint(current):
+        return (
+            current.pawns,
+            tuple(sorted((w.orientation, w.x, w.y) for w in current.walls)),
+            current.walls_remaining,
+            current.current_player,
+        )
+
+    def action_pattern_key(items):
+        return tuple((item["player"], item["action"]) for item in items)
+
     metrics = {
         name: {
             "turns": 0,
@@ -122,6 +146,8 @@ def play_game(
     }
 
     while state.winner is None and state.ply < max_plies:
+        fingerprint = state_fingerprint(state)
+        state_seen[fingerprint] += 1
         player = state.current_player
         name = player_agents[player]
         search = searches[player]
@@ -148,7 +174,35 @@ def play_game(
         agent_metrics["selected_visits"].append(int(selected.get("visits", 0)))
 
         next_state = apply_action_index(state, action)
-        trace.append({
+        next_distances = [
+            shortest_distance(next_state, 0),
+            shortest_distance(next_state, 1),
+        ]
+        distance_deltas = [
+            None if before is None or after is None else after - before
+            for before, after in zip(previous_distances, next_distances)
+        ]
+        own_delta = distance_deltas[player]
+        opponent_delta = distance_deltas[1 - player]
+        made_progress = (
+            (own_delta is not None and own_delta < 0)
+            or (selected.get("category") == "wall" and opponent_delta is not None and opponent_delta > 0)
+        )
+        if made_progress:
+            progress_plies += 1
+            consecutive_no_progress = 0
+        else:
+            no_progress_plies += 1
+            consecutive_no_progress += 1
+            max_consecutive_no_progress = max(
+                max_consecutive_no_progress, consecutive_no_progress
+            )
+
+        pawn_history[player].append(next_state.pawns[player])
+        if pawn_history[player].count(next_state.pawns[player]) > 1:
+            pawn_position_repeats[player] += 1
+
+        trace_entry = {
             "ply": state.ply,
             "player": player,
             "agent": name,
@@ -163,10 +217,34 @@ def play_game(
             "nn_evaluations": stats.get("nn_evaluations"),
             "root_pawn_visit_ratio": stats.get("root_pawn_visit_ratio"),
             "root_wall_visit_ratio": stats.get("root_wall_visit_ratio"),
-        })
+            "pawns_before": [list(pos) for pos in state.pawns],
+            "pawns_after": [list(pos) for pos in next_state.pawns],
+            "shortest_distance_before": previous_distances,
+            "shortest_distance_after": next_distances,
+            "shortest_distance_delta": distance_deltas,
+            "made_progress": made_progress,
+            "consecutive_no_progress_plies": consecutive_no_progress,
+        }
+        trace.append(trace_entry)
+        for size, counts in action_ngrams.items():
+            if len(trace) >= size:
+                key = action_pattern_key(trace[-size:])
+                counts[key] += 1
         state = next_state
+        previous_distances = next_distances
 
     winner_agent = None if state.winner is None else player_agents[state.winner]
+    repeated_states = sum(count - 1 for count in state_seen.values() if count > 1)
+    repeated_state_positions = sum(count > 1 for count in state_seen.values())
+    repeated_action_patterns = {
+        str(size): sum(count - 1 for count in counts.values() if count > 1)
+        for size, counts in action_ngrams.items()
+    }
+    draw_reason = (
+        "not_a_draw" if state.winner is not None
+        else "max_plies" if state.ply >= max_plies
+        else "terminal_without_winner"
+    )
     result_for_a = (
         "draw" if winner_agent is None
         else "win" if winner_agent == agent_a
@@ -195,6 +273,26 @@ def play_game(
         "winner_agent": winner_agent,
         "result_for_a": result_for_a,
         "plies": state.ply,
+        "termination": {
+            "draw": state.winner is None,
+            "draw_reason": draw_reason,
+            "max_plies_reached": state.ply >= max_plies,
+        },
+        "diagnostics": {
+            "repeated_state_occurrences": repeated_states,
+            "unique_repeated_states": repeated_state_positions,
+            "pawn_position_repeats": {
+                str(player): pawn_position_repeats[player] for player in (0, 1)
+            },
+            "repeated_action_patterns": repeated_action_patterns,
+            "no_progress_plies": no_progress_plies,
+            "progress_plies": progress_plies,
+            "no_progress_ratio": (
+                no_progress_plies / state.ply if state.ply else 0.0
+            ),
+            "max_consecutive_no_progress_plies": max_consecutive_no_progress,
+            "final_shortest_distances": previous_distances,
+        },
         "agent_metrics": summaries,
         "action_trace": trace,
     }
@@ -221,6 +319,10 @@ def main() -> int:
         "--output", type=Path,
         default=Path("data/mcts_ablation/policy_value_ablation.json"),
     )
+    parser.add_argument(
+        "--progress-jsonl", type=Path, default=None,
+        help="Append and fsync one JSON record after each game; defaults to output with .jsonl suffix.",
+    )
     args = parser.parse_args()
 
     if args.simulations < 1 or args.pairs < 1 or args.max_plies < 1:
@@ -234,6 +336,10 @@ def main() -> int:
     model.eval()
     games = []
     matchup_reports = []
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    progress_path = args.progress_jsonl or args.output.with_suffix(".jsonl")
+    progress_path.parent.mkdir(parents=True, exist_ok=True)
+    progress_file = progress_path.open("a", encoding="utf-8")
 
     for matchup_index, (agent_a, agent_b) in enumerate(MATCHUPS, 1):
         pair_results = []
@@ -264,7 +370,11 @@ def main() -> int:
                     progressive_widening=args.progressive_widening,
                     initial_wall_candidates=args.initial_wall_candidates,
                 )
+                result["run_id"] = run_id
                 games.append(result)
+                progress_file.write(json.dumps(result, separators=(",", ":")) + "\n")
+                progress_file.flush()
+                os.fsync(progress_file.fileno())
                 matchup_games.append(result)
                 pair_games.append(result)
                 print(
@@ -308,11 +418,14 @@ def main() -> int:
             "paired_results": pair_results,
         })
 
+    progress_file.close()
     report = {
+        "run_id": run_id,
+        "progress_jsonl": str(progress_path),
         "checkpoint": str(args.checkpoint),
         "protocol": (
             "MCTS-vs-MCTS; one checkpoint; paired seeds; swapped seats; "
-            "deterministic max-visit selection; no root noise"
+            "randomized seeded max-visit ties; no root noise; per-game durable JSONL"
         ),
         "agent_definitions": {
             "full": {"policy": "neural", "value": "neural"},
@@ -337,6 +450,11 @@ def main() -> int:
         },
         "matchups": matchup_reports,
         "games": games,
+        "draw_summary": {
+            "max_plies_draws": sum(g["termination"]["draw_reason"] == "max_plies" for g in games),
+            "terminal_draws": sum(g["termination"]["draw_reason"] == "terminal_without_winner" for g in games),
+            "wins": sum(g["winner"] is not None for g in games),
+        },
         "interpretation": (
             "The full agent is compared separately with uniform-policy, zero-value, "
             "and combined ablations. Progressive widening is disabled by default "
