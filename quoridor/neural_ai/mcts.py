@@ -184,10 +184,8 @@ class MCTS:
             return {}
 
         player = state.current_player
-        own_before = shortest_distance(state, player)
-        opponent_before = shortest_distance(state, 1 - player)
-        own_routes_before = shortest_path_metrics(state, player)[1]
-        opponent_routes_before = shortest_path_metrics(state, 1 - player)[1]
+        own_before, own_routes_before = shortest_path_metrics(state, player)
+        opponent_before, opponent_routes_before = shortest_path_metrics(state, 1 - player)
         ranked_by_prior = sorted(
             root.pending_walls, key=lambda item: item[1].prior, reverse=True
         )
@@ -196,13 +194,11 @@ class MCTS:
         route_scores: dict[int, float] = {}
         for action, _edge in ranked_by_prior:
             next_state = apply_action_index(state, action)
-            own_after = shortest_distance(next_state, player)
-            opponent_after = shortest_distance(next_state, 1 - player)
+            own_after, own_routes_after = shortest_path_metrics(next_state, player)
+            opponent_after, opponent_routes_after = shortest_path_metrics(next_state, 1 - player)
             own_cost = 0 if own_before is None or own_after is None else own_after - own_before
             opponent_delay = 0 if opponent_before is None or opponent_after is None else opponent_after - opponent_before
             heuristic_scores[action] = opponent_delay - own_cost
-            own_routes_after = shortest_path_metrics(next_state, player)[1]
-            opponent_routes_after = shortest_path_metrics(next_state, 1 - player)[1]
             opponent_route_reduction = math.log1p(opponent_routes_before) - math.log1p(opponent_routes_after)
             own_route_reduction = math.log1p(own_routes_before) - math.log1p(own_routes_after)
             route_scores[action] = opponent_route_reduction - own_route_reduction
