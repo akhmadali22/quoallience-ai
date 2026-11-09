@@ -28,6 +28,7 @@ def main() -> int:
     parser.add_argument("--repetition-penalty", type=float, default=0.75)
     parser.add_argument("--pawn-progress-bonus", type=float, default=0.0)
     parser.add_argument("--wall-distance-weight", type=float, default=0.0)
+    parser.add_argument("--wall-route-weight", type=float, default=0.0)
     parser.add_argument("--repetition-window", type=int, default=4)
     parser.add_argument("--selection-temperature", type=float, default=0.2)
     parser.add_argument("--opponent", choices=("heuristic", "random"), default="heuristic")
@@ -35,7 +36,7 @@ def main() -> int:
     args = parser.parse_args()
     if args.games < 2 or args.simulations < 1 or args.max_plies < 1:
         parser.error("--games must be >= 2; simulations and max-plies must be positive")
-    if args.category_exploration < 0 or args.selection_temperature < 0 or args.repetition_penalty < 0 or args.pawn_progress_bonus < 0 or args.wall_distance_weight < 0 or args.repetition_window < 1:
+    if args.category_exploration < 0 or args.selection_temperature < 0 or args.repetition_penalty < 0 or args.pawn_progress_bonus < 0 or args.wall_distance_weight < 0 or args.wall_route_weight < 0 or args.repetition_window < 1:
         parser.error("exploration, temperature and penalty values must be non-negative; repetition-window must be positive")
 
     model = load_model(args.checkpoint, device=args.device)
@@ -57,6 +58,7 @@ def main() -> int:
             pawn_progress_bonus=args.pawn_progress_bonus,
             repetition_window=args.repetition_window,
             wall_distance_weight=args.wall_distance_weight,
+            wall_route_weight=args.wall_route_weight,
         )
         heuristic = QuoridorAI(heuristic_config)
         opponent_rng = random.Random(game_seed ^ 0x5EED5EED)
@@ -285,6 +287,7 @@ def main() -> int:
             "repetition_penalty": search.repetition_penalty,
             "pawn_progress_bonus": search.pawn_progress_bonus,
             "wall_distance_weight": search.wall_distance_weight,
+            "wall_route_weight": search.wall_route_weight,
             "repetition_window": search.repetition_window,
             "opponent": args.opponent,
             "progressive_widening": True,
