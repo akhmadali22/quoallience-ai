@@ -242,6 +242,42 @@ def has_path(state: GameState, player: int) -> bool:
         PROFILE["has_path_time"] += perf_counter() - started
 
 
+def shortest_path_metrics(state: GameState, player: int, *, count_cap: int = 1_000_000) -> tuple[int | None, int]:
+    """Return shortest distance and count of shortest routes to the goal row."""
+    if player not in (0, 1):
+        raise ValueError("Player must be 0 or 1")
+    if count_cap < 1:
+        raise ValueError("count_cap must be positive")
+    start = state.pawns[player]
+    goal_y = 0 if player == 0 else 8
+    distances = {start: 0}
+    ways = {start: 1}
+    queue = deque([start])
+    goal_distance = None
+    goal_routes = 0
+    while queue:
+        current = queue.popleft()
+        distance = distances[current]
+        if goal_distance is not None and distance > goal_distance:
+            break
+        if current[1] == goal_y:
+            goal_distance = distance
+            goal_routes = min(count_cap, goal_routes + ways[current])
+            continue
+        x, y = current
+        for nxt in ((x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)):
+            if not inside(nxt) or blocked(state.walls, current, nxt):
+                continue
+            next_distance = distance + 1
+            if nxt not in distances:
+                distances[nxt] = next_distance
+                ways[nxt] = ways[current]
+                queue.append(nxt)
+            elif distances[nxt] == next_distance:
+                ways[nxt] = min(count_cap, ways[nxt] + ways[current])
+    return goal_distance, goal_routes
+
+
 def shortest_distance(
     state: GameState,
     player: int,
