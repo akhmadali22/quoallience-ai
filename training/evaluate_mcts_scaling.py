@@ -77,7 +77,7 @@ def play_game(
         player = state.current_player
         label = player_agents[player]
         search = searches[player]
-        action, visit_policy = search.choose_action(
+        action, _visit_policy = search.choose_action(
             state,
             temperature=0.0,
             rng=rngs[label],
