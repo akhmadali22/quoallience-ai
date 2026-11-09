@@ -45,6 +45,7 @@ class MCTS:
         dirichlet_alpha: float = 0.3,
         dirichlet_fraction: float = 0.25,
         device: str = "cpu",
+        randomize_selection_ties: bool = False,
         progressive_widening: bool = True,
         initial_wall_candidates: int = 8,
         widening_coefficient: float = 2.0,
@@ -70,6 +71,7 @@ class MCTS:
         self.dirichlet_alpha = dirichlet_alpha
         self.dirichlet_fraction = dirichlet_fraction
         self.device = device
+        self.randomize_selection_ties = randomize_selection_ties
         self.progressive_widening = progressive_widening
         self.initial_wall_candidates = initial_wall_candidates
         self.widening_coefficient = widening_coefficient
@@ -223,7 +225,11 @@ class MCTS:
         }
 
     def _select(
-        self, node: Node, action_adjustments: dict[int, float] | None = None
+        self,
+        node: Node,
+        action_adjustments: dict[int, float] | None = None,
+        *,
+        rng: Any | None = None,
     ) -> tuple[int, Edge]:
         scale = math.sqrt(max(1, node.visits))
         active_priors = {action: edge.prior for action, edge in node.edges.items()}
@@ -245,6 +251,7 @@ class MCTS:
         best_action = -1
         best_edge = None
         best_score = -float("inf")
+        tied_actions: list[int] = []
         for action, edge in node.edges.items():
             normalized_prior = normalized_priors[action]
             u = (
@@ -259,6 +266,12 @@ class MCTS:
                 score += action_adjustments.get(action, 0.0)
             if score > best_score:
                 best_action, best_edge, best_score = action, edge, score
+                tied_actions = [action]
+            elif score == best_score:
+                tied_actions.append(action)
+        if rng is not None and len(tied_actions) > 1:
+            best_action = rng.choice(tied_actions)
+            best_edge = node.edges[best_action]
         assert best_edge is not None
         return best_action, best_edge
 
@@ -316,6 +329,7 @@ class MCTS:
         *,
         add_root_noise: bool = False,
         recent_pawn_positions: list[tuple[int, int]] | None = None,
+        rng: Any | None = None,
     ) -> dict[int, float]:
         if state.winner is not None:
             self.last_search_stats = {}
@@ -383,7 +397,9 @@ class MCTS:
                 depth = node.state.ply - state.ply
                 selection_depths[depth] += 1
                 action, edge = self._select(
-                    node, root_action_adjustments if node is root else None
+                    node,
+                    root_action_adjustments if node is root else None,
+                    rng=rng if self.randomize_selection_ties else None,
                 )
                 if edge.child is None:
                     edge.child = Node(apply_action_index(node.state, action))
@@ -505,13 +521,12 @@ class MCTS:
         import random
 
         rng = rng or random
-        if recent_pawn_positions is None:
-            visits = self.search(state, add_root_noise=add_root_noise)
-        else:
-            visits = self.search(
-                state, add_root_noise=add_root_noise,
-                recent_pawn_positions=recent_pawn_positions,
-            )
+        search_kwargs = {"add_root_noise": add_root_noise}
+        if self.randomize_selection_ties:
+            search_kwargs["rng"] = rng
+        if recent_pawn_positions is not None:
+            search_kwargs["recent_pawn_positions"] = recent_pawn_positions
+        visits = self.search(state, **search_kwargs)
         if not visits:
             raise ValueError("Cannot choose an action from a terminal state")
         if temperature <= 1e-8:
