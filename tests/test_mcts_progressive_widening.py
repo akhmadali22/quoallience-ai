@@ -247,3 +247,27 @@ def test_backup_updates_leaf_and_all_ancestor_visits_with_alternating_values():
     assert root_edge.visits == middle_edge.visits == 1
     assert root_edge.value_sum == 0.6
     assert middle_edge.value_sum == -0.6
+
+
+
+def test_selection_ties_can_be_randomized_reproducibly():
+    import random
+
+    node = Node(GameState.initial(), visits=0)
+    node.edges = {
+        0: Edge(prior=0.5),
+        1: Edge(prior=0.5),
+    }
+    mcts = make_mcts(category_exploration=0.0)
+    seeds = list(range(20))
+    first = [
+        mcts._select(node, rng=random.Random(seed))[0]
+        for seed in seeds
+    ]
+    repeated = [
+        mcts._select(node, rng=random.Random(seed))[0]
+        for seed in seeds
+    ]
+
+    assert first == repeated
+    assert set(first) == {0, 1}
