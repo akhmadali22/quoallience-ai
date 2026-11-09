@@ -268,3 +268,31 @@ wall route metrics with candidate-ranking scores and game outcomes.
 Compare action traces, route-score diagnostics, wall path effects, and wins.
 Do not promote a weight based only on fewer own routes being sacrificed; it must
 also improve opponent disruption and eventually head-to-head outcomes.
+
+## MCTS search-budget evaluation
+
+Use a direct MCTS-vs-MCTS tournament to determine whether additional search
+simulations improve playing strength. Both agents use the exact same checkpoint
+and search preferences; only their simulation budgets differ. Each seed is
+played twice, with the agents swapping seats, so both games in a pair start from
+the same initial position and use the same seed.
+
+Example: compare 64 simulations against 128:
+
+```bash
+python -m training.evaluate_mcts_scaling models/checkpoints/neural_v1.pt \\
+  --low-simulations 64 --high-simulations 128 \\
+  --pairs 20 --seed 20261109 --device cpu \\
+  --output data/mcts_scaling/eval_64_vs_128.json
+```
+
+This runs 40 games (20 paired seeds, two seat assignments per seed). The report
+includes paired outcomes, per-agent win/draw/loss scores, and MCTS diagnostics
+per decision: expanded nodes, neural-network evaluations, leaf depth, root
+policy entropy, pawn/wall visit ratios, and selected-action Q/visit counts.
+
+Run a second comparison, such as 128 vs 256, with the same paired-seed protocol
+and compare the score rates. Do not infer that more simulations are better from
+search depth or visit counts alone: the higher-budget agent must demonstrate
+better paired match results. This experiment isolates search-budget effects
+under one checkpoint; it does not independently establish policy/value quality.
