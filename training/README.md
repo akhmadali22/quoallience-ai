@@ -322,3 +322,46 @@ These changes correct search/training bookkeeping; they are not evidence of
 stronger play. Regenerate self-play data after this change before training a new
 checkpoint. Existing replay data has no searched-action mask and cannot recover
 which wall candidates were pending during its original searches.
+
+## MCTS policy/value contribution ablation
+
+Use this tournament to isolate the contribution of the trained policy prior and
+value estimate while keeping every agent inside PUCT MCTS. It compares the full
+network against three controlled ablations:
+
+- `full`: neural policy + neural value.
+- `uniform_policy`: uniform prior over legal actions + neural value.
+- `zero_value`: neural policy + zero leaf value.
+- `uniform_policy_zero_value`: uniform legal-action prior + zero leaf value.
+
+The default protocol disables progressive widening, category exploration, and
+root-only repetition/progress preferences. This is intentional: with progressive
+widening enabled, the policy prior also determines which wall candidates enter
+the tree, so disabling it keeps the policy ablation focused on PUCT prior
+selection rather than candidate-admission order. Exact PUCT score ties are
+randomized with reproducible per-agent RNG streams, avoiding a systematic
+preference for the first action index under uniform priors. Terminal outcomes
+still back up normally when the value head is zeroed.
+
+Run the paired-seat tournament:
+
+```bash
+python -m training.evaluate_mcts_ablation models/checkpoints/neural_v1.pt \
+  --simulations 128 --pairs 10 --seed 20261110 --device cpu \
+  --output data/mcts_ablation/policy_value_ablation.json
+```
+
+Each matchup plays every seed twice with seats swapped:
+- full vs uniform policy: measures the neural policy's contribution while
+  retaining the neural value head.
+- full vs zero value: measures the neural value head's contribution while
+  retaining the neural policy.
+- full vs uniform policy + zero value: measures the combined contribution.
+
+The JSON report includes paired outcomes, per-game action traces, selected
+Q/visit counts, root value, policy entropy, expanded nodes, neural evaluations,
+and pawn/wall visit ratios. This is a component ablation under a fixed MCTS
+protocol, not a claim of absolute strength. After isolating the network
+components, repeat with `--progressive-widening` to measure their interaction
+with the production candidate-admission mechanism.
+
