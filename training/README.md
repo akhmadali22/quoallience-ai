@@ -167,6 +167,35 @@ own pawn progress, regressions, and reversals. The report also contains aggregat
 `value_calibration` MAE/MSE and mean root value.
 
 
+## Root wall candidate ranking experiment
+
+The optional `--wall-distance-weight` reorders only the root's pending wall
+candidates before progressive widening admits them. It combines the neural
+policy's prior rank with the immediate path impact:
+
+`opponent shortest-path increase - own shortest-path increase`.
+
+The feature is disabled by default (`0.0`). It evaluates each legal root wall
+once per search, rather than adding BFS work to every expanded tree node. This
+is a heuristic screening signal, not a full strategic wall evaluation: walls
+that preserve current shortest distances can still affect future options.
+
+Compare small weights with identical seeds and settings:
+
+```bash
+for weight in 0 0.005 0.01 0.02; do
+  python -m training.evaluate models/checkpoints/neural_v1.pt \
+    --games 50 --simulations 128 --seed 4026 \
+    --repetition-penalty 0.75 --pawn-progress-bonus 0 \
+    --wall-distance-weight "$weight" --opponent heuristic --device cpu \
+    --output "data/wall_ranking/eval_wall_${weight}.json"
+done
+```
+
+Keep the baseline weight at zero unless paired-seat results show a repeatable
+improvement. Check both win rate and wall diagnostics; an increase in wall
+frequency alone is not evidence of stronger play.
+
 ## Small progress-bonus sweep and wall-effect diagnostics
 
 The 20-game ablation showed that a progress bonus of 0.10 overwhelms wall
