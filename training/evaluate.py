@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import random
 from pathlib import Path
 
@@ -166,7 +167,6 @@ def main() -> int:
                     own_routes_after = shortest_path_metrics(next_state, neural_player)[1]
                     opponent_routes_before = shortest_path_metrics(state, 1 - neural_player)[1]
                     opponent_routes_after = shortest_path_metrics(next_state, 1 - neural_player)[1]
-                    import math
                     wall_opponent_route_reduction = math.log1p(opponent_routes_before) - math.log1p(opponent_routes_after)
                     wall_own_route_reduction = math.log1p(own_routes_before) - math.log1p(own_routes_after)
                     wall_net_route_score = wall_opponent_route_reduction - wall_own_route_reduction
