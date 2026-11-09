@@ -45,6 +45,7 @@ class MCTS:
         dirichlet_alpha: float = 0.3,
         dirichlet_fraction: float = 0.25,
         device: str = "cpu",
+        randomize_selection_ties: bool = False,
         progressive_widening: bool = True,
         initial_wall_candidates: int = 8,
         widening_coefficient: float = 2.0,
@@ -70,6 +71,7 @@ class MCTS:
         self.dirichlet_alpha = dirichlet_alpha
         self.dirichlet_fraction = dirichlet_fraction
         self.device = device
+        self.randomize_selection_ties = randomize_selection_ties
         self.progressive_widening = progressive_widening
         self.initial_wall_candidates = initial_wall_candidates
         self.widening_coefficient = widening_coefficient
@@ -116,7 +118,7 @@ class MCTS:
             # progressive widening at this particular node.
             return priors, float(value[0].item())
 
-    def _expand(self, node: Node) -> float:
+    def _expand(self, node: Node, *, defer_widen: bool = False) -> float:
         if node.state.winner is not None:
             node.expanded = True
             return 1.0 if node.state.winner == node.state.current_player else -1.0
@@ -141,7 +143,7 @@ class MCTS:
         if not self.progressive_widening:
             node.edges.update(node.pending_walls)
             node.pending_walls.clear()
-        else:
+        elif not defer_widen:
             self._widen(node)
         return value
 
@@ -223,7 +225,11 @@ class MCTS:
         }
 
     def _select(
-        self, node: Node, action_adjustments: dict[int, float] | None = None
+        self,
+        node: Node,
+        action_adjustments: dict[int, float] | None = None,
+        *,
+        rng: Any | None = None,
     ) -> tuple[int, Edge]:
         scale = math.sqrt(max(1, node.visits))
         active_priors = {action: edge.prior for action, edge in node.edges.items()}
@@ -245,6 +251,7 @@ class MCTS:
         best_action = -1
         best_edge = None
         best_score = -float("inf")
+        tied_actions: list[int] = []
         for action, edge in node.edges.items():
             normalized_prior = normalized_priors[action]
             u = (
@@ -259,8 +266,24 @@ class MCTS:
                 score += action_adjustments.get(action, 0.0)
             if score > best_score:
                 best_action, best_edge, best_score = action, edge, score
+                tied_actions = [action]
+            elif score == best_score:
+                tied_actions.append(action)
+        if rng is not None and len(tied_actions) > 1:
+            best_action = rng.choice(tied_actions)
+            best_edge = node.edges[best_action]
         assert best_edge is not None
         return best_action, best_edge
+
+    @staticmethod
+    def _backup(path: list[tuple[Node, Edge]], leaf: Node, value: float) -> None:
+        """Back up a leaf value, updating visits for every node on the path."""
+        leaf.visits += 1
+        for parent, edge in reversed(path):
+            value = -value
+            edge.visits += 1
+            edge.value_sum += value
+            parent.visits += 1
 
     def _all_root_edges(self, root: Node) -> dict[int, Edge]:
         result = dict(root.edges)
@@ -306,6 +329,7 @@ class MCTS:
         *,
         add_root_noise: bool = False,
         recent_pawn_positions: list[tuple[int, int]] | None = None,
+        rng: Any | None = None,
     ) -> dict[int, float]:
         if state.winner is not None:
             self.last_search_stats = {}
@@ -334,7 +358,12 @@ class MCTS:
             return self._expand(node)
 
         root = Node(state)
-        root_value = expand_tracked(root)
+        depth = root.state.ply - state.ply
+        stats["expanded_nodes"] += 1
+        expanded_depths[depth] += 1
+        stats["nn_evaluations"] += 1
+        evaluated_depths[depth] += 1
+        root_value = self._expand(root, defer_widen=True)
         root_action_adjustments = self._root_action_adjustments(state, recent_pawn_positions)
 
         if add_root_noise and root.edges:
@@ -356,6 +385,8 @@ class MCTS:
             )
 
         root_wall_ranking_stats = self._rank_root_wall_candidates(state, root)
+        # Admit the initial wall candidates only after root noise and ranking.
+        self._widen(root)
 
         for _ in range(self.simulations):
             node = root
@@ -366,7 +397,9 @@ class MCTS:
                 depth = node.state.ply - state.ply
                 selection_depths[depth] += 1
                 action, edge = self._select(
-                    node, root_action_adjustments if node is root else None
+                    node,
+                    root_action_adjustments if node is root else None,
+                    rng=rng if self.randomize_selection_ties else None,
                 )
                 if edge.child is None:
                     edge.child = Node(apply_action_index(node.state, action))
@@ -377,11 +410,7 @@ class MCTS:
             value = expand_tracked(node) if not node.expanded else (
                 1.0 if node.state.winner == node.state.current_player else -1.0
             )
-            for parent, edge in reversed(path):
-                value = -value
-                edge.visits += 1
-                edge.value_sum += value
-                parent.visits += 1
+            self._backup(path, node, value)
 
         all_root_edges = self._all_root_edges(root)
         total = sum(edge.visits for edge in all_root_edges.values())
@@ -469,6 +498,8 @@ class MCTS:
             "root_pawn_visit_ratio": root_pawn_visits / total if total else 0.0,
             "root_wall_visit_ratio": root_wall_visits / total if total else 0.0,
             "root_action_stats": root_action_stats,
+            # Only active actions were eligible for this search's policy target.
+            "root_policy_mask": sorted(root.edges),
             "pawn_visits": pawn_visits,
             "wall_visits": wall_visits,
             "pawn_visit_ratio": pawn_visits / total if total else 0.0,
@@ -490,13 +521,12 @@ class MCTS:
         import random
 
         rng = rng or random
-        if recent_pawn_positions is None:
-            visits = self.search(state, add_root_noise=add_root_noise)
-        else:
-            visits = self.search(
-                state, add_root_noise=add_root_noise,
-                recent_pawn_positions=recent_pawn_positions,
-            )
+        search_kwargs = {"add_root_noise": add_root_noise}
+        if self.randomize_selection_ties:
+            search_kwargs["rng"] = rng
+        if recent_pawn_positions is not None:
+            search_kwargs["recent_pawn_positions"] = recent_pawn_positions
+        visits = self.search(state, **search_kwargs)
         if not visits:
             raise ValueError("Cannot choose an action from a terminal state")
         if temperature <= 1e-8:
