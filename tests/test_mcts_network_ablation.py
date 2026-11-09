@@ -1,6 +1,7 @@
 import torch
 
-from training.evaluate_mcts_ablation import AblatedModel
+from quoridor.neural_ai.encoder import ACTION_SIZE
+from training.evaluate_mcts_ablation import AblatedModel, play_game
 
 
 class FixedModel:
@@ -51,3 +52,34 @@ def test_combined_ablation_removes_both_network_outputs():
 
     assert torch.count_nonzero(logits).item() == 0
     assert torch.count_nonzero(values).item() == 0
+
+
+
+class ZeroLogitValueModel:
+    def __call__(self, inputs):
+        return (
+            torch.zeros((inputs.shape[0], ACTION_SIZE), device=inputs.device),
+            torch.zeros((inputs.shape[0],), device=inputs.device),
+        )
+
+
+def test_ablation_tournament_executes_a_short_mcts_game():
+    result = play_game(
+        ZeroLogitValueModel(),
+        agent_a="full",
+        agent_b="uniform_policy",
+        seed=17,
+        a_player=0,
+        simulations=2,
+        max_plies=2,
+        device="cpu",
+        c_puct=1.5,
+        progressive_widening=False,
+        initial_wall_candidates=8,
+    )
+
+    assert result["plies"] == 2
+    assert result["agent_metrics"]["full"]["turns"] == 1
+    assert result["agent_metrics"]["uniform_policy"]["turns"] == 1
+    assert result["result_for_a"] == "draw"
+    assert len(result["action_trace"]) == 2
