@@ -6,7 +6,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from quoridor.engine import GameState, shortest_distance
+from quoridor.engine import GameState, shortest_distance, shortest_path_metrics
 from .encoder import ACTION_SIZE, MOVE_ACTIONS as ENCODER_MOVE_ACTIONS, apply_action_index, encode_state, legal_action_indices
 
 
@@ -54,6 +54,7 @@ class MCTS:
         pawn_progress_bonus: float = 0.0,
         repetition_window: int = 4,
         wall_distance_weight: float = 0.0,
+        wall_route_weight: float = 0.0,
     ):
         if simulations < 1:
             raise ValueError("simulations must be positive")
@@ -85,6 +86,9 @@ class MCTS:
         if wall_distance_weight < 0:
             raise ValueError("wall_distance_weight cannot be negative")
         self.wall_distance_weight = wall_distance_weight
+        if wall_route_weight < 0:
+            raise ValueError("wall_route_weight cannot be negative")
+        self.wall_route_weight = wall_route_weight
         self.widening_exponent = widening_exponent
         self.last_search_stats: dict[str, Any] = {}
 
@@ -176,17 +180,20 @@ class MCTS:
         The heuristic is deliberately root-only: evaluating every wall at every
         expanded node would multiply BFS work throughout the tree.
         """
-        if not root.pending_walls or self.wall_distance_weight <= 0:
+        if not root.pending_walls or (self.wall_distance_weight <= 0 and self.wall_route_weight <= 0):
             return {}
 
         player = state.current_player
         own_before = shortest_distance(state, player)
         opponent_before = shortest_distance(state, 1 - player)
+        own_routes_before = shortest_path_metrics(state, player)[1]
+        opponent_routes_before = shortest_path_metrics(state, 1 - player)[1]
         ranked_by_prior = sorted(
             root.pending_walls, key=lambda item: item[1].prior, reverse=True
         )
         count = len(ranked_by_prior)
         heuristic_scores: dict[int, float] = {}
+        route_scores: dict[int, float] = {}
         for action, _edge in ranked_by_prior:
             next_state = apply_action_index(state, action)
             own_after = shortest_distance(next_state, player)
@@ -194,13 +201,18 @@ class MCTS:
             own_cost = 0 if own_before is None or own_after is None else own_after - own_before
             opponent_delay = 0 if opponent_before is None or opponent_after is None else opponent_after - opponent_before
             heuristic_scores[action] = opponent_delay - own_cost
+            own_routes_after = shortest_path_metrics(next_state, player)[1]
+            opponent_routes_after = shortest_path_metrics(next_state, 1 - player)[1]
+            opponent_route_reduction = math.log1p(opponent_routes_before) - math.log1p(opponent_routes_after)
+            own_route_reduction = math.log1p(own_routes_before) - math.log1p(own_routes_after)
+            route_scores[action] = opponent_route_reduction - own_route_reduction
 
         prior_rank = {
             action: (count - index) / count
             for index, (action, _edge) in enumerate(ranked_by_prior)
         }
         combined = {
-            action: prior_rank[action] + self.wall_distance_weight * heuristic_scores[action]
+            action: prior_rank[action] + self.wall_distance_weight * heuristic_scores[action] + self.wall_route_weight * route_scores[action]
             for action, _edge in ranked_by_prior
         }
         root.pending_walls.sort(key=lambda item: combined[item[0]], reverse=True)
@@ -209,6 +221,9 @@ class MCTS:
             "candidate_count": count,
             "best_heuristic_score": max(heuristic_scores.values(), default=0),
             "worst_heuristic_score": min(heuristic_scores.values(), default=0),
+            "route_weight": self.wall_route_weight,
+            "best_route_score": max(route_scores.values(), default=0),
+            "worst_route_score": min(route_scores.values(), default=0),
         }
 
     def _select(
@@ -423,6 +438,7 @@ class MCTS:
             "root_value": root_value,
             "root_wall_ranking": root_wall_ranking_stats,
             "wall_distance_weight": self.wall_distance_weight,
+            "wall_route_weight": self.wall_route_weight,
             "root_repetition_penalty": self.repetition_penalty,
             "root_pawn_progress_bonus": self.pawn_progress_bonus,
             "root_repetition_adjusted_actions": sum(1 for v in root_action_adjustments.values() if v < 0),
