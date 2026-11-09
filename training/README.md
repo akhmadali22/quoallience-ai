@@ -225,3 +225,31 @@ These are immediate shortest-path effects, not a complete measure of wall
 quality. A wall can be useful by changing future tactical options even when the
 opponent's shortest path does not immediately increase. Inspect these metrics
 alongside game outcomes and action traces.
+
+
+## Strategic wall route-redundancy experiment
+
+Shortest distance alone misses walls that remove alternative routes without
+changing the current minimum distance. The optional `--wall-route-weight`
+adds a root-only route-redundancy signal to wall candidate ranking. It compares
+log changes in the number of shortest routes available to the opponent and to
+ourselves. The route count is capped, and this remains a local geometric
+heuristic rather than a full multi-turn tactical evaluator.
+
+Keep both wall-ranking weights disabled by default. First compare the route
+signal in isolation while holding distance ranking at zero:
+
+```bash
+for weight in 0 0.01 0.02 0.05; do
+  python -m training.evaluate models/checkpoints/neural_v1.pt \\
+    --games 50 --simulations 128 --seed 5026 \\
+    --repetition-penalty 0.75 --pawn-progress-bonus 0 \\
+    --wall-distance-weight 0 --wall-route-weight "$weight" \\
+    --opponent heuristic --device cpu \\
+    --output "data/wall_routes/eval_route_\${weight}.json"
+done
+```
+
+Compare action traces, route-score diagnostics, wall path effects, and wins.
+Do not promote a weight based only on fewer own routes being sacrificed; it must
+also improve opponent disruption and eventually head-to-head outcomes.
