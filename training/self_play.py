@@ -42,6 +42,7 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
         samples.append({
             "state": encode_state(state),
             "policy": {str(key): value for key, value in visits.items()},
+            "policy_mask": search_stats.get("root_policy_mask", sorted(visits)),
             "player": player,
             "ply": state.ply,
             "root_value": search_stats.get("root_value"),
