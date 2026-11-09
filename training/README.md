@@ -296,3 +296,29 @@ and compare the score rates. Do not infer that more simulations are better from
 search depth or visit counts alone: the higher-budget agent must demonstrate
 better paired match results. This experiment isolates search-budget effects
 under one checkpoint; it does not independently establish policy/value quality.
+
+
+## Progressive widening and policy-target correctness
+
+At the root, MCTS now applies Dirichlet noise and optional wall-candidate ranking
+before admitting the initial wall set. This ensures that the first admitted walls
+are selected using the perturbed/ranked priors rather than the unmodified network
+ordering.
+
+Self-play records a `policy_mask` containing the actions admitted to the root
+search by the end of that search. Training normalizes the MCTS visit target and
+computes policy cross-entropy only over this mask. Wall candidates that remained
+in the progressive-widening queue are therefore excluded from the policy
+softmax and receive no policy gradient from a search that never examined them.
+Older replay files without `policy_mask` remain readable and retain the legacy
+full-action-space training behavior.
+
+MCTS backup also increments the leaf node visit count, so every node on a
+completed simulation path receives one visit. This keeps node visit counts
+consistent with incoming edge visits and with the visit-dependent PUCT and
+progressive-widening calculations.
+
+These changes correct search/training bookkeeping; they are not evidence of
+stronger play. Regenerate self-play data after this change before training a new
+checkpoint. Existing replay data has no searched-action mask and cannot recover
+which wall candidates were pending during its original searches.
