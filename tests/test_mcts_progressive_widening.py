@@ -216,7 +216,7 @@ def test_root_selection_adjustment_can_avoid_a_recent_reversal():
 def test_root_noise_and_ranking_run_before_initial_wall_admission():
     state = GameState.initial()
     legal_walls = [action for action in legal_action_indices(state) if action >= MOVE_ACTIONS]
-    mcts = make_mcts(simulations=1, initial_wall_candidates=1)
+    mcts = make_mcts(simulations=1, initial_wall_candidates=1, widening_coefficient=0.5)
 
     def rank_before_widening(search_state, root):
         assert not any(action >= MOVE_ACTIONS for action in root.edges)
