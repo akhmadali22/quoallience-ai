@@ -31,6 +31,40 @@ def load_samples(path: Path) -> list[dict]:
     return samples
 
 
+def build_training_tensors(samples: list[dict]):
+    """Build value/policy targets and exclude actions never admitted by MCTS."""
+    import torch
+
+    states = torch.tensor([sample["state"] for sample in samples], dtype=torch.float32)
+    targets = torch.zeros((len(samples), ACTION_SIZE), dtype=torch.float32)
+    policy_masks = torch.ones((len(samples), ACTION_SIZE), dtype=torch.bool)
+    values = torch.tensor([sample["value"] for sample in samples], dtype=torch.float32)
+
+    for row, sample in enumerate(samples):
+        if "policy_mask" in sample:
+            policy_masks[row].zero_()
+            for action in sample["policy_mask"]:
+                action_index = int(action)
+                if 0 <= action_index < ACTION_SIZE:
+                    policy_masks[row, action_index] = True
+            if not policy_masks[row].any():
+                raise ValueError(f"Sample {row} has an empty policy_mask")
+
+        for action, probability in sample["policy"].items():
+            action_index = int(action)
+            if 0 <= action_index < ACTION_SIZE:
+                targets[row, action_index] = float(probability)
+
+        if torch.any(targets[row].masked_select(~policy_masks[row]) > 1e-8):
+            raise ValueError(f"Sample {row} assigns policy mass outside policy_mask")
+        target_mass = targets[row].sum()
+        if not torch.isfinite(target_mass) or target_mass <= 0:
+            raise ValueError(f"Sample {row} has an invalid policy target")
+        targets[row] /= target_mass
+
+    return states, targets, policy_masks, values
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("replay", type=Path, help="Path to replay.jsonl")
@@ -68,29 +102,7 @@ def main() -> int:
             optimizer.load_state_dict(payload["optimizer_state_dict"])
     model.train()
 
-    states = torch.tensor([s["state"] for s in samples], dtype=torch.float32)
-    targets = torch.zeros((len(samples), ACTION_SIZE), dtype=torch.float32)
-    policy_masks = torch.ones((len(samples), ACTION_SIZE), dtype=torch.bool)
-    values = torch.tensor([s["value"] for s in samples], dtype=torch.float32)
-    for row, sample in enumerate(samples):
-        if "policy_mask" in sample:
-            policy_masks[row].zero_()
-            for action in sample["policy_mask"]:
-                action_index = int(action)
-                if 0 <= action_index < ACTION_SIZE:
-                    policy_masks[row, action_index] = True
-            if not policy_masks[row].any():
-                raise ValueError(f"Sample {row} has an empty policy_mask")
-        for action, probability in sample["policy"].items():
-            action_index = int(action)
-            if 0 <= action_index < ACTION_SIZE:
-                targets[row, action_index] = float(probability)
-        if torch.any(targets[row].masked_select(~policy_masks[row]) > 1e-8):
-            raise ValueError(f"Sample {row} assigns policy mass outside policy_mask")
-        target_mass = targets[row].sum()
-        if not torch.isfinite(target_mass) or target_mass <= 0:
-            raise ValueError(f"Sample {row} has an invalid policy target")
-        targets[row] /= target_mass
+    states, targets, policy_masks, values = build_training_tensors(samples)
 
     order = list(range(len(samples)))
     for epoch in range(args.epochs):
