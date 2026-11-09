@@ -365,3 +365,34 @@ protocol, not a claim of absolute strength. After isolating the network
 components, repeat with `--progressive-widening` to measure their interaction
 with the production candidate-admission mechanism.
 
+
+
+### Crash-safe MCTS ablation diagnostics
+
+The policy/value ablation evaluator now appends one complete game record to a
+JSON Lines file immediately after each game and flushes it to disk with fsync.
+The default path is the report path with a .jsonl extension. The final
+aggregate JSON is still written after the full tournament finishes.
+
+Each ply records both players' shortest-path distances before and after the
+action, distance deltas, and whether the ply made measurable progress. Per-game
+diagnostics include exact full-state repetitions, repeated pawn positions,
+repeated action windows of 4/6/8 plies, total plies without progress, the
+longest consecutive no-progress streak, and final distances.
+
+Draws caused by reaching --max-plies are labeled max_plies. The engine
+currently has no separate terminal-draw rule, so a draw before that limit would
+be labeled terminal_without_winner.
+
+The JSONL file is append-only. Use a fresh output path for a fresh experiment,
+or retain the same path to preserve records from interrupted runs. Each record
+has a run_id so separate invocations can be distinguished.
+
+Example:
+
+    python -m training.evaluate_mcts_ablation models/checkpoints/neural_v1.pt \
+      --simulations 128 --pairs 10 --seed 20261110 --device cpu \
+      --output data/mcts_ablation/policy_value_ablation.json
+
+The durable game-by-game records are written to
+data/mcts_ablation/policy_value_ablation.jsonl.
