@@ -241,12 +241,12 @@ signal in isolation while holding distance ranking at zero:
 
 ```bash
 for weight in 0 0.01 0.02 0.05; do
-  python -m training.evaluate models/checkpoints/neural_v1.pt \\
-    --games 50 --simulations 128 --seed 5026 \\
-    --repetition-penalty 0.75 --pawn-progress-bonus 0 \\
-    --wall-distance-weight 0 --wall-route-weight "$weight" \\
-    --opponent heuristic --device cpu \\
-    --output "data/wall_routes/eval_route_\${weight}.json"
+  python -m training.evaluate models/checkpoints/neural_v1.pt \
+    --games 50 --simulations 128 --seed 5026 \
+    --repetition-penalty 0.75 --pawn-progress-bonus 0 \
+    --wall-distance-weight 0 --wall-route-weight "$weight" \
+    --opponent heuristic --device cpu \
+    --output "data/wall_routes/eval_route_${weight}.json"
 done
 ```
 
