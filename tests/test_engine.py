@@ -10,6 +10,7 @@ from quoridor.engine import (
     is_legal_wall,
     legal_pawn_moves,
     shortest_distance,
+    shortest_path_metrics,
     shortest_path,
     validate_state,
 )
@@ -136,3 +137,14 @@ def test_serialization():
     assert data["current_player"] == 0
     assert data["walls_remaining"] == [10, 10]
     assert data["pawns"][0] == {"x": 4, "y": 8}
+
+
+def test_shortest_path_metrics_initial_state():
+    state = GameState.initial()
+    assert shortest_path_metrics(state, 0) == (8, 1)
+    assert shortest_path_metrics(state, 1) == (8, 1)
+
+
+def test_shortest_path_metrics_rejects_invalid_count_cap():
+    with pytest.raises(ValueError):
+        shortest_path_metrics(GameState.initial(), 0, count_cap=0)
