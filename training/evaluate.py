@@ -8,7 +8,7 @@ import random
 from pathlib import Path
 
 from quoridor.advanced_ai import AIConfig, QuoridorAI
-from quoridor.engine import GameState, shortest_distance
+from quoridor.engine import GameState, shortest_distance, shortest_path_metrics
 from quoridor.neural_ai.encoder import apply_action_index, encode_action, legal_action_indices
 from quoridor.neural_ai.mcts import MOVE_ACTIONS, MCTS
 from quoridor.neural_ai.policy import load_model
@@ -81,6 +81,14 @@ def main() -> int:
         wall_own_path_decreases = 0
         wall_own_distance_delta_sum = 0
         wall_actions_with_distance_effect = 0
+        wall_opponent_route_reduction_sum = 0.0
+        wall_own_route_reduction_sum = 0.0
+        wall_net_route_score_sum = 0.0
+        wall_opponent_routes_reduced = 0
+        wall_opponent_routes_increased = 0
+        wall_own_routes_reduced = 0
+        wall_own_routes_increased = 0
+        wall_route_samples = 0
         pawn_position_history = [state.pawns[neural_player]]
 
         while state.winner is None and state.ply < args.max_plies:
@@ -134,6 +142,9 @@ def main() -> int:
 
                 wall_opponent_delta = None
                 wall_own_delta = None
+                wall_opponent_route_reduction = None
+                wall_own_route_reduction = None
+                wall_net_route_score = None
                 if action_index >= MOVE_ACTIONS:
                     if opponent_distance_delta is not None:
                         wall_opponent_delta = opponent_distance_delta
@@ -150,6 +161,27 @@ def main() -> int:
                             wall_own_path_increases += 1
                         elif wall_own_delta < 0:
                             wall_own_path_decreases += 1
+                if action_index >= MOVE_ACTIONS:
+                    own_routes_before = shortest_path_metrics(state, neural_player)[1]
+                    own_routes_after = shortest_path_metrics(next_state, neural_player)[1]
+                    opponent_routes_before = shortest_path_metrics(state, 1 - neural_player)[1]
+                    opponent_routes_after = shortest_path_metrics(next_state, 1 - neural_player)[1]
+                    import math
+                    wall_opponent_route_reduction = math.log1p(opponent_routes_before) - math.log1p(opponent_routes_after)
+                    wall_own_route_reduction = math.log1p(own_routes_before) - math.log1p(own_routes_after)
+                    wall_net_route_score = wall_opponent_route_reduction - wall_own_route_reduction
+                    wall_route_samples += 1
+                    wall_opponent_route_reduction_sum += wall_opponent_route_reduction
+                    wall_own_route_reduction_sum += wall_own_route_reduction
+                    wall_net_route_score_sum += wall_net_route_score
+                    if wall_opponent_route_reduction > 1e-9:
+                        wall_opponent_routes_reduced += 1
+                    elif wall_opponent_route_reduction < -1e-9:
+                        wall_opponent_routes_increased += 1
+                    if wall_own_route_reduction > 1e-9:
+                        wall_own_routes_reduced += 1
+                    elif wall_own_route_reduction < -1e-9:
+                        wall_own_routes_increased += 1
                 action_trace.append({
                     'ply': state.ply,
                     'player': state.current_player,
@@ -175,6 +207,9 @@ def main() -> int:
                     'opponent_distance_delta': opponent_distance_delta,
                     'wall_opponent_distance_delta': wall_opponent_delta,
                     'wall_own_distance_delta': wall_own_delta,
+                    'wall_opponent_route_reduction': wall_opponent_route_reduction,
+                    'wall_own_route_reduction': wall_own_route_reduction,
+                    'wall_net_route_score': wall_net_route_score,
                     'pawn_distance_delta': (
                         None if own_distance_before is None or own_distance_after is None
                         else own_distance_before - own_distance_after
@@ -228,6 +263,14 @@ def main() -> int:
             "wall_own_path_decreases": wall_own_path_decreases,
             "wall_own_distance_delta_sum": wall_own_distance_delta_sum,
             "wall_actions_with_distance_effect": wall_actions_with_distance_effect,
+            "wall_opponent_route_reduction_sum": wall_opponent_route_reduction_sum,
+            "wall_own_route_reduction_sum": wall_own_route_reduction_sum,
+            "wall_net_route_score_sum": wall_net_route_score_sum,
+            "wall_opponent_routes_reduced": wall_opponent_routes_reduced,
+            "wall_opponent_routes_increased": wall_opponent_routes_increased,
+            "wall_own_routes_reduced": wall_own_routes_reduced,
+            "wall_own_routes_increased": wall_own_routes_increased,
+            "wall_route_samples": wall_route_samples,
             "neural_pawn_action_ratio": (
                 neural_pawn_actions / (neural_pawn_actions + neural_wall_actions)
                 if neural_pawn_actions + neural_wall_actions else 0.0
@@ -328,6 +371,14 @@ def main() -> int:
             "wall_own_path_decreases": sum(row["wall_own_path_decreases"] for row in rows),
             "wall_own_distance_delta_sum": sum(row["wall_own_distance_delta_sum"] for row in rows),
             "wall_actions_with_distance_effect": sum(row["wall_actions_with_distance_effect"] for row in rows),
+            "wall_opponent_route_reduction_sum": sum(row["wall_opponent_route_reduction_sum"] for row in rows),
+            "wall_own_route_reduction_sum": sum(row["wall_own_route_reduction_sum"] for row in rows),
+            "wall_net_route_score_sum": sum(row["wall_net_route_score_sum"] for row in rows),
+            "wall_opponent_routes_reduced": sum(row["wall_opponent_routes_reduced"] for row in rows),
+            "wall_opponent_routes_increased": sum(row["wall_opponent_routes_increased"] for row in rows),
+            "wall_own_routes_reduced": sum(row["wall_own_routes_reduced"] for row in rows),
+            "wall_own_routes_increased": sum(row["wall_own_routes_increased"] for row in rows),
+            "wall_route_samples": sum(row["wall_route_samples"] for row in rows),
         },
         "value_calibration": {
             "samples": len(value_errors),
