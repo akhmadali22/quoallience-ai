@@ -268,3 +268,100 @@ wall route metrics with candidate-ranking scores and game outcomes.
 Compare action traces, route-score diagnostics, wall path effects, and wins.
 Do not promote a weight based only on fewer own routes being sacrificed; it must
 also improve opponent disruption and eventually head-to-head outcomes.
+
+## MCTS search-budget evaluation
+
+Use a direct MCTS-vs-MCTS tournament to determine whether additional search
+simulations improve playing strength. Both agents use the exact same checkpoint
+and search preferences; only their simulation budgets differ. Each seed is
+played twice, with the agents swapping seats, so both games in a pair start from
+the same initial position and use the same seed.
+
+Example: compare 64 simulations against 128:
+
+```bash
+python -m training.evaluate_mcts_scaling models/checkpoints/neural_v1.pt \\
+  --low-simulations 64 --high-simulations 128 \\
+  --pairs 20 --seed 20261109 --device cpu \\
+  --output data/mcts_scaling/eval_64_vs_128.json
+```
+
+This runs 40 games (20 paired seeds, two seat assignments per seed). The report
+includes paired outcomes, per-agent win/draw/loss scores, and MCTS diagnostics
+per decision: expanded nodes, neural-network evaluations, leaf depth, root
+policy entropy, pawn/wall visit ratios, and selected-action Q/visit counts.
+
+Run a second comparison, such as 128 vs 256, with the same paired-seed protocol
+and compare the score rates. Do not infer that more simulations are better from
+search depth or visit counts alone: the higher-budget agent must demonstrate
+better paired match results. This experiment isolates search-budget effects
+under one checkpoint; it does not independently establish policy/value quality.
+
+
+## Progressive widening and policy-target correctness
+
+At the root, MCTS now applies Dirichlet noise and optional wall-candidate ranking
+before admitting the initial wall set. This ensures that the first admitted walls
+are selected using the perturbed/ranked priors rather than the unmodified network
+ordering.
+
+Self-play records a `policy_mask` containing the actions admitted to the root
+search by the end of that search. Training normalizes the MCTS visit target and
+computes policy cross-entropy only over this mask. Wall candidates that remained
+in the progressive-widening queue are therefore excluded from the policy
+softmax and receive no policy gradient from a search that never examined them.
+Older replay files without `policy_mask` remain readable and retain the legacy
+full-action-space training behavior.
+
+MCTS backup also increments the leaf node visit count, so every node on a
+completed simulation path receives one visit. This keeps node visit counts
+consistent with incoming edge visits and with the visit-dependent PUCT and
+progressive-widening calculations.
+
+These changes correct search/training bookkeeping; they are not evidence of
+stronger play. Regenerate self-play data after this change before training a new
+checkpoint. Existing replay data has no searched-action mask and cannot recover
+which wall candidates were pending during its original searches.
+
+## MCTS policy/value contribution ablation
+
+Use this tournament to isolate the contribution of the trained policy prior and
+value estimate while keeping every agent inside PUCT MCTS. It compares the full
+network against three controlled ablations:
+
+- `full`: neural policy + neural value.
+- `uniform_policy`: uniform prior over legal actions + neural value.
+- `zero_value`: neural policy + zero leaf value.
+- `uniform_policy_zero_value`: uniform legal-action prior + zero leaf value.
+
+The default protocol disables progressive widening, category exploration, and
+root-only repetition/progress preferences. This is intentional: with progressive
+widening enabled, the policy prior also determines which wall candidates enter
+the tree, so disabling it keeps the policy ablation focused on PUCT prior
+selection rather than candidate-admission order. Exact PUCT score ties are
+randomized with reproducible per-agent RNG streams, avoiding a systematic
+preference for the first action index under uniform priors. Terminal outcomes
+still back up normally when the value head is zeroed.
+
+Run the paired-seat tournament:
+
+```bash
+python -m training.evaluate_mcts_ablation models/checkpoints/neural_v1.pt \
+  --simulations 128 --pairs 10 --seed 20261110 --device cpu \
+  --output data/mcts_ablation/policy_value_ablation.json
+```
+
+Each matchup plays every seed twice with seats swapped:
+- full vs uniform policy: measures the neural policy's contribution while
+  retaining the neural value head.
+- full vs zero value: measures the neural value head's contribution while
+  retaining the neural policy.
+- full vs uniform policy + zero value: measures the combined contribution.
+
+The JSON report includes paired outcomes, per-game action traces, selected
+Q/visit counts, root value, policy entropy, expanded nodes, neural evaluations,
+and pawn/wall visit ratios. This is a component ablation under a fixed MCTS
+protocol, not a claim of absolute strength. After isolating the network
+components, repeat with `--progressive-widening` to measure their interaction
+with the production candidate-admission mechanism.
+
