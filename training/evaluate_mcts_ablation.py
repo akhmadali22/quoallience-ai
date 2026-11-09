@@ -90,6 +90,7 @@ def play_game(
             simulations=simulations,
             c_puct=c_puct,
             device=device,
+            randomize_selection_ties=True,
             progressive_widening=progressive_widening,
             initial_wall_candidates=initial_wall_candidates,
             category_exploration=0.0,
