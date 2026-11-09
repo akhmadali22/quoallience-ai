@@ -6,7 +6,7 @@ import argparse
 import json
 import random
 import os
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from statistics import mean
@@ -372,7 +372,7 @@ def main() -> int:
                 )
                 result["run_id"] = run_id
                 games.append(result)
-                progress_file.write(json.dumps(result, separators=(",", ":")) + "\\n")
+                progress_file.write(json.dumps(result, separators=(",", ":")) + "\n")
                 progress_file.flush()
                 os.fsync(progress_file.fileno())
                 matchup_games.append(result)
