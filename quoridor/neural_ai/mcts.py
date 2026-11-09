@@ -53,6 +53,7 @@ class MCTS:
         repetition_penalty: float = 0.75,
         pawn_progress_bonus: float = 0.0,
         repetition_window: int = 4,
+        wall_distance_weight: float = 0.0,
     ):
         if simulations < 1:
             raise ValueError("simulations must be positive")
@@ -81,6 +82,9 @@ class MCTS:
         self.repetition_penalty = repetition_penalty
         self.pawn_progress_bonus = pawn_progress_bonus
         self.repetition_window = repetition_window
+        if wall_distance_weight < 0:
+            raise ValueError("wall_distance_weight cannot be negative")
+        self.wall_distance_weight = wall_distance_weight
         self.widening_exponent = widening_exponent
         self.last_search_stats: dict[str, Any] = {}
 
@@ -165,6 +169,49 @@ class MCTS:
             action, edge = node.pending_walls.pop(0)
             node.edges[action] = edge
             active_wall_count += 1
+
+    def _rank_root_wall_candidates(self, state: GameState, root: Node) -> dict[str, float]:
+        """Rank root wall candidates by policy rank plus immediate path impact.
+
+        The heuristic is deliberately root-only: evaluating every wall at every
+        expanded node would multiply BFS work throughout the tree.
+        """
+        if not root.pending_walls or self.wall_distance_weight <= 0:
+            return {}
+
+        from .encoder import decode_action
+
+        player = state.current_player
+        own_before = shortest_distance(state, player)
+        opponent_before = shortest_distance(state, 1 - player)
+        ranked_by_prior = sorted(
+            root.pending_walls, key=lambda item: item[1].prior, reverse=True
+        )
+        count = len(ranked_by_prior)
+        heuristic_scores: dict[int, float] = {}
+        for action, _edge in ranked_by_prior:
+            next_state = apply_action_index(state, action)
+            own_after = shortest_distance(next_state, player)
+            opponent_after = shortest_distance(next_state, 1 - player)
+            own_cost = 0 if own_before is None or own_after is None else own_after - own_before
+            opponent_delay = 0 if opponent_before is None or opponent_after is None else opponent_after - opponent_before
+            heuristic_scores[action] = opponent_delay - own_cost
+
+        prior_rank = {
+            action: (count - index) / count
+            for index, (action, _edge) in enumerate(ranked_by_prior)
+        }
+        combined = {
+            action: prior_rank[action] + self.wall_distance_weight * heuristic_scores[action]
+            for action, _edge in ranked_by_prior
+        }
+        root.pending_walls.sort(key=lambda item: combined[item[0]], reverse=True)
+        return {
+            "weight": self.wall_distance_weight,
+            "candidate_count": count,
+            "best_heuristic_score": max(heuristic_scores.values(), default=0),
+            "worst_heuristic_score": min(heuristic_scores.values(), default=0),
+        }
 
     def _select(
         self, node: Node, action_adjustments: dict[int, float] | None = None
@@ -279,6 +326,7 @@ class MCTS:
 
         root = Node(state)
         root_value = expand_tracked(root)
+        root_wall_ranking_stats = self._rank_root_wall_candidates(state, root)
         root_action_adjustments = self._root_action_adjustments(state, recent_pawn_positions)
 
         if add_root_noise and root.edges:
@@ -374,6 +422,8 @@ class MCTS:
         )
         stats.update({
             "root_value": root_value,
+            "root_wall_ranking": root_wall_ranking_stats,
+            "wall_distance_weight": self.wall_distance_weight,
             "root_repetition_penalty": self.repetition_penalty,
             "root_pawn_progress_bonus": self.pawn_progress_bonus,
             "root_repetition_adjusted_actions": sum(1 for v in root_action_adjustments.values() if v < 0),
