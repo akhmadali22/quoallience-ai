@@ -50,8 +50,9 @@ class MCTS:
         initial_wall_candidates: int = 8,
         widening_coefficient: float = 2.0,
         widening_exponent: float = 0.5,
-        category_exploration: float = 0.35,
-        repetition_penalty: float = 0.75,
+        # Vanilla PUCT is the default; these extensions are opt-in experiments.
+        category_exploration: float = 0.0,
+        repetition_penalty: float = 0.0,
         pawn_progress_bonus: float = 0.0,
         repetition_window: int = 4,
         wall_distance_weight: float = 0.0,
@@ -244,6 +245,9 @@ class MCTS:
             "pawn": sum(edge.visits for action, edge in node.edges.items() if action < MOVE_ACTIONS),
             "wall": sum(edge.visits for action, edge in node.edges.items() if action >= MOVE_ACTIONS),
         }
+        # Optional category balancing is an experimental PUCT extension.
+        # At the default coefficient of zero, selection is vanilla PUCT:
+        # Q(s,a) + c_puct * P(s,a) * sqrt(N(s)) / (1 + N(s,a)).
         category_bonus = {
             name: self.category_exploration * math.sqrt(math.log1p(node.visits) / (1 + count))
             for name, count in category_visits.items()
@@ -293,12 +297,12 @@ class MCTS:
     def _root_action_adjustments(
         self, state: GameState, recent_pawn_positions: list[tuple[int, int]] | None
     ) -> dict[int, float]:
-        """Apply small root-only preferences against recent pawn cycles.
+        """Return optional experimental root adjustments.
 
-        Positions are from the current player's own pawn history. The current
-        square is excluded; earlier squares in the configured window are
-        discouraged, not made illegal. A mild shortest-path delta bonus keeps
-        forward progress visible without forbidding tactical sideways moves.
+        These are disabled by default. The engine does not define repeated
+        positions as terminal draws, so search must not invent that rule or
+        alter backed-up values. When explicitly enabled, these preferences
+        affect root selection only; they never change legal actions or outcomes.
         """
         if not recent_pawn_positions:
             return {}
