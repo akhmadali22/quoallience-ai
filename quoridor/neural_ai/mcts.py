@@ -445,20 +445,62 @@ class MCTS:
         )
         root_pawn_visits = sum(edge.visits for action, edge in all_root_edges.items() if action < MOVE_ACTIONS)
         root_wall_visits = total - root_pawn_visits
-        root_action_stats = {
-            str(action): {
-                "category": "pawn" if action < MOVE_ACTIONS else "wall",
-                "prior": edge.prior, "q": edge.q, "visits": edge.visits,
-                "active": action in root.edges,
-                "selection_adjustment": root_action_adjustments.get(action, 0.0),
-            }
-            for action, edge in all_root_edges.items()
-        }
-        policy_entropy = -sum(
+        # Separate the network's legal-action prior from the visit policy
+        # produced by search. The old root_policy_entropy name was ambiguous:
+        # it actually measured visit entropy, not neural-prior entropy.
+        prior_total_all = sum(edge.prior for edge in all_root_edges.values())
+        legal_prior_probabilities = (
+            {action: edge.prior / prior_total_all for action, edge in all_root_edges.items()}
+            if prior_total_all > 0 else {}
+        )
+        root_prior_entropy = -sum(
+            probability * math.log(probability)
+            for probability in legal_prior_probabilities.values()
+            if probability > 0
+        )
+        root_visit_entropy = -sum(
             probability * math.log(probability)
             for probability in probabilities.values()
             if probability > 0
         )
+        active_category_visits = {
+            "pawn": sum(edge.visits for action, edge in root.edges.items() if action < MOVE_ACTIONS),
+            "wall": sum(edge.visits for action, edge in root.edges.items() if action >= MOVE_ACTIONS),
+        }
+        active_category_bonus = {
+            category: self.category_exploration
+            * math.sqrt(math.log1p(root.visits) / (1 + count))
+            for category, count in active_category_visits.items()
+        }
+        root_action_stats = {}
+        for action, edge in all_root_edges.items():
+            active = action in root.edges
+            category = "pawn" if action < MOVE_ACTIONS else "wall"
+            selection_prior = active_root_selection_priors.get(action) if active else None
+            puct_score = None
+            if active:
+                exploration = (
+                    self.c_puct
+                    * selection_prior
+                    * math.sqrt(max(1, root.visits))
+                    / (1 + edge.visits)
+                )
+                puct_score = (
+                    edge.q
+                    + exploration
+                    + active_category_bonus[category]
+                    + root_action_adjustments.get(action, 0.0)
+                )
+            root_action_stats[str(action)] = {
+                "category": category,
+                "prior": edge.prior,
+                "selection_prior": selection_prior,
+                "q": edge.q,
+                "visits": edge.visits,
+                "active": active,
+                "selection_adjustment": root_action_adjustments.get(action, 0.0),
+                "puct_score": puct_score,
+            }
         stats.update({
             "root_value": root_value,
             "root_wall_ranking": root_wall_ranking_stats,
@@ -467,7 +509,15 @@ class MCTS:
             "root_repetition_penalty": self.repetition_penalty,
             "root_pawn_progress_bonus": self.pawn_progress_bonus,
             "root_repetition_adjusted_actions": sum(1 for v in root_action_adjustments.values() if v < 0),
-            "root_policy_entropy": policy_entropy,
+            "root_prior_entropy": root_prior_entropy,
+            "root_active_prior_entropy": -sum(
+                prior * math.log(prior)
+                for prior in active_root_selection_priors.values()
+                if prior > 0
+            ),
+            "root_visit_entropy": root_visit_entropy,
+            # Backward-compatible alias; this has always been visit entropy.
+            "root_policy_entropy": root_visit_entropy,
             "max_leaf_depth": max(leaf_depths, default=0),
             "average_leaf_depth": (
                 sum(leaf_depths) / len(leaf_depths) if leaf_depths else 0.0
