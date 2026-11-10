@@ -380,6 +380,13 @@ def walls_overlap_or_cross(
     existing: frozenset[Wall],
     candidate: Wall,
 ) -> bool:
+    # An identical wall is already occupying this exact segment.
+    # Sets silently collapse duplicates, so this must be rejected before
+    # applying the action or the player would lose a wall without changing
+    # the board.
+    if candidate in existing:
+        return True
+
     x = candidate.x
     y = candidate.y
 

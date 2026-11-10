@@ -70,6 +70,44 @@ def test_wall_overlap():
     assert is_legal_wall(state, Wall("H", 4, 2), 0)
 
 
+def test_identical_wall_is_illegal():
+    wall = Wall("V", 7, 2)
+    state = replace(
+        GameState.initial(),
+        walls=frozenset({wall}),
+        walls_remaining=(9, 10),
+    )
+
+    assert not is_legal_wall(state, wall, 0)
+
+
+def test_applying_duplicate_wall_is_rejected_without_consuming_wall():
+    wall = Wall("V", 7, 2)
+    state = replace(
+        GameState.initial(),
+        walls=frozenset({wall}),
+        walls_remaining=(9, 10),
+    )
+
+    with pytest.raises(ValueError, match="Illegal wall placement"):
+        apply_wall(state, wall)
+
+    assert state.walls == frozenset({wall})
+    assert state.walls_remaining == (9, 10)
+    assert state.current_player == 0
+    assert state.ply == 0
+
+
+def test_new_wall_remains_legal_when_not_duplicated():
+    state = GameState.initial()
+    wall = Wall("V", 7, 2)
+
+    assert is_legal_wall(state, wall, 0)
+    updated = apply_wall(state, wall)
+    assert updated.walls == frozenset({wall})
+    assert updated.walls_remaining == (9, 10)
+
+
 def test_wall_must_preserve_paths():
     state = GameState.initial()
 
