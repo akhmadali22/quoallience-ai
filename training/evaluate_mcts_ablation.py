@@ -81,6 +81,29 @@ def _record_pawn_position(
     return repeated
 
 
+def _top_root_actions(root_action_stats: dict, *, limit: int = 5) -> list[dict]:
+    """Return compact root alternatives ordered by visits, then prior."""
+    ranked = sorted(
+        root_action_stats.items(),
+        key=lambda item: (
+            int(item[1].get("visits", 0)),
+            float(item[1].get("prior", 0.0)),
+        ),
+        reverse=True,
+    )
+    return [
+        {
+            "action": int(action),
+            "category": values.get("category"),
+            "prior": values.get("prior"),
+            "q": values.get("q"),
+            "visits": values.get("visits", 0),
+            "active": values.get("active", False),
+        }
+        for action, values in ranked[:limit]
+    ]
+
+
 def play_game(
     model,
     *,
@@ -235,6 +258,20 @@ def play_game(
             "prior": selected.get("prior"),
             "q": selected.get("q"),
             "visits": selected.get("visits"),
+            "selected_action_rank_by_visits": next(
+                (
+                    rank
+                    for rank, candidate in enumerate(
+                        _top_root_actions(stats.get("root_action_stats", {}), limit=len(stats.get("root_action_stats", {}))),
+                        start=1,
+                    )
+                    if candidate["action"] == action
+                ),
+                None,
+            ),
+            "root_top_actions_by_visits": _top_root_actions(
+                stats.get("root_action_stats", {})
+            ),
             "root_value": stats.get("root_value"),
             "root_policy_entropy": stats.get("root_policy_entropy"),
             "expanded_nodes": stats.get("expanded_nodes"),
