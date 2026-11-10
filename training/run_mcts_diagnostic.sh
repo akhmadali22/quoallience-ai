@@ -6,6 +6,9 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
+# Make repository packages (for example, quoridor/) importable by Python.
+export PYTHONPATH="$REPO_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+
 CHECKPOINT="${1:-models/checkpoints/neural_v1.pt}"
 SIMULATIONS="${MCTS_SIMULATIONS:-16}"
 PAIRS="${MCTS_PAIRS:-1}"
