@@ -63,6 +63,24 @@ def _mean(values: list[float]) -> float | None:
     return mean(values) if values else None
 
 
+def _record_pawn_position(
+    history: dict[int, list[tuple[int, int]]],
+    repeat_counts: dict[int, int],
+    *,
+    player: int,
+    position: tuple[int, int],
+    action_category: str | None,
+) -> bool:
+    """Record a pawn destination, ignoring wall turns and other actions."""
+    if action_category != "pawn":
+        return False
+    history[player].append(position)
+    repeated = history[player].count(position) > 1
+    if repeated:
+        repeat_counts[player] += 1
+    return repeated
+
+
 def play_game(
     model,
     *,
@@ -200,12 +218,13 @@ def play_game(
                 max_consecutive_no_progress, consecutive_no_progress
             )
 
-        pawn_position_repeat = False
-        if selected.get("category") == "pawn":
-            pawn_history[player].append(next_state.pawns[player])
-            pawn_position_repeat = pawn_history[player].count(next_state.pawns[player]) > 1
-            if pawn_position_repeat:
-                pawn_position_repeats[player] += 1
+        pawn_position_repeat = _record_pawn_position(
+            pawn_history,
+            pawn_position_repeats,
+            player=player,
+            position=next_state.pawns[player],
+            action_category=selected.get("category"),
+        )
 
         trace_entry = {
             "ply": state.ply,
