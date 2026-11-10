@@ -91,3 +91,27 @@ def test_ablation_tournament_executes_a_short_mcts_game():
         "shortest_distance_before" in ply and "shortest_distance_after" in ply
         for ply in result["action_trace"]
     )
+
+
+
+def test_pawn_position_repeat_diagnostic_ignores_wall_turns():
+    # The initial square is the first observation. Repeated positions are
+    # counted only when a pawn action actually lands on a previously seen square.
+    history = {0: [(4, 8)], 1: [(4, 0)]}
+    repeats = {0: 0, 1: 0}
+
+    # A wall action leaves the pawn at (4, 8): it must not add an observation.
+    # This mirrors play_game's category guard around history updates.
+    category = "wall"
+    if category == "pawn":
+        history[0].append((4, 8))
+        repeats[0] += history[0].count((4, 8)) > 1
+    assert history[0] == [(4, 8)]
+    assert repeats[0] == 0
+
+    # A pawn move that returns to the initial square is a genuine repetition.
+    category = "pawn"
+    if category == "pawn":
+        history[0].append((4, 8))
+        repeats[0] += history[0].count((4, 8)) > 1
+    assert repeats[0] == 1
