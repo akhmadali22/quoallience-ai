@@ -246,8 +246,9 @@ class MCTS:
             "wall": sum(edge.visits for action, edge in node.edges.items() if action >= MOVE_ACTIONS),
         }
         # Optional category balancing is an experimental PUCT extension.
-        # At the default coefficient of zero, selection is vanilla PUCT:
-        # Q(s,a) + c_puct * P(s,a) * sqrt(N(s)) / (1 + N(s,a)).
+        # At the default coefficient of zero, selection is PUCT:
+        # Q(s,a) + c_puct * P(s,a) * sqrt(max(1, N(s))) / (1 + N(s,a)).
+        # max(1, N) keeps policy priors influential on the first root visit.
         category_bonus = {
             name: self.category_exploration * math.sqrt(math.log1p(node.visits) / (1 + count))
             for name, count in category_visits.items()
