@@ -407,3 +407,10 @@ since a stationary pawn during a wall action is not a pawn-position revisit.
 The older `pawn_position_repeats` key is retained as an alias with the corrected
 semantics for easier comparison with existing analysis scripts. Per-ply traces
 include `pawn_position_repeat` so individual revisits can be inspected.
+
+
+The MCTS ablation per-ply trace also stores the top five root actions ranked
+by visit count (prior breaks ties), including action category, prior, Q value,
+visits, and whether each action was active in the search. The selected action's
+rank is recorded as `selected_action_rank_by_visits`. This is observational
+instrumentation only; it does not alter PUCT selection or root priors.
