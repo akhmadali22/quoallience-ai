@@ -87,8 +87,15 @@ def _top_root_actions(
     """Return compact root alternatives ordered by visits, prior, or PUCT score."""
     if sort_by not in {"visits", "prior", "puct_score"}:
         raise ValueError(f"Unsupported root-action sort key: {sort_by}")
+    candidates = list(root_action_stats.items())
+    if sort_by == "puct_score":
+        candidates = [
+            item for item in candidates
+            if item[1].get("active", item[1].get("puct_score") is not None)
+            and item[1].get("puct_score") is not None
+        ]
     ranked = sorted(
-        root_action_stats.items(),
+        candidates,
         key=lambda item: (
             float(item[1].get(sort_by) or 0.0),
             int(item[1].get("visits", 0)),
