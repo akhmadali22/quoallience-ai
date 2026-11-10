@@ -81,13 +81,24 @@ def _record_pawn_position(
     return repeated
 
 
-def _top_root_actions(root_action_stats: dict, *, limit: int = 5) -> list[dict]:
-    """Return compact root alternatives ordered by visits, then prior."""
+def _top_root_actions(
+    root_action_stats: dict, *, limit: int = 5, sort_by: str = "visits"
+) -> list[dict]:
+    """Return compact root alternatives ordered by visits, prior, or PUCT score."""
+    if sort_by not in {"visits", "prior", "puct_score"}:
+        raise ValueError(f"Unsupported root-action sort key: {sort_by}")
+    candidates = list(root_action_stats.items())
+    if sort_by == "puct_score":
+        candidates = [
+            item for item in candidates
+            if item[1].get("active", item[1].get("puct_score") is not None)
+            and item[1].get("puct_score") is not None
+        ]
     ranked = sorted(
-        root_action_stats.items(),
+        candidates,
         key=lambda item: (
+            float(item[1].get(sort_by) or 0.0),
             int(item[1].get("visits", 0)),
-            float(item[1].get("prior", 0.0)),
         ),
         reverse=True,
     )
@@ -99,6 +110,9 @@ def _top_root_actions(root_action_stats: dict, *, limit: int = 5) -> list[dict]:
             "q": values.get("q"),
             "visits": values.get("visits", 0),
             "active": values.get("active", False),
+            "selection_prior": values.get("selection_prior"),
+            "selection_adjustment": values.get("selection_adjustment"),
+            "puct_score": values.get("puct_score"),
         }
         for action, values in ranked[:limit]
     ]
@@ -177,7 +191,9 @@ def play_game(
         name: {
             "turns": 0,
             "root_values": [],
-            "root_policy_entropies": [],
+            "root_prior_entropies": [],
+            "root_active_prior_entropies": [],
+            "root_visit_entropies": [],
             "expanded_nodes": [],
             "nn_evaluations": [],
             "selected_q": [],
@@ -203,7 +219,9 @@ def play_game(
         agent_metrics["turns"] += 1
         for key, source in (
             ("root_values", "root_value"),
-            ("root_policy_entropies", "root_policy_entropy"),
+            ("root_prior_entropies", "root_prior_entropy"),
+            ("root_active_prior_entropies", "root_active_prior_entropy"),
+            ("root_visit_entropies", "root_visit_entropy"),
             ("expanded_nodes", "expanded_nodes"),
             ("nn_evaluations", "nn_evaluations"),
             ("pawn_visit_ratios", "root_pawn_visit_ratio"),
@@ -272,8 +290,30 @@ def play_game(
             "root_top_actions_by_visits": _top_root_actions(
                 stats.get("root_action_stats", {})
             ),
+            "root_top_actions_by_puct": _top_root_actions(
+                stats.get("root_action_stats", {}), sort_by="puct_score"
+            ),
+            "selected_action_rank_by_prior": next(
+                (
+                    rank for rank, candidate in enumerate(
+                        _top_root_actions(
+                            stats.get("root_action_stats", {}),
+                            limit=len(stats.get("root_action_stats", {})),
+                            sort_by="prior",
+                        ),
+                        start=1,
+                    )
+                    if candidate["action"] == action
+                ),
+                None,
+            ),
+            "selected_action_puct_score": selected.get("puct_score"),
             "root_value": stats.get("root_value"),
-            "root_policy_entropy": stats.get("root_policy_entropy"),
+            "root_prior_entropy": stats.get("root_prior_entropy"),
+            "root_active_prior_entropy": stats.get("root_active_prior_entropy"),
+            "root_visit_entropy": stats.get("root_visit_entropy"),
+            # Compatibility alias; this is visit entropy, not prior entropy.
+            "root_policy_entropy": stats.get("root_visit_entropy"),
             "expanded_nodes": stats.get("expanded_nodes"),
             "nn_evaluations": stats.get("nn_evaluations"),
             "root_pawn_visit_ratio": stats.get("root_pawn_visit_ratio"),
@@ -316,7 +356,11 @@ def play_game(
         name: {
             "turns": values["turns"],
             "mean_root_value": _mean(values["root_values"]),
-            "mean_root_policy_entropy": _mean(values["root_policy_entropies"]),
+            "mean_root_prior_entropy": _mean(values["root_prior_entropies"]),
+            "mean_root_active_prior_entropy": _mean(values["root_active_prior_entropies"]),
+            "mean_root_visit_entropy": _mean(values["root_visit_entropies"]),
+            # Backward-compatible alias for old consumers; it means visit entropy.
+            "mean_root_policy_entropy": _mean(values["root_visit_entropies"]),
             "mean_expanded_nodes": _mean(values["expanded_nodes"]),
             "mean_nn_evaluations": _mean(values["nn_evaluations"]),
             "mean_selected_q": _mean(values["selected_q"]),
