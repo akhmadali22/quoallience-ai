@@ -111,7 +111,9 @@ def play_game(
     trace = []
     state_seen = Counter()
     action_ngrams = {size: Counter() for size in (4, 6, 8)}
-    pawn_history = {0: [], 1: []}
+    # Count a position only after an actual pawn move. Wall placements do not
+    # create another observation of a pawn position.
+    pawn_history = {0: [state.pawns[0]], 1: [state.pawns[1]]}
     pawn_position_repeats = {0: 0, 1: 0}
     consecutive_no_progress = 0
     max_consecutive_no_progress = 0
@@ -198,9 +200,12 @@ def play_game(
                 max_consecutive_no_progress, consecutive_no_progress
             )
 
-        pawn_history[player].append(next_state.pawns[player])
-        if pawn_history[player].count(next_state.pawns[player]) > 1:
-            pawn_position_repeats[player] += 1
+        pawn_position_repeat = False
+        if selected.get("category") == "pawn":
+            pawn_history[player].append(next_state.pawns[player])
+            pawn_position_repeat = pawn_history[player].count(next_state.pawns[player]) > 1
+            if pawn_position_repeat:
+                pawn_position_repeats[player] += 1
 
         trace_entry = {
             "ply": state.ply,
@@ -223,6 +228,7 @@ def play_game(
             "shortest_distance_after": next_distances,
             "shortest_distance_delta": distance_deltas,
             "made_progress": made_progress,
+            "pawn_position_repeat": pawn_position_repeat,
             "consecutive_no_progress_plies": consecutive_no_progress,
         }
         trace.append(trace_entry)
@@ -281,6 +287,11 @@ def play_game(
         "diagnostics": {
             "repeated_state_occurrences": repeated_states,
             "unique_repeated_states": repeated_state_positions,
+            # Counts repeated destinations on pawn-move turns only; wall turns
+            # are intentionally excluded from both the history and numerator.
+            "pawn_move_position_repeats": {
+                str(player): pawn_position_repeats[player] for player in (0, 1)
+            },
             "pawn_position_repeats": {
                 str(player): pawn_position_repeats[player] for player in (0, 1)
             },
