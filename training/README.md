@@ -396,3 +396,14 @@ Example:
 
 The durable game-by-game records are written to
 data/mcts_ablation/policy_value_ablation.jsonl.
+
+
+### Pawn-position repetition diagnostic semantics
+
+In the MCTS policy/value ablation JSONL, `pawn_move_position_repeats` counts
+repeated pawn destinations only on actual pawn-move turns. The starting square
+is included as the first observed position. Wall-placement turns are excluded,
+since a stationary pawn during a wall action is not a pawn-position revisit.
+The older `pawn_position_repeats` key is retained as an alias with the corrected
+semantics for easier comparison with existing analysis scripts. Per-ply traces
+include `pawn_position_repeat` so individual revisits can be inspected.
