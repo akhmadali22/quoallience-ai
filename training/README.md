@@ -414,3 +414,20 @@ by visit count (prior breaks ties), including action category, prior, Q value,
 visits, and whether each action was active in the search. The selected action's
 rank is recorded as `selected_action_rank_by_visits`. This is observational
 instrumentation only; it does not alter PUCT selection or root priors.
+
+
+### Root policy, visit, and PUCT diagnostics
+
+The evaluator reports three distinct root distributions:
+- `root_prior_entropy`: entropy of the network prior over all legal root actions.
+- `root_active_prior_entropy`: entropy of priors renormalized over currently active root edges, matching the prior normalization used by PUCT selection.
+- `root_visit_entropy`: entropy of the root visit distribution after simulations.
+
+The legacy `root_policy_entropy` and `mean_root_policy_entropy` keys remain as
+compatibility aliases for visit entropy; they are not neural policy entropy.
+Each action record includes its final-snapshot `puct_score`, computed with the
+same Q, normalized active prior, exploration term, category bonus, and root
+adjustment as `_select`. The trace includes top root actions ranked by visits
+and by this final-snapshot PUCT score. The selected action is chosen by maximum
+visit count, so its rank by visits is expected to be first and is not an
+independent measure of search quality.

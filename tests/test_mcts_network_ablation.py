@@ -87,6 +87,15 @@ def test_ablation_tournament_executes_a_short_mcts_game():
     assert result["termination"]["max_plies_reached"] is True
     assert len(result["diagnostics"]["final_shortest_distances"]) == 2
     assert result["diagnostics"]["no_progress_plies"] + result["diagnostics"]["progress_plies"] == 2
+    for ply in result["action_trace"]:
+        assert "root_prior_entropy" in ply
+        assert "root_active_prior_entropy" in ply
+        assert "root_visit_entropy" in ply
+        assert "root_top_actions_by_puct" in ply
+        assert all(
+            candidate["puct_score"] is not None
+            for candidate in ply["root_top_actions_by_puct"]
+        )
     assert all(
         "shortest_distance_before" in ply and "shortest_distance_after" in ply
         for ply in result["action_trace"]
@@ -137,3 +146,18 @@ def test_root_action_summary_exposes_competing_puct_candidates():
     assert [item["action"] for item in top] == [3, 4, 81]
     assert top[0]["q"] == 0.6
     assert top[2]["active"] is True
+
+
+def test_root_action_summary_can_rank_by_puct_and_prior():
+    from training.evaluate_mcts_ablation import _top_root_actions
+
+    stats = {
+        "1": {"prior": 0.8, "visits": 2, "puct_score": 0.3},
+        "2": {"prior": 0.1, "visits": 9, "puct_score": 0.7},
+        "3": {"prior": 0.4, "visits": 4, "puct_score": 0.5},
+        "4": {"prior": 0.95, "visits": 0, "puct_score": None, "active": False},
+    }
+
+    assert [x["action"] for x in _top_root_actions(stats, sort_by="prior")] == [4, 1, 3, 2]
+    assert [x["action"] for x in _top_root_actions(stats, sort_by="puct_score")] == [2, 3, 1]
+    assert [x["action"] for x in _top_root_actions(stats, sort_by="visits")] == [2, 3, 1]
