@@ -91,3 +91,49 @@ def test_ablation_tournament_executes_a_short_mcts_game():
         "shortest_distance_before" in ply and "shortest_distance_after" in ply
         for ply in result["action_trace"]
     )
+
+
+
+
+def test_pawn_position_repeat_diagnostic_ignores_wall_turns():
+    from training.evaluate_mcts_ablation import _record_pawn_position
+
+    history = {0: [(4, 8)], 1: [(4, 0)]}
+    repeats = {0: 0, 1: 0}
+
+    # A wall leaves the pawn stationary but is not another pawn-position visit.
+    assert not _record_pawn_position(
+        history, repeats, player=0, position=(4, 8), action_category="wall"
+    )
+    assert history[0] == [(4, 8)]
+    assert repeats[0] == 0
+
+    # A pawn move returning to the initial square is a genuine revisit.
+    assert _record_pawn_position(
+        history, repeats, player=0, position=(4, 8), action_category="pawn"
+    )
+    assert history[0] == [(4, 8), (4, 8)]
+    assert repeats[0] == 1
+
+    # A new pawn destination is recorded without incrementing the repeat count.
+    assert not _record_pawn_position(
+        history, repeats, player=0, position=(3, 8), action_category="pawn"
+    )
+    assert repeats[0] == 1
+
+
+def test_root_action_summary_exposes_competing_puct_candidates():
+    from training.evaluate_mcts_ablation import _top_root_actions
+
+    stats = {
+        "81": {"category": "wall", "prior": 0.8, "q": 0.2, "visits": 4, "active": True},
+        "3": {"category": "pawn", "prior": 0.1, "q": 0.6, "visits": 7, "active": True},
+        "4": {"category": "pawn", "prior": 0.4, "q": 0.1, "visits": 7, "active": True},
+        "82": {"category": "wall", "prior": 0.9, "q": 0.0, "visits": 0, "active": False},
+    }
+
+    top = _top_root_actions(stats, limit=3)
+
+    assert [item["action"] for item in top] == [3, 4, 81]
+    assert top[0]["q"] == 0.6
+    assert top[2]["active"] is True
