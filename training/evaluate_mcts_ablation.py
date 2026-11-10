@@ -110,6 +110,9 @@ def _top_root_actions(
             "q": values.get("q"),
             "visits": values.get("visits", 0),
             "active": values.get("active", False),
+            "selection_prior": values.get("selection_prior"),
+            "selection_adjustment": values.get("selection_adjustment"),
+            "puct_score": values.get("puct_score"),
         }
         for action, values in ranked[:limit]
     ]
