@@ -22,19 +22,25 @@ from quoridor.neural_ai.policy import load_model
 AGENTS = {
     "full": ("neural", "neural"),
     "uniform_policy": ("uniform", "neural"),
+    "category_uniform_policy": ("category_uniform", "neural"),
     "zero_value": ("neural", "zero"),
     "uniform_policy_zero_value": ("uniform", "zero"),
+    "category_uniform_policy_zero_value": ("category_uniform", "zero"),
 }
 AGENT_SEED_SALTS = {
     "full": 0x10A51,
     "uniform_policy": 0x21B62,
+    "category_uniform_policy": 0x25C83,
     "zero_value": 0x32C73,
     "uniform_policy_zero_value": 0x43D84,
+    "category_uniform_policy_zero_value": 0x54E95,
 }
 MATCHUPS = (
     ("full", "uniform_policy"),
+    ("full", "category_uniform_policy"),
     ("full", "zero_value"),
     ("full", "uniform_policy_zero_value"),
+    ("full", "category_uniform_policy_zero_value"),
 )
 
 
@@ -42,7 +48,7 @@ class AblatedModel:
     """Wrap a trained model while selectively removing policy/value outputs."""
 
     def __init__(self, model, *, policy_mode: str, value_mode: str):
-        if policy_mode not in {"neural", "uniform"}:
+        if policy_mode not in {"neural", "uniform", "category_uniform"}:
             raise ValueError(f"Unsupported policy mode: {policy_mode}")
         if value_mode not in {"neural", "zero"}:
             raise ValueError(f"Unsupported value mode: {value_mode}")
@@ -52,7 +58,7 @@ class AblatedModel:
 
     def __call__(self, inputs):
         logits, value = self.model(inputs)
-        if self.policy_mode == "uniform":
+        if self.policy_mode in {"uniform", "category_uniform"}:
             logits = torch.zeros_like(logits)
         if self.value_mode == "zero":
             value = torch.zeros_like(value)
@@ -151,6 +157,7 @@ def play_game(
             randomize_selection_ties=True,
             progressive_widening=progressive_widening,
             initial_wall_candidates=initial_wall_candidates,
+            category_balanced_prior=(AGENTS[name][0] == "category_uniform"),
             category_exploration=0.0,
             repetition_penalty=0.0,
             pawn_progress_bonus=0.0,
@@ -540,9 +547,11 @@ def main() -> int:
         ),
         "agent_definitions": {
             "full": {"policy": "neural", "value": "neural"},
-            "uniform_policy": {"policy": "uniform legal-action prior", "value": "neural"},
+            "uniform_policy": {"policy": "uniform over all legal actions", "value": "neural"},
+            "category_uniform_policy": {"policy": "50% pawn / 50% wall prior mass when both categories exist", "value": "neural"},
             "zero_value": {"policy": "neural", "value": "zero"},
-            "uniform_policy_zero_value": {"policy": "uniform legal-action prior", "value": "zero"},
+            "uniform_policy_zero_value": {"policy": "uniform over all legal actions", "value": "zero"},
+            "category_uniform_policy_zero_value": {"policy": "50% pawn / 50% wall prior mass when both categories exist", "value": "zero"},
         },
         "config": {
             "simulations": args.simulations,
@@ -553,6 +562,7 @@ def main() -> int:
             "c_puct": args.c_puct,
             "progressive_widening": args.progressive_widening,
             "initial_wall_candidates": args.initial_wall_candidates,
+            "category_balanced_uniform_policy": True,
             "category_exploration": 0.0,
             "repetition_penalty": 0.0,
             "pawn_progress_bonus": 0.0,
@@ -567,8 +577,8 @@ def main() -> int:
             "wins": sum(g["winner"] is not None for g in games),
         },
         "interpretation": (
-            "The full agent is compared separately with uniform-policy, zero-value, "
-            "and combined ablations. Progressive widening is disabled by default "
+            "The full agent is compared with uniform legal-action and category-balanced "
+            "uniform policy baselines, plus zero-value ablations. Progressive widening is disabled by default "
             "so policy ablation does not also change which wall candidates are admitted. "
             "All agents still use PUCT MCTS. This measures component contribution "
             "under this search protocol, not absolute playing strength."

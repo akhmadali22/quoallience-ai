@@ -274,6 +274,7 @@ def test_selection_ties_can_be_randomized_reproducibly():
 
 def test_default_selection_uses_vanilla_puct_without_experimental_adjustments():
     mcts = make_mcts()
+    assert mcts.category_balanced_prior is False
     assert mcts.category_exploration == 0.0
     assert mcts.repetition_penalty == 0.0
     assert mcts.pawn_progress_bonus == 0.0
@@ -301,3 +302,41 @@ def test_repetition_preferences_are_opt_in_and_do_not_change_game_rules():
     )
     assert adjustments == {}
 
+
+
+
+def test_category_balanced_prior_splits_mass_equally_between_available_categories():
+    import torch
+
+    class ZeroLogitModel:
+        def __call__(self, inputs):
+            return torch.zeros((1, 193)), torch.zeros((1,))
+
+    mcts = MCTS(ZeroLogitModel(), category_balanced_prior=True)
+    priors, _ = mcts._evaluate(GameState.initial())
+    pawn_mass = sum(value for action, value in priors.items() if action < MOVE_ACTIONS)
+    wall_mass = sum(value for action, value in priors.items() if action >= MOVE_ACTIONS)
+    assert abs(pawn_mass - 0.5) < 1e-6
+    assert abs(wall_mass - 0.5) < 1e-6
+    assert abs(sum(priors.values()) - 1.0) < 1e-6
+
+
+def test_category_balanced_prior_falls_back_when_only_one_category_exists():
+    import torch
+
+    class ZeroLogitModel:
+        def __call__(self, inputs):
+            return torch.zeros((1, 193)), torch.zeros((1,))
+
+    mcts = MCTS(ZeroLogitModel(), category_balanced_prior=True)
+    # A synthetic terminal-adjacent state is not needed: directly exercise
+    # the one-category normalization helper through a mocked legal-action set.
+    import quoridor.neural_ai.mcts as mcts_module
+    original = mcts_module.legal_action_indices
+    try:
+        mcts_module.legal_action_indices = lambda state: [0, 1, 2]
+        priors, _ = mcts._evaluate(GameState.initial())
+    finally:
+        mcts_module.legal_action_indices = original
+    assert abs(sum(priors.values()) - 1.0) < 1e-6
+    assert all(value >= 0 for value in priors.values())
