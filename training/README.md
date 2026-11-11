@@ -533,6 +533,13 @@ are retained for analysis and do not replace the incumbent. Later iterations
 train from the latest promoted champion, or from the original checkpoint if no
 candidate has passed promotion.
 
+The loop defaults to the controlled vanilla-PUCT baseline: C-PUCT 1.5,
+category exploration 0, repetition penalty 0, pawn progress bonus 0, and
+progressive widening disabled. To explicitly run the optional progressive
+widening variant in both self-play and candidate evaluation, add
+`--progressive-widening`. Do not compare candidates evaluated with different
+search settings.
+
 The standalone paired-seat evaluator can also be run directly:
 
 ```bash
