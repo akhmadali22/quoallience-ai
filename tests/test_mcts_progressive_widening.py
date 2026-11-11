@@ -193,7 +193,7 @@ def test_root_adjustments_are_empty_without_history():
 
 def test_choose_action_accepts_recent_pawn_history():
     import random
-    mcts = make_mcts(simulations=4)
+    mcts = make_mcts(simulations=4, repetition_penalty=0.75)
     action, visits = mcts.choose_action(
         GameState.initial(), rng=random.Random(7),
         recent_pawn_positions=[(4, 7), (4, 8)],
@@ -271,3 +271,33 @@ def test_selection_ties_can_be_randomized_reproducibly():
 
     assert first == repeated
     assert set(first) == {0, 1}
+
+def test_default_selection_uses_vanilla_puct_without_experimental_adjustments():
+    mcts = make_mcts()
+    assert mcts.category_exploration == 0.0
+    assert mcts.repetition_penalty == 0.0
+    assert mcts.pawn_progress_bonus == 0.0
+
+    node = Node(GameState.initial(), visits=16)
+    node.edges = {
+        0: Edge(prior=0.75, visits=2, value_sum=0.5),
+        1: Edge(prior=0.25, visits=0),
+    }
+    action, _ = mcts._select(node)
+
+    q0 = 0.5 / 2
+    u0 = 1.5 * 0.75 * (16 ** 0.5) / (1 + 2)
+    q1 = 0.0
+    u1 = 1.5 * 0.25 * (16 ** 0.5) / (1 + 0)
+    assert q0 + u0 > q1 + u1
+    assert action == 0
+
+
+def test_repetition_preferences_are_opt_in_and_do_not_change_game_rules():
+    mcts = make_mcts()
+    state = GameState.initial()
+    adjustments = mcts._root_action_adjustments(
+        state, [(4, 7), (4, 8)]
+    )
+    assert adjustments == {}
+
