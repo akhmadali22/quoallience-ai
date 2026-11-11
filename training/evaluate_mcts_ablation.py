@@ -94,6 +94,12 @@ def _top_root_actions(
     if sort_by not in {"visits", "prior", "puct_score"}:
         raise ValueError(f"Unsupported root-action sort key: {sort_by}")
     candidates = list(root_action_stats.items())
+    if sort_by == "visits":
+        # An admitted-to-root but unvisited action is not a searched alternative.
+        # Keep legacy records without an "active" field for compatibility.
+        candidates = [
+            item for item in candidates if item[1].get("active", True)
+        ]
     if sort_by == "puct_score":
         candidates = [
             item for item in candidates
