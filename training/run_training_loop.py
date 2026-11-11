@@ -33,13 +33,14 @@ def main() -> int:
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--seed", type=int, default=20261112)
-    parser.add_argument("--category-exploration", type=float, default=0.35)
-    parser.add_argument("--repetition-penalty", type=float, default=0.75)
+    parser.add_argument("--category-exploration", type=float, default=0.0)
+    parser.add_argument("--repetition-penalty", type=float, default=0.0)
     parser.add_argument("--pawn-progress-bonus", type=float, default=0.0)
     parser.add_argument("--repetition-window", type=int, default=4)
     parser.add_argument("--c-puct", type=float, default=1.5)
     parser.add_argument("--initial-wall-candidates", type=int, default=8)
-    parser.add_argument("--disable-progressive-widening", action="store_true")
+    parser.add_argument("--progressive-widening", action="store_true",
+                        help="Enable optional wall-candidate progressive widening in self-play and evaluation.")
     parser.add_argument("--alpha", type=float, default=0.05)
     parser.add_argument("--output-root", type=Path, default=Path("data/alphazero_runs"))
     args = parser.parse_args()
@@ -93,11 +94,13 @@ def main() -> int:
             "--device", args.device,
             "--seed", str(iteration_seed),
             "--output-dir", str(selfplay_dir),
+            "--c-puct", str(args.c_puct),
+            "--initial-wall-candidates", str(args.initial_wall_candidates),
             "--category-exploration", str(args.category_exploration),
             "--repetition-penalty", str(args.repetition_penalty),
             "--pawn-progress-bonus", str(args.pawn_progress_bonus),
             "--repetition-window", str(args.repetition_window),
-        ], repo_root=repo_root)
+        ] + (["--progressive-widening"] if args.progressive_widening else []), repo_root=repo_root)
 
         run_step([
             sys.executable, "-m", "training.train",
@@ -132,8 +135,8 @@ def main() -> int:
             "--alpha", str(args.alpha),
             "--output", str(evaluation_path),
         ]
-        if args.disable_progressive_widening:
-            evaluation_command.append("--disable-progressive-widening")
+        if args.progressive_widening:
+            evaluation_command.append("--progressive-widening")
         run_step(evaluation_command, repo_root=repo_root)
 
         report = json.loads(evaluation_path.read_text(encoding="utf-8"))
