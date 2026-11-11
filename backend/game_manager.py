@@ -11,8 +11,6 @@ class GameSession:
     game_id: str
     state: GameState
     human_player: int
-    ai_time_limit: float
-    ai_max_depth: int
     history: list[dict[str, Any]] = field(default_factory=list)
 
     @property
@@ -48,8 +46,6 @@ class GameManager:
         self,
         human_player: int = 0,
         first_player: str = "human",
-        ai_time_limit: float = 55,
-        ai_max_depth: int = 5,
     ) -> GameSession:
         if human_player not in (0, 1):
             raise ValueError("human_player harus 0 atau 1.")
@@ -70,8 +66,6 @@ class GameManager:
             game_id=str(uuid4()),
             state=state,
             human_player=human_player,
-            ai_time_limit=ai_time_limit,
-            ai_max_depth=ai_max_depth,
         )
 
         self._games[session.game_id] = session

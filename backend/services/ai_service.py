@@ -3,15 +3,8 @@ from quoridor.advanced_ai import AIConfig, QuoridorAI
 
 
 class AIService:
-    def __init__(
-        self,
-        time_limit: float = 5.0,
-        max_depth: int = 4,
-    ):
-        self.config = AIConfig(
-            time_limit=time_limit,
-            max_depth=max_depth,
-        )
+    def __init__(self):
+        self.config = AIConfig()
         self.ai = QuoridorAI(self.config)
 
     def choose_action(self, state: GameState) -> dict:
