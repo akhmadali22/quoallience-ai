@@ -122,11 +122,12 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=20261112)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--c-puct", type=float, default=1.5)
-    parser.add_argument("--category-exploration", type=float, default=0.35)
-    parser.add_argument("--repetition-penalty", type=float, default=0.75)
+    parser.add_argument("--category-exploration", type=float, default=0.0)
+    parser.add_argument("--repetition-penalty", type=float, default=0.0)
     parser.add_argument("--pawn-progress-bonus", type=float, default=0.0)
     parser.add_argument("--repetition-window", type=int, default=4)
-    parser.add_argument("--disable-progressive-widening", action="store_true")
+    parser.add_argument("--progressive-widening", action="store_true",
+                        help="Enable optional wall-candidate progressive widening.")
     parser.add_argument("--initial-wall-candidates", type=int, default=8)
     parser.add_argument("--min-decisive-pairs", type=int, default=10)
     parser.add_argument("--alpha", type=float, default=0.05)
@@ -176,7 +177,7 @@ def main() -> int:
                 repetition_penalty=args.repetition_penalty,
                 pawn_progress_bonus=args.pawn_progress_bonus,
                 repetition_window=args.repetition_window,
-                progressive_widening=not args.disable_progressive_widening,
+                progressive_widening=args.progressive_widening,
                 initial_wall_candidates=args.initial_wall_candidates,
             )
             games.append(game)
@@ -233,7 +234,7 @@ def main() -> int:
             "repetition_penalty": args.repetition_penalty,
             "pawn_progress_bonus": args.pawn_progress_bonus,
             "repetition_window": args.repetition_window,
-            "progressive_widening": not args.disable_progressive_widening,
+            "progressive_widening": args.progressive_widening,
             "initial_wall_candidates": args.initial_wall_candidates,
             "min_decisive_pairs": args.min_decisive_pairs,
             "alpha": args.alpha,
