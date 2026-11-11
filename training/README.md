@@ -87,9 +87,10 @@ functional gate, not a full Elo system or a significance test.
 ## Current limitations
 
 This first implementation intentionally favors a small, inspectable vertical
-slice over a distributed training system. It does not yet include symmetry
-augmentation, prioritized replay, batched inference, persistent tree reuse,
-model-vs-model promotion gates, or crash-resumable partial-game trajectories.
+slice over a distributed training system. It now includes a conservative
+paired-seat candidate-vs-incumbent promotion gate, but does not yet include
+symmetry augmentation, prioritized replay, batched inference, persistent tree
+reuse, a full Elo/rating system, or crash-resumable partial-game trajectories.
 Random-network self-play is only a bootstrap smoke test; meaningful strength
 requires many iterations and evaluation against fixed opponents. The existing
 heuristic is retained for that purpose.
