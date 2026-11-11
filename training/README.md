@@ -431,3 +431,73 @@ adjustment as `_select`. The trace includes top root actions ranked by visits
 and by this final-snapshot PUCT score. The selected action is chosen by maximum
 visit count, so its rank by visits is expected to be first and is not an
 independent measure of search quality.
+
+
+## Controlled vanilla-PUCT search experiments
+
+The experiment sequence separates search mechanics from network-component attribution.
+The default PUCT score remains:
+
+`Q(s,a) + c_puct * P(s,a) * sqrt(max(1, N(s))) / (1 + N(s,a))`
+
+Category exploration, repetition penalties, pawn-progress bonuses, and wall
+ranking heuristics remain disabled in these controlled runs. Progressive
+widening is an independent MCTS option; it admits every legal pawn action
+immediately and adds legal wall actions in descending prior order according
+to the configured visit-dependent widening schedule. It does not alter
+terminal handling or value backup.
+
+### 1. Progressive widening and simulation-budget matrix
+
+Run matched MCTS-vs-MCTS comparisons at 16 vs 64 and 64 vs 128 simulations,
+once with progressive widening disabled and once enabled:
+
+```bash
+MCTS_PAIRS=10 MCTS_MAX_PLIES=200 \
+  bash training/run_mcts_search_matrix.sh models/checkpoints/neural_v1.pt
+```
+
+The runner uses the same checkpoint, seed set, C-PUCT (1.5), vanilla PUCT
+settings, and paired seat swaps in every comparison. It writes four distinct
+reports under `data/mcts_search_matrix/seed_<seed>/`. Increase
+`MCTS_PAIRS` to 20 or more for follow-up evaluation. A result dominated by
+max-ply draws is inconclusive; inspect terminal wins, paired outcomes, and
+action diagnostics rather than interpreting draw score as win rate.
+
+### 2. Category-balanced uniform policy baseline
+
+The policy/value evaluator now includes two distinct uniform baselines:
+
+- `uniform_policy`: equal prior per legal action. Its total wall prior mass
+  can dominate because the opening has many more legal wall placements than
+  pawn moves.
+- `category_uniform_policy`: 50% total prior mass for pawn moves and 50% for
+  wall placements whenever both categories are available, with mass distributed
+  within each category. If only one category is available, it receives 100%.
+
+This changes only the prior distribution supplied to PUCT. It does not add a
+category bonus to the PUCT score and does not change Q backup. With progressive
+widening enabled, the active subset is renormalized for selection, so the
+effective active pawn/wall mass can differ from the full legal-action 50:50
+prior until more wall candidates are admitted. For a clean policy/value
+component comparison, first run with progressive widening disabled.
+
+### 3. Re-evaluate policy and value contributions
+
+After inspecting the search matrix and selecting a simulation budget, run:
+
+```bash
+MCTS_SIMULATIONS=128 MCTS_PAIRS=20 MCTS_PROGRESSIVE_WIDENING=0 \
+  bash training/run_mcts_policy_value_ablation.sh models/checkpoints/neural_v1.pt
+```
+
+The report compares the full neural policy/value model against uniform legal
+policy, category-balanced uniform policy, zero value, and the combined
+policy/value ablations. All agents still use PUCT MCTS. To measure the
+interaction with progressive widening after the isolated comparison, repeat
+with `MCTS_PROGRESSIVE_WIDENING=1` and a separate output path.
+
+Do not promote a checkpoint or conclude that a component improves playing
+strength from a handful of games or max-ply draws. Keep the checkpoint fixed
+during these experiments; retrain only after the search protocol and component
+effects have been measured consistently.
