@@ -10,7 +10,7 @@ from pathlib import Path
 
 from quoridor.engine import GameState
 from quoridor.neural_ai.encoder import apply_action_index
-from quoridor.neural_ai.mcts import MCTS
+from quoridor.neural_ai.mcts import MOVE_ACTIONS, MCTS
 from quoridor.neural_ai.policy import load_model
 
 
@@ -90,7 +90,7 @@ def play_game(
             "player": player,
             "agent": label,
             "action": action,
-            "category": "pawn" if action < 81 else "wall",
+            "category": "pawn" if action < MOVE_ACTIONS else "wall",
         })
         state = next_state
 
