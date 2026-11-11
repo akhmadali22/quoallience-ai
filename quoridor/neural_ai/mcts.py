@@ -48,6 +48,7 @@ class MCTS:
         randomize_selection_ties: bool = False,
         progressive_widening: bool = True,
         initial_wall_candidates: int = 8,
+        category_balanced_prior: bool = False,
         widening_coefficient: float = 2.0,
         widening_exponent: float = 0.5,
         # Vanilla PUCT is the default; these extensions are opt-in experiments.
@@ -75,6 +76,7 @@ class MCTS:
         self.randomize_selection_ties = randomize_selection_ties
         self.progressive_widening = progressive_widening
         self.initial_wall_candidates = initial_wall_candidates
+        self.category_balanced_prior = category_balanced_prior
         self.widening_coefficient = widening_coefficient
         if category_exploration < 0:
             raise ValueError("category_exploration cannot be negative")
@@ -114,9 +116,26 @@ class MCTS:
             mask[legal] = logits[legal]
             probs = torch.softmax(mask, dim=0)
             priors = {action: float(probs[action].item()) for action in legal}
-            # Keep raw network priors here. Category balancing belongs in
-            # _select(), where it can see the actions currently admitted by
-            # progressive widening at this particular node.
+            if self.category_balanced_prior:
+                # Experimental baseline: allocate half of the prior mass to
+                # each available action category, then preserve the model's
+                # relative priors within that category. If a category is
+                # absent, the remaining category receives all prior mass.
+                pawn_actions = [action for action in legal if action < MOVE_ACTIONS]
+                wall_actions = [action for action in legal if action >= MOVE_ACTIONS]
+                pawn_total = sum(priors[action] for action in pawn_actions)
+                wall_total = sum(priors[action] for action in wall_actions)
+                if pawn_actions and wall_actions:
+                    for action in pawn_actions:
+                        priors[action] = 0.5 * priors[action] / pawn_total if pawn_total > 0 else 0.5 / len(pawn_actions)
+                    for action in wall_actions:
+                        priors[action] = 0.5 * priors[action] / wall_total if wall_total > 0 else 0.5 / len(wall_actions)
+                elif pawn_actions:
+                    for action in pawn_actions:
+                        priors[action] = priors[action] / pawn_total if pawn_total > 0 else 1.0 / len(pawn_actions)
+                elif wall_actions:
+                    for action in wall_actions:
+                        priors[action] = priors[action] / wall_total if wall_total > 0 else 1.0 / len(wall_actions)
             return priors, float(value[0].item())
 
     def _expand(self, node: Node, *, defer_widen: bool = False) -> float:
