@@ -274,6 +274,7 @@ def test_selection_ties_can_be_randomized_reproducibly():
 
 def test_default_selection_uses_vanilla_puct_without_experimental_adjustments():
     mcts = make_mcts()
+    assert mcts.category_balanced_prior is False
     assert mcts.category_exploration == 0.0
     assert mcts.repetition_penalty == 0.0
     assert mcts.pawn_progress_bonus == 0.0
