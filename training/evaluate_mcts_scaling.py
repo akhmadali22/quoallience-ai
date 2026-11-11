@@ -27,6 +27,7 @@ def play_game(
     category_exploration: float,
     repetition_penalty: float,
     pawn_progress_bonus: float,
+    progressive_widening: bool,
 ) -> dict:
     """Play one game; both agents share weights and differ only in MCTS budget."""
     budgets = {
@@ -45,6 +46,7 @@ def play_game(
             category_exploration=category_exploration,
             repetition_penalty=repetition_penalty,
             pawn_progress_bonus=pawn_progress_bonus,
+            progressive_widening=progressive_widening,
         )
         for player in (0, 1)
     }
@@ -171,9 +173,13 @@ def main() -> int:
     parser.add_argument("--max-plies", type=int, default=200)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--seed", type=int, default=20261109)
-    parser.add_argument("--category-exploration", type=float, default=0.35)
-    parser.add_argument("--repetition-penalty", type=float, default=0.75)
+    parser.add_argument("--category-exploration", type=float, default=0.0)
+    parser.add_argument("--repetition-penalty", type=float, default=0.0)
     parser.add_argument("--pawn-progress-bonus", type=float, default=0.0)
+    parser.add_argument(
+        "--disable-progressive-widening", action="store_true",
+        help="Disable progressive widening for a matched vanilla-PUCT comparison.",
+    )
     parser.add_argument("--output", type=Path,
                         default=Path("data/mcts_scaling/eval_64_vs_128.json"))
     args = parser.parse_args()
@@ -218,6 +224,7 @@ def main() -> int:
                 category_exploration=args.category_exploration,
                 repetition_penalty=args.repetition_penalty,
                 pawn_progress_bonus=args.pawn_progress_bonus,
+                progressive_widening=not args.disable_progressive_widening,
             )
             games.append(result)
             pair_games.append(result)
@@ -263,7 +270,7 @@ def main() -> int:
             "category_exploration": args.category_exploration,
             "repetition_penalty": args.repetition_penalty,
             "pawn_progress_bonus": args.pawn_progress_bonus,
-            "progressive_widening": True,
+            "progressive_widening": not args.disable_progressive_widening,
             "selection_temperature": 0.0,
             "wall_distance_weight": 0.0,
             "wall_route_weight": 0.0,
@@ -284,7 +291,8 @@ def main() -> int:
         "games": games,
         "interpretation": (
             "This isolates the effect of MCTS simulation budget while holding "
-            "checkpoint and search preferences constant. It does not by itself "
+            "checkpoint and vanilla PUCT settings constant. Progressive widening "
+            "is matched between agents and can be disabled for a control run. It does not by itself "
             "prove that the policy/value network is well trained."
         ),
     }
