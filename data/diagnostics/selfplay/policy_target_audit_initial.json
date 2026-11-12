@@ -1,0 +1,90 @@
+{
+  "source": "data/diagnostics/selfplay/replay.jsonl",
+  "samples": 120,
+  "games": 2,
+  "action_space": {
+    "pawn": 81,
+    "wall": 128,
+    "total": 209
+  },
+  "target_mass": {
+    "pawn_mean": 0.65,
+    "wall_mean": 0.35,
+    "zero_pawn_samples": 39,
+    "zero_wall_samples": 77
+  },
+  "neural_prior": {
+    "pawn_mass_mean": 0.627512
+  },
+  "root_visit_distribution": {
+    "pawn_ratio_mean": 0.65
+  },
+  "target_entropy_nats_mean": 0.879552,
+  "phase_buckets_by_ply": {
+    "0-9": {
+      "samples": 20,
+      "mean_pawn_target_mass": 0.05625,
+      "mean_wall_target_mass": 0.94375,
+      "mean_network_pawn_prior_mass": 0.01537,
+      "mean_root_pawn_visit_ratio": 0.05625,
+      "mean_target_entropy_nats": 1.039721,
+      "zero_pawn_target_samples": 18,
+      "zero_wall_target_samples": 1
+    },
+    "10-19": {
+      "samples": 20,
+      "mean_pawn_target_mass": 0.00625,
+      "mean_wall_target_mass": 0.99375,
+      "mean_network_pawn_prior_mass": 0.03276,
+      "mean_root_pawn_visit_ratio": 0.00625,
+      "mean_target_entropy_nats": 1.143693,
+      "zero_pawn_target_samples": 19,
+      "zero_wall_target_samples": 0
+    },
+    "20-29": {
+      "samples": 20,
+      "mean_pawn_target_mass": 0.8375,
+      "mean_wall_target_mass": 0.1625,
+      "mean_network_pawn_prior_mass": 0.716943,
+      "mean_root_pawn_visit_ratio": 0.8375,
+      "mean_target_entropy_nats": 0.824326,
+      "zero_pawn_target_samples": 2,
+      "zero_wall_target_samples": 16
+    },
+    "30-39": {
+      "samples": 20,
+      "mean_pawn_target_mass": 1,
+      "mean_wall_target_mass": 0,
+      "mean_network_pawn_prior_mass": 1,
+      "mean_root_pawn_visit_ratio": 1,
+      "mean_target_entropy_nats": 0.79136,
+      "zero_pawn_target_samples": 0,
+      "zero_wall_target_samples": 20
+    },
+    "40-49": {
+      "samples": 20,
+      "mean_pawn_target_mass": 1,
+      "mean_wall_target_mass": 0,
+      "mean_network_pawn_prior_mass": 1,
+      "mean_root_pawn_visit_ratio": 1,
+      "mean_target_entropy_nats": 0.738941,
+      "zero_pawn_target_samples": 0,
+      "zero_wall_target_samples": 20
+    },
+    "50-59": {
+      "samples": 20,
+      "mean_pawn_target_mass": 1,
+      "mean_wall_target_mass": 0,
+      "mean_network_pawn_prior_mass": 1,
+      "mean_root_pawn_visit_ratio": 1,
+      "mean_target_entropy_nats": 0.739274,
+      "zero_pawn_target_samples": 0,
+      "zero_wall_target_samples": 20
+    }
+  },
+  "policy_mask": {
+    "samples_with_mask": 120,
+    "total_target_mass_outside_mask": 0
+  },
+  "caveat": "Exploratory descriptive statistics from two self-play games with 8 simulations per move. Not statistically sufficient to attribute weakness solely to the neural policy."
+}
