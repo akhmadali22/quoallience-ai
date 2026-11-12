@@ -96,6 +96,7 @@ class MCTS:
         self.wall_route_weight = wall_route_weight
         self.widening_exponent = widening_exponent
         self.last_search_stats: dict[str, Any] = {}
+        self._last_evaluation_network_priors: dict[int, float] = {}
 
     def _evaluate(self, state: GameState) -> tuple[dict[int, float], float]:
         import torch
@@ -116,6 +117,7 @@ class MCTS:
             mask[legal] = logits[legal]
             probs = torch.softmax(mask, dim=0)
             priors = {action: float(probs[action].item()) for action in legal}
+            self._last_evaluation_network_priors = dict(priors)
             if self.category_balanced_prior:
                 # Experimental baseline: allocate half of the prior mass to
                 # each available action category, then preserve the model's
@@ -390,7 +392,7 @@ class MCTS:
         evaluated_depths[depth] += 1
         root_value = self._expand(root, defer_widen=True)
         # Preserve the unmodified network output before optional Dirichlet noise.
-        root_network_priors = {
+        root_network_priors = dict(self._last_evaluation_network_priors) or {
             action: edge.prior for action, edge in self._all_root_edges(root).items()
         }
         root_action_adjustments = self._root_action_adjustments(state, recent_pawn_positions)
