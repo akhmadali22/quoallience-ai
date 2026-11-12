@@ -767,10 +767,9 @@ class MCTS:
         import random
 
         rng = rng or random
-        search_kwargs = {
-            "add_root_noise": add_root_noise,
-            "record_selection_trace": record_selection_trace,
-        }
+        search_kwargs = {"add_root_noise": add_root_noise}
+        if record_selection_trace:
+            search_kwargs["record_selection_trace"] = True
         if self.randomize_selection_ties:
             search_kwargs["rng"] = rng
         if recent_pawn_positions is not None:
