@@ -6,10 +6,12 @@ def test_policy_target_audit_reports_pawn_wall_mass_and_mask_counts():
         {
             "policy": {"0": 0.25, "80": 0.25, "81": 0.5},
             "policy_mask": [0, 80, 81, 82],
+            "ply": 0,
         },
         {
             "policy": {"81": 1.0},
             "policy_mask": [0, 81],
+            "ply": 10,
         },
     ])
     assert report["samples"] == 2
@@ -17,6 +19,8 @@ def test_policy_target_audit_reports_pawn_wall_mass_and_mask_counts():
     assert report["target_mass"]["wall"]["mean"] == 0.75
     assert report["samples_with_zero_category_target"]["pawn"] == 1
     assert report["policy_mask_actions"]["pawn"]["mean"] == 1.5
+    assert report["phase_buckets_by_ply"]["0-9"]["samples"] == 1
+    assert report["phase_buckets_by_ply"]["10-19"]["zero_pawn_target_samples"] == 1
 
 
 def test_policy_target_audit_rejects_mass_outside_search_mask():
