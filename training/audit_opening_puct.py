@@ -125,7 +125,7 @@ def summarize_actions(action_stats: dict[str, dict], c_puct: float) -> dict:
     return categories
 
 
-def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str, root_category_prior_mix: float = 0.0) -> dict:
+def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str, root_category_prior_mix: float = 0.0, opening_goal_directed_prior: bool = False) -> dict:
     state = decode_replay_state(sample)
     legal = legal_action_indices(state)
     if not legal:
@@ -217,7 +217,7 @@ def main() -> int:
     parser.add_argument("checkpoint", type=Path)
     parser.add_argument("replay", type=Path)
     parser.add_argument("--budgets", type=int, nargs="+", default=[8, 32, 64])
-    parser.add_argument("--root-category-prior-mixes", type=float, nargs="+", default=[0.0, 0.25, 0.5],
+    parser.add_argument("--opening-goal-directed-prior", action="store_true",\n                        help="Enable the root-only goal-directed prior on opening plies 0-9.")\n    parser.add_argument("--root-category-prior-mixes", type=float, nargs="+", default=[0.0, 0.25, 0.5],
                         help="Compare vanilla prior (0) with root-only mixing toward 50:50 pawn/wall category mass.")
     parser.add_argument("--max-ply", type=int, default=19)
     parser.add_argument("--c-puct", type=float, default=1.5)
@@ -297,7 +297,7 @@ def main() -> int:
             "progressive_widening": False,
             "root_dirichlet_noise": False,
             "category_balanced_prior": False,
-            "root_category_prior_mix": "varied per run; applied only at root after optional noise, default 0 preserves vanilla prior",
+            "root_category_prior_mix": "varied per run; applied only at root after optional noise, default 0 preserves vanilla prior",\n            "opening_goal_directed_prior": args.opening_goal_directed_prior,
             "category_exploration": 0.0,
             "repetition_penalty": 0.0,
             "pawn_progress_bonus": 0.0,
