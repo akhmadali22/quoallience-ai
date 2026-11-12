@@ -127,6 +127,7 @@ def play_game(
             "agent": label,
             "action": action,
             "category": "pawn" if action < MOVE_ACTIONS else "wall",
+            "selected_action_root_stats": search_stats.get("root_action_stats", {}).get(str(action)),
             "root_diagnostics": compact_root_diagnostics(search_stats),
         })
         state = next_state
