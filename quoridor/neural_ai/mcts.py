@@ -389,6 +389,10 @@ class MCTS:
         stats["nn_evaluations"] += 1
         evaluated_depths[depth] += 1
         root_value = self._expand(root, defer_widen=True)
+        # Preserve the unmodified network output before optional Dirichlet noise.
+        root_network_priors = {
+            action: edge.prior for action, edge in self._all_root_edges(root).items()
+        }
         root_action_adjustments = self._root_action_adjustments(state, recent_pawn_positions)
         # Repetition diagnostics use canonical full-state identities. They are
         # observational only and do not alter PUCT scores or game outcomes.
@@ -502,16 +506,27 @@ class MCTS:
         # Separate the network's legal-action prior from the visit policy
         # produced by search. The old root_policy_entropy name was ambiguous:
         # it actually measured visit entropy, not neural-prior entropy.
-        prior_total_all = sum(edge.prior for edge in all_root_edges.values())
-        legal_prior_probabilities = (
-            {action: edge.prior / prior_total_all for action, edge in all_root_edges.items()}
-            if prior_total_all > 0 else {}
+        network_prior_total = sum(root_network_priors.values())
+        network_prior_probabilities = (
+            {action: prior / network_prior_total for action, prior in root_network_priors.items()}
+            if network_prior_total > 0 else {}
         )
-        root_prior_entropy = -sum(
+        effective_prior_total = sum(edge.prior for edge in all_root_edges.values())
+        effective_prior_probabilities = (
+            {action: edge.prior / effective_prior_total for action, edge in all_root_edges.items()}
+            if effective_prior_total > 0 else {}
+        )
+        root_network_prior_entropy = -sum(
             probability * math.log(probability)
-            for probability in legal_prior_probabilities.values()
+            for probability in network_prior_probabilities.values()
             if probability > 0
         )
+        root_effective_prior_entropy = -sum(
+            probability * math.log(probability)
+            for probability in effective_prior_probabilities.values()
+            if probability > 0
+        )
+        root_prior_entropy = root_network_prior_entropy
         root_visit_entropy = -sum(
             probability * math.log(probability)
             for probability in probabilities.values()
@@ -549,6 +564,8 @@ class MCTS:
             action_stats = {
                 "category": category,
                 "prior": edge.prior,
+                "effective_prior": edge.prior,
+                "network_prior": root_network_priors.get(action),
                 "selection_prior": selection_prior,
                 "q": edge.q,
                 "visits": edge.visits,
@@ -583,6 +600,16 @@ class MCTS:
             ),
             "root_repetition_adjusted_actions": sum(1 for v in root_action_adjustments.values() if v < 0),
             "root_prior_entropy": root_prior_entropy,
+            "root_network_prior_entropy": root_network_prior_entropy,
+            "root_effective_prior_entropy": root_effective_prior_entropy,
+            "root_network_pawn_prior_mass": sum(
+                prior for action, prior in network_prior_probabilities.items()
+                if action < MOVE_ACTIONS
+            ),
+            "root_network_wall_prior_mass": sum(
+                prior for action, prior in network_prior_probabilities.items()
+                if action >= MOVE_ACTIONS
+            ),
             "root_active_prior_entropy": -sum(
                 prior * math.log(prior)
                 for prior in active_root_selection_priors.values()
