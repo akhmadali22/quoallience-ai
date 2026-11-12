@@ -54,6 +54,7 @@ class MCTS:
         category_balanced_prior: bool = False,
         root_category_prior_mix: float = 0.0,
         opening_goal_directed_prior: bool = False,
+        avoid_recent_state_repetition: bool = False,
         widening_coefficient: float = 2.0,
         widening_exponent: float = 0.5,
         # Vanilla PUCT is the default; these extensions are opt-in experiments.
@@ -86,6 +87,7 @@ class MCTS:
             raise ValueError("root_category_prior_mix must be between 0 and 1")
         self.root_category_prior_mix = root_category_prior_mix
         self.opening_goal_directed_prior = bool(opening_goal_directed_prior)
+        self.avoid_recent_state_repetition = bool(avoid_recent_state_repetition)
         self.widening_coefficient = widening_coefficient
         if category_exploration < 0:
             raise ValueError("category_exploration cannot be negative")
@@ -382,9 +384,16 @@ class MCTS:
         trace_sink: list[dict[str, Any]] | None = None,
         simulation_index: int | None = None,
         selection_depth: int | None = None,
+        allowed_actions: set[int] | None = None,
     ) -> tuple[int, Edge]:
+        candidates = {
+            action: edge for action, edge in node.edges.items()
+            if allowed_actions is None or action in allowed_actions
+        }
+        if not candidates:
+            raise RuntimeError("PUCT selection has no eligible actions")
         scale = math.sqrt(max(1, node.visits))
-        active_priors = {action: edge.prior for action, edge in node.edges.items()}
+        active_priors = {action: edge.prior for action, edge in candidates.items()}
         prior_total = sum(active_priors.values())
         if prior_total > 0:
             normalized_priors = {action: prior / prior_total for action, prior in active_priors.items()}
@@ -405,7 +414,7 @@ class MCTS:
         best_edge = None
         best_score = -float("inf")
         tied_actions: list[int] = []
-        for action, edge in node.edges.items():
+        for action, edge in candidates.items():
             normalized_prior = normalized_priors[action]
             u = self.c_puct * normalized_prior * scale / (1 + edge.visits)
             category = "pawn" if action < MOVE_ACTIONS else "wall"
@@ -449,6 +458,8 @@ class MCTS:
                 "node_ply": node.state.ply,
                 "node_visits_before_selection": node.visits,
                 "active_candidate_count": len(scored),
+                "eligible_candidate_count": len(candidates),
+                "repetition_filter_active": allowed_actions is not None,
                 "top_overall": best_in(None),
                 "top_pawn": best_in("pawn"),
                 "top_wall": best_in("wall"),
@@ -568,6 +579,21 @@ class MCTS:
         # the position four plies ago is detected when N=4.
         candidate_repetition_history = repetition_history[-self.repetition_window:]
         candidate_repetition_counts = Counter(candidate_repetition_history)
+        repetition_blocked_actions: set[int] = set()
+        if self.avoid_recent_state_repetition:
+            for action in legal_action_indices(state):
+                next_state = apply_action_index(state, action)
+                if state_repetition_key(next_state) in candidate_repetition_counts:
+                    repetition_blocked_actions.add(action)
+        all_legal_actions = set(legal_action_indices(state))
+        allowed_root_actions = (
+            all_legal_actions - repetition_blocked_actions
+            if self.avoid_recent_state_repetition and repetition_blocked_actions
+            else None
+        )
+        # If every legal action repeats, fall back to ordinary PUCT.
+        if allowed_root_actions == set():
+            allowed_root_actions = None
         # Root repetition is a separate question: compare the current root
         # with the preceding N positions. This needs N+1 keys including root,
         # otherwise a four-ply cycle (same side-to-move position at t and t+4)
@@ -595,6 +621,7 @@ class MCTS:
                 ),
                 "next_state_repetition_count": candidate_repetition_counts.get(next_key, 0),
                 "next_state_repeated": candidate_repetition_counts.get(next_key, 0) > 0,
+                "repetition_blocked": action in repetition_blocked_actions,
             }
 
         if add_root_noise and root.edges:
@@ -640,6 +667,14 @@ class MCTS:
         root_wall_ranking_stats = self._rank_root_wall_candidates(state, root)
         # Admit the initial wall candidates only after root noise and ranking.
         self._widen(root)
+        if allowed_root_actions is not None and not (set(root.edges) & allowed_root_actions):
+            # Progressive widening may hide every eligible wall. Admit the
+            # highest-prior eligible pending wall before applying the filter.
+            for index, (action, edge) in enumerate(root.pending_walls):
+                if action in allowed_root_actions:
+                    root.edges[action] = edge
+                    root.pending_walls.pop(index)
+                    break
 
         for simulation_index in range(self.simulations):
             trace_start = len(selection_trace)
@@ -657,6 +692,7 @@ class MCTS:
                     trace_sink=selection_trace if record_selection_trace else None,
                     simulation_index=simulation_index,
                     selection_depth=depth,
+                    allowed_actions=allowed_root_actions if node is root else None,
                 )
                 if edge.child is None:
                     edge.child = Node(apply_action_index(node.state, action))
@@ -804,6 +840,15 @@ class MCTS:
             "root_pawn_progress_bonus": self.pawn_progress_bonus,
             "root_repetition_history_length": len(repetition_history),
             "root_repetition_window": self.repetition_window,
+            "avoid_recent_state_repetition": self.avoid_recent_state_repetition,
+            "root_repetition_blocked_actions": len(repetition_blocked_actions),
+            "root_repetition_allowed_actions": (
+                len(allowed_root_actions) if allowed_root_actions is not None else len(all_legal_actions)
+            ),
+            "root_repetition_fallback_all_actions": (
+                self.avoid_recent_state_repetition and allowed_root_actions is None
+                and bool(repetition_blocked_actions)
+            ),
             "root_current_state_repetition_count": root_repetition_counts.get(state_repetition_key(state), 0),
             "root_repetition_root_lookback": self.repetition_window,
             "root_pawn_actions_with_repeated_next_state": sum(
