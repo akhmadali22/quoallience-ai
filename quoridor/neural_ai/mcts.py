@@ -252,6 +252,9 @@ class MCTS:
         action_adjustments: dict[int, float] | None = None,
         *,
         rng: Any | None = None,
+        trace_sink: list[dict[str, Any]] | None = None,
+        simulation_index: int | None = None,
+        selection_depth: int | None = None,
     ) -> tuple[int, Edge]:
         scale = math.sqrt(max(1, node.visits))
         active_priors = {action: edge.prior for action, edge in node.edges.items()}
@@ -266,39 +269,65 @@ class MCTS:
             "pawn": sum(edge.visits for action, edge in node.edges.items() if action < MOVE_ACTIONS),
             "wall": sum(edge.visits for action, edge in node.edges.items() if action >= MOVE_ACTIONS),
         }
-        # Optional category balancing is an experimental PUCT extension.
-        # At the default coefficient of zero, selection is PUCT:
-        # Q(s,a) + c_puct * P(s,a) * sqrt(max(1, N(s))) / (1 + N(s,a)).
-        # max(1, N) keeps policy priors influential on the first root visit.
         category_bonus = {
             name: self.category_exploration * math.sqrt(math.log1p(node.visits) / (1 + count))
             for name, count in category_visits.items()
         }
+        scored: list[dict[str, Any]] = []
         best_action = -1
         best_edge = None
         best_score = -float("inf")
         tied_actions: list[int] = []
         for action, edge in node.edges.items():
             normalized_prior = normalized_priors[action]
-            u = (
-                self.c_puct
-                * normalized_prior
-                * scale
-                / (1 + edge.visits)
-            )
+            u = self.c_puct * normalized_prior * scale / (1 + edge.visits)
             category = "pawn" if action < MOVE_ACTIONS else "wall"
-            score = edge.q + u + category_bonus[category]
-            if action_adjustments is not None:
-                score += action_adjustments.get(action, 0.0)
+            adjustment = action_adjustments.get(action, 0.0) if action_adjustments is not None else 0.0
+            score = edge.q + u + category_bonus[category] + adjustment
+            if trace_sink is not None:
+                scored.append({
+                    "action": action,
+                    "category": category,
+                    "prior": normalized_prior,
+                    "edge_prior": edge.prior,
+                    "q": edge.q,
+                    "u": u,
+                    "category_bonus": category_bonus[category],
+                    "selection_adjustment": adjustment,
+                    "puct_score": score,
+                    "visits": edge.visits,
+                })
             if score > best_score:
                 best_action, best_edge, best_score = action, edge, score
                 tied_actions = [action]
             elif score == best_score:
                 tied_actions.append(action)
+
         if rng is not None and len(tied_actions) > 1:
             best_action = rng.choice(tied_actions)
             best_edge = node.edges[best_action]
         assert best_edge is not None
+
+        if trace_sink is not None:
+            def best_in(category: str | None) -> dict[str, Any] | None:
+                candidates = [row for row in scored if category is None or row["category"] == category]
+                if not candidates:
+                    return None
+                return dict(max(candidates, key=lambda row: row["puct_score"]))
+
+            selected = next(row for row in scored if row["action"] == best_action)
+            trace_sink.append({
+                "simulation": simulation_index,
+                "selection_depth": selection_depth,
+                "node_ply": node.state.ply,
+                "node_visits_before_selection": node.visits,
+                "active_candidate_count": len(scored),
+                "top_overall": best_in(None),
+                "top_pawn": best_in("pawn"),
+                "top_wall": best_in("wall"),
+                "top_score_tie_actions": list(tied_actions),
+                "selected": dict(selected),
+            })
         return best_action, best_edge
 
     @staticmethod
@@ -357,6 +386,7 @@ class MCTS:
         recent_pawn_positions: list[tuple[int, int]] | None = None,
         recent_state_keys: list[tuple] | None = None,
         rng: Any | None = None,
+        record_selection_trace: bool = False,
     ) -> dict[int, float]:
         if state.winner is not None:
             self.last_search_stats = {}
@@ -372,6 +402,7 @@ class MCTS:
         evaluated_depths: Counter[int] = Counter()
         selection_depths: Counter[int] = Counter()
         leaf_depths: list[int] = []
+        selection_trace: list[dict[str, Any]] = []
 
         def expand_tracked(node: Node) -> float:
             depth = node.state.ply - state.ply
@@ -461,7 +492,7 @@ class MCTS:
         # Admit the initial wall candidates only after root noise and ranking.
         self._widen(root)
 
-        for _ in range(self.simulations):
+        for simulation_index in range(self.simulations):
             node = root
             path: list[tuple[Node, Edge]] = []
 
@@ -473,6 +504,9 @@ class MCTS:
                     node,
                     root_action_adjustments if node is root else None,
                     rng=rng if self.randomize_selection_ties else None,
+                    trace_sink=selection_trace if record_selection_trace else None,
+                    simulation_index=simulation_index,
+                    selection_depth=depth,
                 )
                 if edge.child is None:
                     edge.child = Node(apply_action_index(node.state, action))
@@ -665,6 +699,8 @@ class MCTS:
             "root_pawn_visit_ratio": root_pawn_visits / total if total else 0.0,
             "root_wall_visit_ratio": root_wall_visits / total if total else 0.0,
             "root_action_stats": root_action_stats,
+            "selection_trace_enabled": record_selection_trace,
+            "selection_trace": selection_trace if record_selection_trace else [],
             # Only active actions were eligible for this search's policy target.
             "root_policy_mask": sorted(root.edges),
             "pawn_visits": pawn_visits,

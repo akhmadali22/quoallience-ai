@@ -685,3 +685,39 @@ term before the first simulation; final Q and U are post-search snapshots, not
 a historical trace of every selection decision. Use the per-action rows to
 distinguish low prior allocation from low backed-up Q and later exploration
 effects.
+
+
+
+### Chronological PUCT selection trace
+
+The opening PUCT audit now records the actual selection decision at every
+simulation step and every visited tree depth. Each trace entry captures the
+highest-scoring overall candidate, the highest-scoring pawn candidate, the
+highest-scoring wall candidate, and the action selected by PUCT. For each
+candidate it stores action index/category, normalized selection prior, raw
+edge prior, Q, U, category bonus, optional selection adjustment, PUCT score,
+and visits immediately before selection.
+
+The trace is observational and uses the existing selection calculation. It
+does not change priors, tie-breaking, action availability, Q backup, or the
+PUCT formula. Comparing the best pawn and wall scores at the root across
+simulation indices shows whether pawn actions lose immediately on prior-driven
+U, or only after Q values diverge. Deeper trace entries expose the same process
+at subsequent nodes.
+
+Run the audit with the same command as the opening PUCT audit:
+
+```bash
+python -m training.audit_opening_puct \
+  models/checkpoints/neural_v1.pt \
+  data/diagnostics/selfplay/replay.jsonl \
+  --budgets 8 32 64 \
+  --max-ply 19 \
+  --output data/diagnostics/selfplay/opening_puct_selection_trace.json
+```
+
+The output contains a `selection_trace` array for each position/budget run.
+Root entries have `selection_depth=0`; `simulation` identifies the search
+iteration. `top_overall`, `top_pawn`, `top_wall`, and `selected` are
+snapshots from immediately before that selection. The trace can be large
+because it preserves each actual selection step; use a fresh output filename.
