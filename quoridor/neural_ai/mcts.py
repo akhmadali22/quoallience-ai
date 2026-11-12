@@ -6,7 +6,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from quoridor.engine import GameState, shortest_distance, shortest_path_metrics
+from quoridor.engine import GameState, shortest_distance, shortest_path_metrics, state_repetition_key
 from .encoder import ACTION_SIZE, MOVE_ACTIONS as ENCODER_MOVE_ACTIONS, apply_action_index, encode_state, legal_action_indices
 
 
@@ -353,6 +353,7 @@ class MCTS:
         *,
         add_root_noise: bool = False,
         recent_pawn_positions: list[tuple[int, int]] | None = None,
+        recent_state_keys: list[tuple] | None = None,
         rng: Any | None = None,
     ) -> dict[int, float]:
         if state.winner is not None:
@@ -389,6 +390,35 @@ class MCTS:
         evaluated_depths[depth] += 1
         root_value = self._expand(root, defer_widen=True)
         root_action_adjustments = self._root_action_adjustments(state, recent_pawn_positions)
+        # Repetition diagnostics use canonical full-state identities. They are
+        # observational only and do not alter PUCT scores or game outcomes.
+        from .encoder import decode_action
+        repetition_history = list(recent_state_keys or [])
+        if not repetition_history or repetition_history[-1] != state_repetition_key(state):
+            repetition_history.append(state_repetition_key(state))
+        repetition_window = repetition_history[-self.repetition_window:]
+        repetition_counts = Counter(repetition_window)
+        root_pawn_diagnostics: dict[int, dict[str, Any]] = {}
+        root_player = state.current_player
+        root_distance = shortest_distance(state, root_player)
+        for action in legal_action_indices(state):
+            if action >= MOVE_ACTIONS:
+                continue
+            _, destination = decode_action(action)
+            next_state = apply_action_index(state, action)
+            next_key = state_repetition_key(next_state)
+            next_distance = shortest_distance(next_state, root_player)
+            root_pawn_diagnostics[action] = {
+                "destination": list(destination),
+                "distance_before": root_distance,
+                "distance_after": next_distance,
+                "distance_delta": (
+                    None if root_distance is None or next_distance is None
+                    else root_distance - next_distance
+                ),
+                "next_state_repetition_count": repetition_counts.get(next_key, 0),
+                "next_state_repeated": repetition_counts.get(next_key, 0) > 0,
+            }
 
         if add_root_noise and root.edges:
             import torch
@@ -502,6 +532,7 @@ class MCTS:
             category = "pawn" if action < MOVE_ACTIONS else "wall"
             selection_prior = active_root_selection_priors.get(action) if active else None
             puct_score = None
+            exploration = None
             if active:
                 exploration = (
                     self.c_puct
@@ -515,7 +546,7 @@ class MCTS:
                     + active_category_bonus[category]
                     + root_action_adjustments.get(action, 0.0)
                 )
-            root_action_stats[str(action)] = {
+            action_stats = {
                 "category": category,
                 "prior": edge.prior,
                 "selection_prior": selection_prior,
@@ -523,8 +554,12 @@ class MCTS:
                 "visits": edge.visits,
                 "active": active,
                 "selection_adjustment": root_action_adjustments.get(action, 0.0),
+                "u_score": exploration,
                 "puct_score": puct_score,
             }
+            if action in root_pawn_diagnostics:
+                action_stats.update(root_pawn_diagnostics[action])
+            root_action_stats[str(action)] = action_stats
         stats.update({
             "root_value": root_value,
             "root_wall_ranking": root_wall_ranking_stats,
@@ -532,6 +567,20 @@ class MCTS:
             "wall_route_weight": self.wall_route_weight,
             "root_repetition_penalty": self.repetition_penalty,
             "root_pawn_progress_bonus": self.pawn_progress_bonus,
+            "root_repetition_history_length": len(repetition_history),
+            "root_repetition_window": self.repetition_window,
+            "root_current_state_repetition_count": repetition_counts.get(state_repetition_key(state), 0),
+            "root_pawn_actions_with_repeated_next_state": sum(
+                item["next_state_repeated"] for item in root_pawn_diagnostics.values()
+            ),
+            "root_pawn_actions_with_progress": sum(
+                item["distance_delta"] is not None and item["distance_delta"] > 0
+                for item in root_pawn_diagnostics.values()
+            ),
+            "root_pawn_actions_with_regression": sum(
+                item["distance_delta"] is not None and item["distance_delta"] < 0
+                for item in root_pawn_diagnostics.values()
+            ),
             "root_repetition_adjusted_actions": sum(1 for v in root_action_adjustments.values() if v < 0),
             "root_prior_entropy": root_prior_entropy,
             "root_active_prior_entropy": -sum(
@@ -590,6 +639,7 @@ class MCTS:
         add_root_noise: bool = False,
         rng: Any | None = None,
         recent_pawn_positions: list[tuple[int, int]] | None = None,
+        recent_state_keys: list[tuple] | None = None,
     ) -> tuple[int, dict[int, float]]:
         """Choose from root visits; an optional RNG makes ties reproducible per game."""
         import random
@@ -600,6 +650,8 @@ class MCTS:
             search_kwargs["rng"] = rng
         if recent_pawn_positions is not None:
             search_kwargs["recent_pawn_positions"] = recent_pawn_positions
+        if recent_state_keys is not None:
+            search_kwargs["recent_state_keys"] = recent_state_keys
         visits = self.search(state, **search_kwargs)
         if not visits:
             raise ValueError("Cannot choose an action from a terminal state")
