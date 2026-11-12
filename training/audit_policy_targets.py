@@ -7,6 +7,7 @@ import json
 import math
 from pathlib import Path
 from statistics import mean, median
+from collections import defaultdict
 
 from quoridor.neural_ai.encoder import ACTION_SIZE, MOVE_ACTIONS
 
@@ -35,6 +36,12 @@ def audit_samples(samples: list[dict]) -> dict:
     wall_target_nonzero: list[float] = []
     outside_mask_mass = 0.0
     legacy_mask_samples = 0
+    phase_samples: dict[str, dict[str, list[float]]] = defaultdict(
+        lambda: {
+            "pawn_mass": [], "wall_mass": [], "entropy": [],
+            "pawn_mask_count": [], "wall_mask_count": [],
+        }
+    )
 
     for row, sample in enumerate(samples):
         policy = {
@@ -74,6 +81,26 @@ def audit_samples(samples: list[dict]) -> dict:
         wall_target_nonzero.append(float(sum(
             value > 1e-12 for action, value in normalized.items() if action >= MOVE_ACTIONS
         )))
+        ply = int(sample.get("ply", 0))
+        phase = f"{(ply // 10) * 10}-{(ply // 10) * 10 + 9}"
+        phase_samples[phase]["pawn_mass"].append(p_mass)
+        phase_samples[phase]["wall_mass"].append(w_mass)
+        phase_samples[phase]["entropy"].append(entropy[-1])
+        phase_samples[phase]["pawn_mask_count"].append(pawn_mask_count[-1])
+        phase_samples[phase]["wall_mask_count"].append(wall_mask_count[-1])
+
+    phase_buckets = {}
+    for phase, values in sorted(phase_samples.items(), key=lambda item: int(item[0].split("-")[0])):
+        phase_buckets[phase] = {
+            "samples": len(values["pawn_mass"]),
+            "mean_pawn_target_mass": mean(values["pawn_mass"]),
+            "mean_wall_target_mass": mean(values["wall_mass"]),
+            "mean_target_entropy_nats": mean(values["entropy"]),
+            "mean_searched_pawn_actions": mean(values["pawn_mask_count"]),
+            "mean_searched_wall_actions": mean(values["wall_mask_count"]),
+            "zero_pawn_target_samples": sum(value <= 1e-12 for value in values["pawn_mass"]),
+            "zero_wall_target_samples": sum(value <= 1e-12 for value in values["wall_mass"]),
+        }
 
     return {
         "samples": len(samples),
@@ -87,6 +114,7 @@ def audit_samples(samples: list[dict]) -> dict:
             "wall": summarize(wall_mass),
         },
         "target_entropy_nats": summarize(entropy),
+        "phase_buckets_by_ply": phase_buckets,
         "policy_mask_actions": {
             "pawn": summarize(pawn_mask_count),
             "wall": summarize(wall_mask_count),
