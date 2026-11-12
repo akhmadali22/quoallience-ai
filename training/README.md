@@ -448,8 +448,10 @@ action records:
 
 The trace also stores the selected action's own root statistics, root pawn/wall
 visit ratios, prior and visit entropies, raw neural prior mass by action
-category, and the five highest-prior wall candidates. This separates a weak
-network prior from insufficient exploration or an unfavorable Q estimate.
+category, and the five highest-prior wall candidates. Per-game summaries count
+repeated root positions, selected pawn moves into recently seen states, and
+pawn progress/regression moves. This separates a weak network prior from
+insufficient exploration or an unfavorable Q estimate.
 
 Repetition identity includes both pawn positions, the complete wall layout,
 remaining wall inventory, side to move, and winner. Ply is excluded because
