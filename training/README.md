@@ -615,9 +615,10 @@ python -m training.audit_policy_targets \\
 
 The report separates normalized MCTS visit-target mass, target entropy,
 nonzero target actions, and the number of searched actions in the pawn and wall
-categories. It also checks that no nonzero target mass falls outside the
-recorded `policy_mask`. These are per-position target statistics, not counts of
-legal actions and not the neural network's predicted prior.
+categories, including ten-ply phase buckets so opening targets are not hidden by
+late-game pawn-only positions. It also checks that no nonzero target mass falls
+outside the recorded `policy_mask`. These are per-position target statistics,
+not counts of legal actions and not the neural network's predicted prior.
 
 During training, the existing policy cross-entropy is now reported as additive
 pawn and wall contributions, alongside their average target-mass shares. The
