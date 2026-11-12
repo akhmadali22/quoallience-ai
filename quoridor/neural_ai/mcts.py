@@ -6,7 +6,10 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from quoridor.engine import (\n    GameState, shortest_distance, shortest_distance_to_position,\n    shortest_path_metrics, state_repetition_key,\n)
+from quoridor.engine import (
+    GameState, shortest_distance, shortest_distance_to_position,
+    shortest_path_metrics, state_repetition_key,
+)
 from .encoder import ACTION_SIZE, MOVE_ACTIONS as ENCODER_MOVE_ACTIONS, apply_action_index, encode_state, legal_action_indices
 
 
@@ -50,6 +53,7 @@ class MCTS:
         initial_wall_candidates: int = 8,
         category_balanced_prior: bool = False,
         root_category_prior_mix: float = 0.0,
+        opening_goal_directed_prior: bool = False,
         widening_coefficient: float = 2.0,
         widening_exponent: float = 0.5,
         # Vanilla PUCT is the default; these extensions are opt-in experiments.
@@ -81,6 +85,7 @@ class MCTS:
         if not 0.0 <= root_category_prior_mix <= 1.0:
             raise ValueError("root_category_prior_mix must be between 0 and 1")
         self.root_category_prior_mix = root_category_prior_mix
+        self.opening_goal_directed_prior = bool(opening_goal_directed_prior)
         self.widening_coefficient = widening_coefficient
         if category_exploration < 0:
             raise ValueError("category_exploration cannot be negative")
@@ -782,6 +787,10 @@ class MCTS:
                 "selection_adjustment": root_action_adjustments.get(action, 0.0),
                 "u_score": exploration,
                 "puct_score": puct_score,
+                "goal_directed_prior_weight": (
+                    root_goal_directed_prior_stats.get("candidate_action_weights", {}).get(str(action), 0.0)
+                    if root_goal_directed_prior_stats else 0.0
+                ),
             }
             if action in root_pawn_diagnostics:
                 action_stats.update(root_pawn_diagnostics[action])
@@ -854,6 +863,8 @@ class MCTS:
             ),
             "category_exploration": self.category_exploration,
             "root_category_prior_mix": self.root_category_prior_mix,
+            "opening_goal_directed_prior": self.opening_goal_directed_prior,
+            "root_goal_directed_prior": root_goal_directed_prior_stats,
             "root_pawn_visits": root_pawn_visits,
             "root_wall_visits": root_wall_visits,
             "root_pawn_visit_ratio": root_pawn_visits / total if total else 0.0,
