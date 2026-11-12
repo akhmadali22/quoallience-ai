@@ -293,3 +293,53 @@ def test_selection_trace_records_top_puct_candidates_and_selected_action():
                 + candidate["selection_adjustment"]
             )
         assert step["simulation"] in range(4)
+
+
+
+def test_repetition_avoidance_selects_highest_vanilla_puct_among_allowed_actions():
+    state = GameState.initial()
+    legal = legal_action_indices(state)
+    repeated_action = next(a for a in legal if a < MOVE_ACTIONS)
+    allowed_actions = [a for a in legal if a != repeated_action]
+    history = [
+        state_repetition_key(state),
+        state_repetition_key(apply_action_index(state, repeated_action)),
+    ]
+    mcts = make_mcts(
+        simulations=8, progressive_widening=False,
+        avoid_recent_state_repetition=True,
+    )
+    mcts.search(state, recent_state_keys=history, record_selection_trace=True)
+    stats = mcts.last_search_stats
+    repeated_row = stats["root_action_stats"][str(repeated_action)]
+    assert repeated_row["repetition_blocked"] is True
+    assert repeated_row["visits"] == 0
+    assert stats["root_repetition_blocked_actions"] >= 1
+    assert stats["root_repetition_fallback_all_actions"] is False
+
+    root_trace = [
+        row for row in stats["selection_trace"]
+        if row["selection_depth"] == 0
+    ]
+    assert root_trace
+    for row in root_trace:
+        assert row["repetition_filter_active"] is True
+        assert row["selected"]["action"] != repeated_action
+
+
+def test_repetition_avoidance_falls_back_when_every_legal_action_repeats():
+    state = GameState.initial()
+    legal = legal_action_indices(state)
+    history = [state_repetition_key(state)] + [
+        state_repetition_key(apply_action_index(state, action))
+        for action in legal
+    ]
+    mcts = make_mcts(
+        simulations=4, progressive_widening=False,
+        avoid_recent_state_repetition=True,
+    )
+    mcts.search(state, recent_state_keys=history)
+    stats = mcts.last_search_stats
+    assert stats["root_repetition_fallback_all_actions"] is True
+    assert stats["root_repetition_allowed_actions"] == len(legal)
+    assert sum(item["visits"] for item in stats["root_action_stats"].values()) == 4
