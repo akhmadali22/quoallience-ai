@@ -493,6 +493,7 @@ class MCTS:
         self._widen(root)
 
         for simulation_index in range(self.simulations):
+            trace_start = len(selection_trace)
             node = root
             path: list[tuple[Node, Edge]] = []
 
@@ -517,7 +518,6 @@ class MCTS:
             value = expand_tracked(node) if not node.expanded else (
                 1.0 if node.state.winner == node.state.current_player else -1.0
             )
-            trace_start = len(selection_trace)
             # Selection entries are appended during traversal. Attach the
             # matching edge's post-backup values to each selection snapshot.
             self._backup(path, node, value)
