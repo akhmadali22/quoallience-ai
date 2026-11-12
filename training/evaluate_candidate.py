@@ -46,6 +46,8 @@ def compact_root_diagnostics(stats: dict) -> dict:
         "root_pawn_visits", "root_wall_visits", "root_legal_actions",
         "root_active_actions", "root_repetition_history_length",
         "root_repetition_window", "root_current_state_repetition_count",
+        "avoid_recent_state_repetition", "root_repetition_blocked_actions",
+        "root_repetition_allowed_actions", "root_repetition_fallback_all_actions",
         "root_pawn_actions_with_repeated_next_state",
         "root_pawn_actions_with_progress", "root_pawn_actions_with_regression",
         "opening_goal_directed_prior", "root_goal_directed_prior",
@@ -75,6 +77,7 @@ def play_game(
     progressive_widening: bool,
     initial_wall_candidates: int,
     candidate_opening_goal_directed_prior: bool,
+    candidate_avoid_recent_state_repetition: bool,
 ) -> dict:
     models = {
         "candidate": candidate_model,
@@ -99,6 +102,9 @@ def play_game(
             repetition_window=repetition_window,
             opening_goal_directed_prior=(
                 candidate_opening_goal_directed_prior and label == "candidate"
+            ),
+            avoid_recent_state_repetition=(
+                candidate_avoid_recent_state_repetition and label == "candidate"
             ),
         )
         for label, model in models.items()
@@ -203,6 +209,10 @@ def main() -> int:
         "--candidate-opening-goal-directed-prior", action="store_true",
         help="Enable opening goal-directed prior for candidate only; incumbent remains vanilla PUCT.",
     )
+    parser.add_argument(
+        "--candidate-avoid-recent-state-repetition", action="store_true",
+        help="Apply full-state repetition avoidance to candidate only; incumbent remains vanilla PUCT.",
+    )
     parser.add_argument("--min-decisive-pairs", type=int, default=10)
     parser.add_argument("--alpha", type=float, default=0.05)
     parser.add_argument("--output", type=Path, required=True)
@@ -254,6 +264,7 @@ def main() -> int:
                 progressive_widening=args.progressive_widening,
                 initial_wall_candidates=args.initial_wall_candidates,
                 candidate_opening_goal_directed_prior=args.candidate_opening_goal_directed_prior,
+                candidate_avoid_recent_state_repetition=args.candidate_avoid_recent_state_repetition,
             )
             games.append(game)
             pair_games.append(game)
@@ -312,6 +323,7 @@ def main() -> int:
             "progressive_widening": args.progressive_widening,
             "initial_wall_candidates": args.initial_wall_candidates,
             "candidate_opening_goal_directed_prior": args.candidate_opening_goal_directed_prior,
+            "candidate_avoid_recent_state_repetition": args.candidate_avoid_recent_state_repetition,
             "min_decisive_pairs": args.min_decisive_pairs,
             "alpha": args.alpha,
             "selection_temperature": 0.0,
