@@ -721,3 +721,35 @@ Root entries have `selection_depth=0`; `simulation` identifies the search
 iteration. `top_overall`, `top_pawn`, `top_wall`, and `selected` are
 snapshots from immediately before that selection. The trace can be large
 because it preserves each actual selection step; use a fresh output filename.
+
+
+## Search-free neural policy alignment audit
+
+To evaluate the neural policy independently of MCTS, compare the checkpoint's
+masked raw policy probabilities directly with the visit targets already stored
+in replay:
+
+```bash
+python -m training.audit_policy_alignment \
+  models/checkpoints/neural_v1.pt \
+  data/diagnostics/selfplay/replay.jsonl \
+  --output data/diagnostics/selfplay/policy_alignment_audit.json
+```
+
+This is inference-only. It does not run MCTS, train the network, modify the
+checkpoint, change the loss, or alter the architecture. The recorded
+`policy_mask` is applied exactly as in training.
+
+The report includes per-position and ten-ply phase summaries for:
+- policy cross-entropy and KL divergence against the replay visit target;
+- comparison with a uniform prior over legal actions;
+- target and predicted pawn/wall probability mass;
+- category-conditional cross-entropy and KL, separating category allocation
+  from action ranking within each category;
+- rank of the best target-supported action and target mass captured by the
+  policy's top 1, 5, and 10 predictions.
+
+Use this report alongside the opening PUCT audit. The alignment audit measures
+what the network predicts before search; the PUCT audit measures how search
+turns those priors and backed-up values into root visits. Neither metric alone
+establishes strategic playing strength.
