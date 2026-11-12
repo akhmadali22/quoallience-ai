@@ -517,7 +517,22 @@ class MCTS:
             value = expand_tracked(node) if not node.expanded else (
                 1.0 if node.state.winner == node.state.current_player else -1.0
             )
+            trace_start = len(selection_trace)
+            # Selection entries are appended during traversal. Attach the
+            # matching edge's post-backup values to each selection snapshot.
             self._backup(path, node, value)
+            if record_selection_trace:
+                for trace_row, (parent, edge) in zip(
+                    selection_trace[trace_start:], path
+                ):
+                    q_before = trace_row["selected"]["q"]
+                    q_after = edge.q
+                    trace_row["selected_after_backup"] = {
+                        "q": q_after,
+                        "visits": edge.visits,
+                        "value_sum": edge.value_sum,
+                        "q_delta": q_after - q_before,
+                    }
 
         all_root_edges = self._all_root_edges(root)
         total = sum(edge.visits for edge in all_root_edges.values())
@@ -720,12 +735,16 @@ class MCTS:
         rng: Any | None = None,
         recent_pawn_positions: list[tuple[int, int]] | None = None,
         recent_state_keys: list[tuple] | None = None,
+        record_selection_trace: bool = False,
     ) -> tuple[int, dict[int, float]]:
         """Choose from root visits; an optional RNG makes ties reproducible per game."""
         import random
 
         rng = rng or random
-        search_kwargs = {"add_root_noise": add_root_noise}
+        search_kwargs = {
+            "add_root_noise": add_root_noise,
+            "record_selection_trace": record_selection_trace,
+        }
         if self.randomize_selection_ties:
             search_kwargs["rng"] = rng
         if recent_pawn_positions is not None:
