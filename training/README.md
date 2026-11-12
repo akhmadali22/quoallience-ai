@@ -655,3 +655,33 @@ evidence. If most games end at the max-ply limit, treat the comparison as
 inconclusive rather than calling the higher simulation budget stronger. Keep
 the checkpoint fixed until this matrix is reviewed; only then decide whether
 the neural policy needs a separate experiment.
+
+
+## Isolate opening vanilla PUCT decisions
+
+After auditing policy targets and checkpoint loss, inspect why MCTS changes the
+pawn/wall allocation on the exact same replay positions. Run:
+
+```bash
+python -m training.audit_opening_puct \
+  models/checkpoints/neural_v1.pt \
+  data/diagnostics/selfplay/replay.jsonl \
+  --budgets 8 32 64 \
+  --max-ply 19 \
+  --output data/diagnostics/selfplay/opening_puct_audit.json
+```
+
+The script reconstructs each replay state at ply 0-19 and runs all requested
+budgets independently on the same checkpoint and same positions. It records
+every legal root action's neural prior, initial Q/U/PUCT score, final visits,
+final Q/U/PUCT score, and category. Category summaries include legal action
+counts, prior mass, visit share, and visit-weighted Q.
+
+This is a controlled vanilla-PUCT diagnostic: progressive widening, root
+Dirichlet noise, category-balanced priors, category exploration, repetition
+penalty, and pawn-progress bonus are explicitly disabled. The script does not
+train or modify the checkpoint. The initial U is the prior-driven exploration
+term before the first simulation; final Q and U are post-search snapshots, not
+a historical trace of every selection decision. Use the per-action rows to
+distinguish low prior allocation from low backed-up Q and later exploration
+effects.
