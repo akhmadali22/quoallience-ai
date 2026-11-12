@@ -220,3 +220,32 @@ def test_real_four_ply_pawn_cycle_is_detected_at_candidate_and_root():
     # At t=4 the root detector must compare against t=0 (four prior plies).
     mcts.search(state, recent_state_keys=history)
     assert mcts.last_search_stats["root_current_state_repetition_count"] == 2
+
+
+
+def test_selection_trace_records_top_puct_candidates_and_selected_action():
+    state = GameState.initial()
+    mcts = make_mcts(simulations=4, progressive_widening=False)
+    mcts.search(state, record_selection_trace=True)
+    trace = mcts.last_search_stats["selection_trace"]
+
+    root_steps = [step for step in trace if step["selection_depth"] == 0]
+    assert len(root_steps) == 4
+    for step in root_steps:
+        assert step["top_overall"] is not None
+        assert step["top_pawn"] is not None
+        assert step["top_wall"] is not None
+        assert step["selected"]["action"] in {
+            row["action"] for row in (
+                step["top_overall"], step["top_pawn"], step["top_wall"]
+            )
+        } or step["selected"]["puct_score"] <= step["top_overall"]["puct_score"]
+        for candidate in (step["top_overall"], step["top_pawn"], step["top_wall"], step["selected"]):
+            assert candidate["prior"] >= 0
+            assert candidate["u"] >= 0
+            assert candidate["puct_score"] == (
+                candidate["q"] + candidate["u"]
+                + candidate["category_bonus"]
+                + candidate["selection_adjustment"]
+            )
+        assert step["simulation"] in range(4)
