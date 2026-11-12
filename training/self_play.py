@@ -81,6 +81,7 @@ def summarize_selection_trace(trace: list[dict]) -> dict:
 def play_game(
     model, *, game_id: int, seed: int, config: SelfPlayConfig, device: str,
     record_selection_trace: bool = False, trace_max_ply: int = 19,
+    opening_goal_directed_prior: bool = False,
 ) -> tuple[list[dict], dict]:
     random.seed(seed)
     state = GameState.initial()
@@ -93,6 +94,7 @@ def play_game(
         c_puct=config.c_puct,
         progressive_widening=config.progressive_widening,
         initial_wall_candidates=config.initial_wall_candidates,
+        opening_goal_directed_prior=opening_goal_directed_prior,
     )
     samples: list[dict] = []
     action_log: list[dict] = []
@@ -213,7 +215,9 @@ def main() -> int:
                         help="Optional root repetition preference; zero keeps vanilla PUCT.")
     parser.add_argument("--pawn-progress-bonus", type=float, default=0.0)
     parser.add_argument("--repetition-window", type=int, default=4)
-    parser.add_argument("--opening-goal-directed-prior", action="store_true",\n                        help="Enable the root-only goal-directed prior for opening plies 0-9.")\n    parser.add_argument("--record-selection-trace", action="store_true",
+    parser.add_argument("--opening-goal-directed-prior", action="store_true",
+                        help="Enable the root-only goal-directed prior for opening plies 0-9.")
+    parser.add_argument("--record-selection-trace", action="store_true",
                         help="Record every PUCT selection and post-backup Q update for opening plies.")
     parser.add_argument("--trace-max-ply", type=int, default=19,
                         help="Last ply to trace when --record-selection-trace is enabled.")
@@ -250,7 +254,8 @@ def main() -> int:
     save_checkpoint(model, snapshot_path, extra={
         "source_checkpoint": args.checkpoint, "seed": args.seed,
         "selection_trace_enabled": args.record_selection_trace,
-        "selection_trace_max_ply": args.trace_max_ply if args.record_selection_trace else None,\n        "opening_goal_directed_prior": args.opening_goal_directed_prior,
+        "selection_trace_max_ply": args.trace_max_ply if args.record_selection_trace else None,
+        "opening_goal_directed_prior": args.opening_goal_directed_prior,
     })
     config = SelfPlayConfig(
         simulations=args.simulations, max_plies=args.max_plies,
@@ -272,6 +277,7 @@ def main() -> int:
                 model, game_id=game_id, seed=seed, config=config, device=device,
                 record_selection_trace=args.record_selection_trace,
                 trace_max_ply=args.trace_max_ply,
+                opening_goal_directed_prior=args.opening_goal_directed_prior,
             )
             for sample in samples:
                 samples_file.write(json.dumps(sample, separators=(",", ":")) + "\n")
