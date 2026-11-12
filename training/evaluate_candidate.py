@@ -141,6 +141,29 @@ def play_game(
         else "win" if winner_agent == "candidate"
         else "loss"
     )
+    selected_pawn_stats = [
+        item["selected_action_root_stats"]
+        for item in trace
+        if item["category"] == "pawn" and item.get("selected_action_root_stats")
+    ]
+    repetition_summary = {
+        "repeated_root_positions": sum(
+            item["root_diagnostics"].get("root_current_state_repetition_count", 0) > 1
+            for item in trace
+        ),
+        "selected_pawn_moves": len(selected_pawn_stats),
+        "selected_pawn_moves_to_recent_state": sum(
+            item.get("next_state_repeated", False) for item in selected_pawn_stats
+        ),
+        "selected_pawn_progress_moves": sum(
+            item.get("distance_delta") is not None and item["distance_delta"] > 0
+            for item in selected_pawn_stats
+        ),
+        "selected_pawn_regression_moves": sum(
+            item.get("distance_delta") is not None and item["distance_delta"] < 0
+            for item in selected_pawn_stats
+        ),
+    }
     return {
         "seed": seed,
         "candidate_player": candidate_player,
@@ -149,6 +172,7 @@ def play_game(
         "result_for_candidate": result,
         "plies": state.ply,
         "draw_reason": "max_plies" if winner_agent is None else None,
+        "repetition_diagnostics": repetition_summary,
         "action_trace": trace,
     }
 
