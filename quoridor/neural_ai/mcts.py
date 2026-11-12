@@ -6,7 +6,10 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from quoridor.engine import GameState, shortest_distance, shortest_path_metrics, state_repetition_key
+from quoridor.engine import (
+    GameState, shortest_distance, shortest_distance_to_position,
+    shortest_path_metrics, state_repetition_key,
+)
 from .encoder import ACTION_SIZE, MOVE_ACTIONS as ENCODER_MOVE_ACTIONS, apply_action_index, encode_state, legal_action_indices
 
 
@@ -50,6 +53,7 @@ class MCTS:
         initial_wall_candidates: int = 8,
         category_balanced_prior: bool = False,
         root_category_prior_mix: float = 0.0,
+        opening_goal_directed_prior: bool = False,
         widening_coefficient: float = 2.0,
         widening_exponent: float = 0.5,
         # Vanilla PUCT is the default; these extensions are opt-in experiments.
@@ -81,6 +85,7 @@ class MCTS:
         if not 0.0 <= root_category_prior_mix <= 1.0:
             raise ValueError("root_category_prior_mix must be between 0 and 1")
         self.root_category_prior_mix = root_category_prior_mix
+        self.opening_goal_directed_prior = bool(opening_goal_directed_prior)
         self.widening_coefficient = widening_coefficient
         if category_exploration < 0:
             raise ValueError("category_exploration cannot be negative")
@@ -248,6 +253,124 @@ class MCTS:
             "route_weight": self.wall_route_weight,
             "best_route_score": max(route_scores.values(), default=0),
             "worst_route_score": min(route_scores.values(), default=0),
+        }
+
+    def _apply_opening_goal_directed_prior(self, state: GameState, root: Node) -> dict[str, Any]:
+        """Blend neural prior with a root-only strategic prior during plies 0-9.
+
+        Player 0 targets (4, 3); player 1 uses its vertical mirror (4, 5).
+        At target distance <= 6, strategic mass goes to pawn moves that reduce
+        that distance. Beyond 6, it goes to walls that increase the opponent's
+        shortest path. The two normalized distributions are added and
+        renormalized, so this changes P only; vanilla Q + U selection is intact.
+        """
+        if not self.opening_goal_directed_prior or not 0 <= state.ply <= 9:
+            return {}
+
+        all_edges = self._all_root_edges(root)
+        player = state.current_player
+        target = (4, 3) if player == 0 else (4, 5)
+        own_distance = shortest_distance_to_position(state, player, target)
+        strategic_weights: dict[int, float] = {}
+        mode = "pawn_to_center" if own_distance is not None and own_distance <= 6 else "extend_opponent_path"
+        opponent_distance_before = None
+        max_opponent_delay = None
+
+        if mode == "pawn_to_center":
+            pawn_actions = [action for action in all_edges if action < MOVE_ACTIONS]
+            progress_by_action: dict[int, tuple[int | None, int]] = {}
+            for action in pawn_actions:
+                next_state = apply_action_index(state, action)
+                distance_after = shortest_distance_to_position(next_state, player, target)
+                progress = (
+                    own_distance - distance_after
+                    if distance_after is not None else 0
+                )
+                progress_by_action[action] = (distance_after, progress)
+            positive = {
+                action: float(progress)
+                for action, (_distance, progress) in progress_by_action.items()
+                if progress > 0
+            }
+            if positive:
+                strategic_weights = positive
+            elif progress_by_action:
+                best_distance = min(
+                    distance for distance, _progress in progress_by_action.values()
+                    if distance is not None
+                )
+                strategic_weights = {
+                    action: 1.0 for action, (distance, _progress) in progress_by_action.items()
+                    if distance == best_distance
+                }
+        else:
+            wall_actions = [action for action in all_edges if action >= MOVE_ACTIONS]
+            opponent = 1 - player
+            opponent_distance_before = shortest_distance(state, opponent)
+            delay_by_action: dict[int, int] = {}
+            for action in wall_actions:
+                next_state = apply_action_index(state, action)
+                distance_after = shortest_distance(next_state, opponent)
+                delay_by_action[action] = (
+                    distance_after - opponent_distance_before
+                    if distance_after is not None and opponent_distance_before is not None
+                    else 0
+                )
+            max_opponent_delay = max(delay_by_action.values(), default=None)
+            positive = {
+                action: float(delay)
+                for action, delay in delay_by_action.items()
+                if delay > 0
+            }
+            if positive:
+                strategic_weights = positive
+            elif delay_by_action:
+                # If no wall increases the opponent's distance, retain the
+                # least-bad wall frontier instead of manufacturing a benefit.
+                best_delay = max(delay_by_action.values())
+                strategic_weights = {
+                    action: 1.0 for action, delay in delay_by_action.items()
+                    if delay == best_delay
+                }
+
+        if not strategic_weights:
+            return {
+                "active": True,
+                "mode": mode,
+                "ply": state.ply,
+                "target": list(target),
+                "own_target_distance": own_distance,
+                "threshold": 6,
+                "candidate_actions": 0,
+                "fallback": "no_strategic_candidates",
+            }
+
+        strategic_total = sum(strategic_weights.values())
+        neural_total = sum(edge.prior for edge in all_edges.values())
+        strategic_prior = {
+            action: weight / strategic_total
+            for action, weight in strategic_weights.items()
+        }
+        for action, edge in all_edges.items():
+            neural_prior = edge.prior / neural_total if neural_total > 0 else 0.0
+            goal_prior = strategic_prior.get(action, 0.0)
+            edge.prior = (neural_prior + goal_prior) / 2.0
+
+        return {
+            "active": True,
+            "mode": mode,
+            "ply": state.ply,
+            "target": list(target),
+            "own_target_distance": own_distance,
+            "opponent_distance_before": opponent_distance_before,
+            "max_opponent_delay": max_opponent_delay,
+            "threshold": 6,
+            "candidate_actions": len(strategic_weights),
+            "strategic_prior_mass": 0.5,
+            "neural_prior_mass": 0.5,
+            "candidate_action_weights": {
+                str(action): weight for action, weight in strategic_weights.items()
+            },
         }
 
     def _select(
@@ -513,6 +636,7 @@ class MCTS:
                             else 1.0 / len(category_edges)
                         )
                         edge.prior = target_mass * within_category
+        root_goal_directed_prior_stats = self._apply_opening_goal_directed_prior(state, root)
         root_wall_ranking_stats = self._rank_root_wall_candidates(state, root)
         # Admit the initial wall candidates only after root noise and ranking.
         self._widen(root)
@@ -663,6 +787,10 @@ class MCTS:
                 "selection_adjustment": root_action_adjustments.get(action, 0.0),
                 "u_score": exploration,
                 "puct_score": puct_score,
+                "goal_directed_prior_weight": (
+                    root_goal_directed_prior_stats.get("candidate_action_weights", {}).get(str(action), 0.0)
+                    if root_goal_directed_prior_stats else 0.0
+                ),
             }
             if action in root_pawn_diagnostics:
                 action_stats.update(root_pawn_diagnostics[action])
@@ -735,6 +863,8 @@ class MCTS:
             ),
             "category_exploration": self.category_exploration,
             "root_category_prior_mix": self.root_category_prior_mix,
+            "opening_goal_directed_prior": self.opening_goal_directed_prior,
+            "root_goal_directed_prior": root_goal_directed_prior_stats,
             "root_pawn_visits": root_pawn_visits,
             "root_wall_visits": root_wall_visits,
             "root_pawn_visit_ratio": root_pawn_visits / total if total else 0.0,
