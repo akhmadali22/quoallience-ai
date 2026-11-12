@@ -139,7 +139,7 @@ Evaluation reports record, for each neural turn, pawn coordinates before and aft
 
 Neural MCTS accepts the current player's recent pawn-position history. At the root only, pawn actions that return to one of the previous positions inside the configured window receive a configurable selection penalty. Pawn actions that reduce the player's shortest path distance receive a small configurable bonus. These are soft search preferences, not legality rules; tactical moves remain available.
 
-Defaults: `--repetition-penalty 0.75`, `--pawn-progress-bonus 0.0` (disabled until a smaller value is validated), and `--repetition-window 4`. Both self-play and evaluation accept these flags. Evaluation also reports root-value mean absolute and squared error against the final game outcome, allowing value calibration to be measured rather than guessed.
+Defaults: `--repetition-penalty 0.0`, `--pawn-progress-bonus 0.0`, and `--repetition-window 4`. Both preferences are opt-in experiments and remain disabled in the vanilla-PUCT baseline. The pawn-coordinate preference is separate from the full-state repetition instrumentation documented below.
 
 Example ablation: set `--repetition-penalty 0 --pawn-progress-bonus 0` to disable both root preferences while keeping the same checkpoint, seeds, and simulation budget.
 
@@ -432,6 +432,36 @@ adjustment as `_select`. The trace includes top root actions ranked by visits
 and by this final-snapshot PUCT score. The selected action is chosen by maximum
 visit count, so its rank by visits is expected to be first and is not an
 independent measure of search quality.
+
+
+
+## Root MCTS instrumentation and full-state repetition history
+
+Self-play replay samples and candidate-evaluation game traces now retain root
+search diagnostics without changing vanilla PUCT selection. Every legal pawn
+action records:
+- raw neural-network prior before Dirichlet noise;
+- effective prior after optional root noise and normalized active prior used by PUCT;
+- Q value, U exploration term, final-snapshot PUCT score, and visit count;
+- destination square and shortest-path distance before/after the move;
+- whether the resulting full game state appeared in the recent repetition window.
+
+The trace also stores the selected action's own root statistics, root pawn/wall
+visit ratios, prior and visit entropies, raw neural prior mass by action
+category, and the five highest-prior wall candidates. Per-game summaries count
+repeated root positions, selected pawn moves into recently seen states, and
+pawn progress/regression moves. This separates a weak network prior from
+insufficient exploration or an unfavorable Q estimate.
+
+Repetition identity includes both pawn positions, the complete wall layout,
+remaining wall inventory, side to move, and winner. Ply is excluded because
+the same board position at a different move number is still the same position.
+The game runners pass the chronological state-key history into MCTS. The
+instrumentation counts prior occurrences of each pawn action's resulting state
+inside the configured recent window; it does not declare a draw, remove legal
+actions, or modify PUCT scores. The older root-only pawn-coordinate preference
+remains a separate optional experiment and is not the full-state repetition
+detector.
 
 
 ## Controlled vanilla-PUCT search experiments
