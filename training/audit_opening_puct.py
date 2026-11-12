@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 from pathlib import Path
 from statistics import mean
 
@@ -101,10 +100,7 @@ def summarize_actions(action_stats: dict[str, dict], c_puct: float) -> dict:
             ),
             "initial_exploration_mass": c_puct * sum(priors),
             "visits": sum(visits),
-            "visit_ratio": (
-                sum(visits) / sum(int(row["visits"]) for _, row in action_stats.items())
-                if False else None
-            ),
+            "visit_ratio": None,
             "visit_weighted_q": (
                 sum(q * weight for q, weight in visited_q) / q_weight
                 if q_weight else None
