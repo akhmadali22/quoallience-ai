@@ -143,7 +143,7 @@ def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str
         repetition_penalty=0.0,
         pawn_progress_bonus=0.0,
     )
-    search.search(state, add_root_noise=False)
+    search.search(state, add_root_noise=False, record_selection_trace=True)
     stats = search.last_search_stats
     action_stats = stats["root_action_stats"]
 
@@ -202,6 +202,8 @@ def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str
         "network_wall_prior_mass": stats["root_network_wall_prior_mass"],
         "pawn_wall": categories,
         "actions": action_rows,
+        "selection_trace": stats["selection_trace"],
+        "selection_trace_steps": len(stats["selection_trace"]),
     }
 
 
@@ -292,6 +294,7 @@ def main() -> int:
             "final_u": "PUCT exploration term after the requested simulations.",
             "q": "Root edge mean value from the perspective of the root player.",
             "final_puct_score": "Final root Q + U. This is a post-search snapshot, not a historical trace of every selection decision.",
+            "selection_trace": "Chronological trace of every actual PUCT selection in each simulation and tree depth. Each step records the highest-scoring overall, pawn, and wall candidate plus the action actually selected, with Q, U, normalized prior, PUCT score, and visit count. The score is computed from the node statistics immediately before that selection.",
             "uniform_legal_action_prior": "1 / number of legal root actions; useful as a branching-factor reference, not a policy target.",
         },
         "runs": runs,
