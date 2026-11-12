@@ -393,7 +393,9 @@ class MCTS:
         if not candidates:
             raise RuntimeError("PUCT selection has no eligible actions")
         scale = math.sqrt(max(1, node.visits))
-        active_priors = {action: edge.prior for action, edge in candidates.items()}
+        # Keep vanilla PUCT normalization over every active edge. The filter
+        # only restricts the argmax set; it must not rescale priors or U scores.
+        active_priors = {action: edge.prior for action, edge in node.edges.items()}
         prior_total = sum(active_priors.values())
         if prior_total > 0:
             normalized_priors = {action: prior / prior_total for action, prior in active_priors.items()}
