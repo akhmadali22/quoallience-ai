@@ -457,9 +457,15 @@ Repetition identity includes both pawn positions, the complete wall layout,
 remaining wall inventory, side to move, and winner. Ply is excluded because
 the same board position at a different move number is still the same position.
 The game runners pass the chronological state-key history into MCTS. The
-instrumentation counts prior occurrences of each pawn action's resulting state
-inside the configured recent window; it does not declare a draw, remove legal
-actions, or modify PUCT scores. The older root-only pawn-coordinate preference
+instrumentation uses two explicit boundaries. For a candidate next state,
+it compares against the current root plus the previous `repetition_window - 1`
+positions, so a candidate that returns to a full state from four plies earlier
+is visible with the default window of four. For the current root itself, it
+compares the root against the previous four positions, which requires retaining
+five keys including the current root; this catches a same-side-to-move cycle at
+plies `t` and `t+4`. The two counts are reported separately. Repetition remains
+observational: it does not declare a draw, remove legal actions, or modify PUCT
+scores. The older root-only pawn-coordinate preference
 remains a separate optional experiment and is not the full-state repetition
 detector.
 
@@ -595,3 +601,57 @@ This gate is evidence for promotion, not proof of general playing strength.
 Use enough pairs and varied seeds, and keep the evaluation MCTS settings fixed
 between candidate and incumbent. The loop is bounded by `--iterations`; it
 does not run indefinitely.
+
+
+## Pawn/wall policy-target audit and vanilla PUCT budget matrix
+
+Audit a self-play replay before using it for training:
+
+```bash
+python -m training.audit_policy_targets \\
+  data/diagnostics/selfplay/replay.jsonl \\
+  --output data/diagnostics/selfplay/policy_target_audit.json
+```
+
+The report separates normalized MCTS visit-target mass from raw neural prior
+mass and MCTS root visit ratio, plus target entropy, nonzero target actions,
+and the number of searched actions in the pawn and wall categories. It includes
+ten-ply phase buckets so opening targets are not hidden by late-game pawn-only
+positions. It also checks that no nonzero target mass falls
+outside the recorded `policy_mask`. These are per-position target statistics,
+not counts of legal actions and not the neural network's predicted prior.
+
+During training, the existing policy cross-entropy is now reported as additive
+pawn and wall contributions, alongside their average target-mass shares. The
+loss formula is unchanged: this is instrumentation, not category reweighting.
+No pawn/wall balancing coefficient is introduced.
+
+To measure the current checkpoint's actual pawn/wall policy cross-entropy and
+value MSE on a replay without training or modifying the checkpoint, run:
+
+```bash
+python -m training.audit_policy_loss \
+  models/checkpoints/neural_v1.pt \
+  data/diagnostics/selfplay/replay.jsonl \
+  --output data/diagnostics/selfplay/policy_loss_audit.json
+```
+
+The report includes additive pawn and wall contributions to policy
+cross-entropy, value loss, total objective, and the same ten-ply phase buckets.
+
+
+After the audit, compare all three vanilla PUCT budgets against the same
+checkpoint and paired seed set:
+
+```bash
+MCTS_PAIRS=10 MCTS_SEED=20261112 MCTS_MAX_PLIES=200 \\
+  bash training/run_mcts_budget_matrix.sh models/checkpoints/neural_v1.pt
+```
+
+This runs 8-vs-32, 32-vs-64, and 8-vs-64 with seat swaps. Progressive widening,
+category exploration, repetition penalty, pawn progress bonus, wall-distance
+ranking, and wall-route ranking are disabled. Increase `MCTS_PAIRS` for stronger
+evidence. If most games end at the max-ply limit, treat the comparison as
+inconclusive rather than calling the higher simulation budget stronger. Keep
+the checkpoint fixed until this matrix is reviewed; only then decide whether
+the neural policy needs a separate experiment.
