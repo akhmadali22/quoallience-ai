@@ -103,12 +103,20 @@ def test_full_state_repetition_is_reported_without_changing_puct():
     assert item["selection_adjustment"] == 0.0
 
 
-def test_recent_state_history_is_bounded_by_repetition_window():
+def test_repetition_lookup_ignores_positions_outside_recent_window():
     state = GameState.initial()
+    pawn_action = next(
+        action for action in legal_action_indices(state)
+        if action < MOVE_ACTIONS
+    )
+    next_key = state_repetition_key(apply_action_index(state, pawn_action))
     mcts = make_mcts(simulations=2, repetition_window=2)
     mcts.search(state, recent_state_keys=[
-        ("old",), ("older",), state_repetition_key(state)
+        next_key, ("unrelated-position",), state_repetition_key(state)
     ])
+    item = mcts.last_search_stats["root_action_stats"][str(pawn_action)]
+    assert item["next_state_repetition_count"] == 0
+    assert item["next_state_repeated"] is False
     assert mcts.last_search_stats["root_repetition_history_length"] == 3
     assert mcts.last_search_stats["root_repetition_window"] == 2
 
