@@ -49,6 +49,7 @@ class MCTS:
         progressive_widening: bool = True,
         initial_wall_candidates: int = 8,
         category_balanced_prior: bool = False,
+        root_category_prior_mix: float = 0.0,
         widening_coefficient: float = 2.0,
         widening_exponent: float = 0.5,
         # Vanilla PUCT is the default; these extensions are opt-in experiments.
@@ -77,6 +78,9 @@ class MCTS:
         self.progressive_widening = progressive_widening
         self.initial_wall_candidates = initial_wall_candidates
         self.category_balanced_prior = category_balanced_prior
+        if not 0.0 <= root_category_prior_mix <= 1.0:
+            raise ValueError("root_category_prior_mix must be between 0 and 1")
+        self.root_category_prior_mix = root_category_prior_mix
         self.widening_coefficient = widening_coefficient
         if category_exploration < 0:
             raise ValueError("category_exploration cannot be negative")
@@ -488,6 +492,27 @@ class MCTS:
                 key=lambda item: item[1].prior, reverse=True
             )
 
+        # Optional root-only prior smoothing. This changes P, not the PUCT
+        # equation: within-category neural rankings are preserved while a
+        # configurable fraction of category mass is mixed with a 50:50
+        # pawn/wall allocation. A missing category receives no mass.
+        if self.root_category_prior_mix > 0.0:
+            all_edges = self._all_root_edges(root)
+            pawn_edges = [(a, e) for a, e in all_edges.items() if a < MOVE_ACTIONS]
+            wall_edges = [(a, e) for a, e in all_edges.items() if a >= MOVE_ACTIONS]
+            if pawn_edges and wall_edges:
+                for category_edges in (pawn_edges, wall_edges):
+                    category_total = sum(edge.prior for _, edge in category_edges)
+                    target_mass = (
+                        (1.0 - self.root_category_prior_mix) * category_total
+                        + 0.5 * self.root_category_prior_mix
+                    )
+                    for _, edge in category_edges:
+                        within_category = (
+                            edge.prior / category_total if category_total > 0
+                            else 1.0 / len(category_edges)
+                        )
+                        edge.prior = target_mass * within_category
         root_wall_ranking_stats = self._rank_root_wall_candidates(state, root)
         # Admit the initial wall candidates only after root noise and ranking.
         self._widen(root)
@@ -709,6 +734,7 @@ class MCTS:
                 if action >= MOVE_ACTIONS
             ),
             "category_exploration": self.category_exploration,
+            "root_category_prior_mix": self.root_category_prior_mix,
             "root_pawn_visits": root_pawn_visits,
             "root_wall_visits": root_wall_visits,
             "root_pawn_visit_ratio": root_pawn_visits / total if total else 0.0,
@@ -741,10 +767,9 @@ class MCTS:
         import random
 
         rng = rng or random
-        search_kwargs = {
-            "add_root_noise": add_root_noise,
-            "record_selection_trace": record_selection_trace,
-        }
+        search_kwargs = {"add_root_noise": add_root_noise}
+        if record_selection_trace:
+            search_kwargs["record_selection_trace"] = True
         if self.randomize_selection_ties:
             search_kwargs["rng"] = rng
         if recent_pawn_positions is not None:

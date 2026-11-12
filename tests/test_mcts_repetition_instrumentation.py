@@ -19,6 +19,51 @@ def make_mcts(**kwargs):
     return mcts
 
 
+def test_root_category_prior_mix_changes_only_root_category_mass():
+    state = GameState.initial()
+    baseline = make_mcts(
+        simulations=4, progressive_widening=False, root_category_prior_mix=0.0
+    )
+    mixed = make_mcts(
+        simulations=4, progressive_widening=False, root_category_prior_mix=0.25
+    )
+
+    baseline.search(state)
+    mixed.search(state)
+    base = baseline.last_search_stats["root_action_stats"]
+    changed = mixed.last_search_stats["root_action_stats"]
+
+    base_pawn = sum(item["effective_prior"] for item in base.values()
+                    if item["category"] == "pawn")
+    mixed_pawn = sum(item["effective_prior"] for item in changed.values()
+                     if item["category"] == "pawn")
+    mixed_wall = sum(item["effective_prior"] for item in changed.values()
+                     if item["category"] == "wall")
+
+    assert abs(base_pawn - 3 / len(base)) < 1e-9
+    assert abs(mixed_pawn - (0.75 * base_pawn + 0.125)) < 1e-9
+    assert abs(mixed_wall - (0.75 * (1.0 - base_pawn) + 0.125)) < 1e-9
+    assert abs(mixed_pawn + mixed_wall - 1.0) < 1e-9
+    assert mixed.last_search_stats["root_category_prior_mix"] == 0.25
+
+    # PUCT remains Q + U. The extension changes only the root prior P.
+    for item in changed.values():
+        if item["active"]:
+            assert abs(item["puct_score"] - (
+                item["q"] + item["u_score"]
+                + item["selection_adjustment"]
+            )) < 1e-9
+
+
+def test_root_category_prior_mix_rejects_out_of_range_values():
+    import pytest
+
+    with pytest.raises(ValueError, match="root_category_prior_mix"):
+        make_mcts(root_category_prior_mix=-0.01)
+    with pytest.raises(ValueError, match="root_category_prior_mix"):
+        make_mcts(root_category_prior_mix=1.01)
+
+
 def test_repetition_key_ignores_ply_but_includes_complete_position():
     state = GameState.initial()
     later_same_position = GameState(

@@ -770,3 +770,41 @@ Use this report alongside the opening PUCT audit. The alignment audit measures
 what the network predicts before search; the PUCT audit measures how search
 turns those priors and backed-up values into root visits. Neither metric alone
 establishes strategic playing strength.
+
+## Root-only category prior smoothing experiment
+
+The opening PUCT audit can compare vanilla neural priors against a controlled
+root-only prior smoothing intervention on the exact same replay positions:
+
+```bash
+python -m training.audit_opening_puct \
+  models/checkpoints/neural_v1.pt \
+  data/diagnostics/selfplay/replay.jsonl \
+  --budgets 8 32 64 \
+  --max-ply 19 \
+  --root-category-prior-mixes 0.0 0.25 0.5 \
+  --output data/diagnostics/selfplay/root_prior_mix_audit.json
+```
+
+`root_category_prior_mix` mixes the neural prior's total category mass at
+the root with a 50:50 pawn/wall allocation. A value of 0.0 is unchanged vanilla
+PUCT; 0.25 moves one quarter of the category allocation toward 50:50; 0.5
+moves half-way; 1.0 gives exactly 50:50 category mass when both categories
+have legal actions. Within each category, the neural network's relative action
+ranking is preserved. If one category has no legal actions, the available
+category keeps all prior mass.
+
+The intervention is applied only at the root and changes only prior P.
+The PUCT selection equation, Q values, backup, legal actions, and deeper-node
+priors remain unchanged. Root Dirichlet noise is disabled in this fixed-position
+audit so all variants are deterministic and directly comparable. Progressive
+widening, category exploration, repetition penalties, and pawn-progress
+bonuses are also disabled.
+
+The report keeps raw network pawn prior mass separate from the effective
+root prior mass after mixing, then records pawn/wall visits, Q, and the full
+selection trace for each mix and simulation budget. Treat this as a search
+exploration experiment, not a training or architecture change. Do not promote
+a mix value based only on increased pawn visits: inspect action quality and
+then run a separate paired playing-strength evaluation with the same settings.
+
