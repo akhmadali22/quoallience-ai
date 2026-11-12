@@ -284,18 +284,19 @@ class MCTS:
             category = "pawn" if action < MOVE_ACTIONS else "wall"
             adjustment = action_adjustments.get(action, 0.0) if action_adjustments is not None else 0.0
             score = edge.q + u + category_bonus[category] + adjustment
-            scored.append({
-                "action": action,
-                "category": category,
-                "prior": normalized_prior,
-                "edge_prior": edge.prior,
-                "q": edge.q,
-                "u": u,
-                "category_bonus": category_bonus[category],
-                "selection_adjustment": adjustment,
-                "puct_score": score,
-                "visits": edge.visits,
-            })
+            if trace_sink is not None:
+                scored.append({
+                    "action": action,
+                    "category": category,
+                    "prior": normalized_prior,
+                    "edge_prior": edge.prior,
+                    "q": edge.q,
+                    "u": u,
+                    "category_bonus": category_bonus[category],
+                    "selection_adjustment": adjustment,
+                    "puct_score": score,
+                    "visits": edge.visits,
+                })
             if score > best_score:
                 best_action, best_edge, best_score = action, edge, score
                 tied_actions = [action]
