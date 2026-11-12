@@ -688,6 +688,23 @@ effects.
 
 
 
+### Self-play opening PUCT selection trace
+
+To capture the actual PUCT decisions in self-play (rather than replaying a fixed position later), rerun the same self-play setup with tracing enabled:
+
+```bash
+python -m training.self_play \
+  --checkpoint models/checkpoints/neural_v1.pt \
+  --games 2 --simulations 8 --max-plies 60 --seed 20261102 \
+  --output-dir data/diagnostics/selfplay_selection_trace \
+  --record-selection-trace --trace-max-ply 19
+```
+
+The trace is enabled only for plies 0-19 by default. Each replay sample stores every root and deeper-node selection event for each simulation. At each selection it records the best overall, best pawn, and best wall candidates, including their PUCT score, Q, U, prior, and visits immediately before selection. The selected edge also stores Q, visit count, value sum, and Q delta after that simulation's backup. The per-position summary identifies the first simulation where the best wall score exceeds the best pawn score, the first simulation that selects a pawn, and whether pawn is never selected at the root.
+
+Tracing is observational only. It does not change the checkpoint, priors, root noise, temperature, PUCT formula, tie-breaking, or backup. Use a fresh output directory. Keep the checkpoint, seed, game count, simulation budget, and other self-play arguments identical to the original run when comparing traces.
+
+
 ### Chronological PUCT selection trace
 
 The opening PUCT audit now records the actual selection decision at every
