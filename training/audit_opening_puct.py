@@ -304,7 +304,7 @@ def main() -> int:
             "randomize_selection_ties": False,
         },
         "interpretation": {
-            "initial_u": "c_puct * network prior, with root Q=0 and sqrt(max(1,N))=1 before the first simulation.",
+            "initial_u": "c_puct * effective root prior after the configured category mix, with root Q=0 and sqrt(max(1,N))=1 before the first simulation.",
             "final_u": "PUCT exploration term after the requested simulations.",
             "q": "Root edge mean value from the perspective of the root player.",
             "final_puct_score": "Final root Q + U. This is a post-search snapshot, not a historical trace of every selection decision.",
@@ -317,7 +317,7 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(f"PUCT opening audit: {args.output}")
-    print(f"Completed {len(samples)} positions x {len(args.budgets)} budgets = {len(runs)} searches.")
+    print(f"Completed {len(samples)} positions x {len(args.budgets)} budgets x {len(args.root_category_prior_mixes)} prior mixes = {len(runs)} searches.")
     return 0
 
 
