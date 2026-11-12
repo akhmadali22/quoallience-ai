@@ -613,10 +613,11 @@ python -m training.audit_policy_targets \\
   --output data/diagnostics/selfplay/policy_target_audit.json
 ```
 
-The report separates normalized MCTS visit-target mass, target entropy,
-nonzero target actions, and the number of searched actions in the pawn and wall
-categories, including ten-ply phase buckets so opening targets are not hidden by
-late-game pawn-only positions. It also checks that no nonzero target mass falls
+The report separates normalized MCTS visit-target mass from raw neural prior
+mass and MCTS root visit ratio, plus target entropy, nonzero target actions,
+and the number of searched actions in the pawn and wall categories. It includes
+ten-ply phase buckets so opening targets are not hidden by late-game pawn-only
+positions. It also checks that no nonzero target mass falls
 outside the recorded `policy_mask`. These are per-position target statistics,
 not counts of legal actions and not the neural network's predicted prior.
 
