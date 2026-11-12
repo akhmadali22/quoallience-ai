@@ -30,6 +30,8 @@ def audit_samples(samples: list[dict]) -> dict:
     pawn_mass: list[float] = []
     wall_mass: list[float] = []
     entropy: list[float] = []
+    network_pawn_prior_mass: list[float] = []
+    root_pawn_visit_ratio: list[float] = []
     pawn_mask_count: list[float] = []
     wall_mask_count: list[float] = []
     pawn_target_nonzero: list[float] = []
@@ -39,6 +41,7 @@ def audit_samples(samples: list[dict]) -> dict:
     phase_samples: dict[str, dict[str, list[float]]] = defaultdict(
         lambda: {
             "pawn_mass": [], "wall_mass": [], "entropy": [],
+            "network_pawn_prior_mass": [], "root_pawn_visit_ratio": [],
             "pawn_mask_count": [], "wall_mask_count": [],
         }
     )
@@ -86,6 +89,15 @@ def audit_samples(samples: list[dict]) -> dict:
         phase_samples[phase]["pawn_mass"].append(p_mass)
         phase_samples[phase]["wall_mass"].append(w_mass)
         phase_samples[phase]["entropy"].append(entropy[-1])
+        diagnostics = sample.get("root_diagnostics") or {}
+        network_mass = diagnostics.get("root_network_pawn_prior_mass")
+        visit_ratio = diagnostics.get("root_pawn_visit_ratio")
+        if network_mass is not None:
+            network_pawn_prior_mass.append(float(network_mass))
+            phase_samples[phase]["network_pawn_prior_mass"].append(float(network_mass))
+        if visit_ratio is not None:
+            root_pawn_visit_ratio.append(float(visit_ratio))
+            phase_samples[phase]["root_pawn_visit_ratio"].append(float(visit_ratio))
         phase_samples[phase]["pawn_mask_count"].append(pawn_mask_count[-1])
         phase_samples[phase]["wall_mask_count"].append(wall_mask_count[-1])
 
@@ -96,6 +108,12 @@ def audit_samples(samples: list[dict]) -> dict:
             "mean_pawn_target_mass": mean(values["pawn_mass"]),
             "mean_wall_target_mass": mean(values["wall_mass"]),
             "mean_target_entropy_nats": mean(values["entropy"]),
+            "mean_network_pawn_prior_mass": (
+                mean(values["network_pawn_prior_mass"]) if values["network_pawn_prior_mass"] else None
+            ),
+            "mean_root_pawn_visit_ratio": (
+                mean(values["root_pawn_visit_ratio"]) if values["root_pawn_visit_ratio"] else None
+            ),
             "mean_searched_pawn_actions": mean(values["pawn_mask_count"]),
             "mean_searched_wall_actions": mean(values["wall_mask_count"]),
             "zero_pawn_target_samples": sum(value <= 1e-12 for value in values["pawn_mass"]),
@@ -114,6 +132,8 @@ def audit_samples(samples: list[dict]) -> dict:
             "wall": summarize(wall_mass),
         },
         "target_entropy_nats": summarize(entropy),
+        "network_pawn_prior_mass": summarize(network_pawn_prior_mass),
+        "root_pawn_visit_ratio": summarize(root_pawn_visit_ratio),
         "phase_buckets_by_ply": phase_buckets,
         "policy_mask_actions": {
             "pawn": summarize(pawn_mask_count),
