@@ -48,6 +48,7 @@ def compact_root_diagnostics(stats: dict) -> dict:
         "root_repetition_window", "root_current_state_repetition_count",
         "root_pawn_actions_with_repeated_next_state",
         "root_pawn_actions_with_progress", "root_pawn_actions_with_regression",
+        "opening_goal_directed_prior", "root_goal_directed_prior",
     )
     compact = {key: stats.get(key) for key in keys}
     compact["pawn_actions"] = pawn_actions
@@ -73,6 +74,7 @@ def play_game(
     repetition_window: int,
     progressive_widening: bool,
     initial_wall_candidates: int,
+    candidate_opening_goal_directed_prior: bool,
 ) -> dict:
     models = {
         "candidate": candidate_model,
@@ -95,6 +97,9 @@ def play_game(
             repetition_penalty=repetition_penalty,
             pawn_progress_bonus=pawn_progress_bonus,
             repetition_window=repetition_window,
+            opening_goal_directed_prior=(
+                candidate_opening_goal_directed_prior and label == "candidate"
+            ),
         )
         for label, model in models.items()
     }
@@ -194,6 +199,10 @@ def main() -> int:
     parser.add_argument("--progressive-widening", action="store_true",
                         help="Enable optional wall-candidate progressive widening.")
     parser.add_argument("--initial-wall-candidates", type=int, default=8)
+    parser.add_argument(
+        "--candidate-opening-goal-directed-prior", action="store_true",
+        help="Enable opening goal-directed prior for candidate only; incumbent remains vanilla PUCT.",
+    )
     parser.add_argument("--min-decisive-pairs", type=int, default=10)
     parser.add_argument("--alpha", type=float, default=0.05)
     parser.add_argument("--output", type=Path, required=True)
@@ -244,6 +253,7 @@ def main() -> int:
                 repetition_window=args.repetition_window,
                 progressive_widening=args.progressive_widening,
                 initial_wall_candidates=args.initial_wall_candidates,
+                candidate_opening_goal_directed_prior=args.candidate_opening_goal_directed_prior,
             )
             games.append(game)
             pair_games.append(game)
@@ -301,6 +311,7 @@ def main() -> int:
             "repetition_window": args.repetition_window,
             "progressive_widening": args.progressive_widening,
             "initial_wall_candidates": args.initial_wall_candidates,
+            "candidate_opening_goal_directed_prior": args.candidate_opening_goal_directed_prior,
             "min_decisive_pairs": args.min_decisive_pairs,
             "alpha": args.alpha,
             "selection_temperature": 0.0,
