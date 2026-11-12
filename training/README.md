@@ -626,6 +626,20 @@ pawn and wall contributions, alongside their average target-mass shares. The
 loss formula is unchanged: this is instrumentation, not category reweighting.
 No pawn/wall balancing coefficient is introduced.
 
+To measure the current checkpoint's actual pawn/wall policy cross-entropy and
+value MSE on a replay without training or modifying the checkpoint, run:
+
+```bash
+python -m training.audit_policy_loss \
+  models/checkpoints/neural_v1.pt \
+  data/diagnostics/selfplay/replay.jsonl \
+  --output data/diagnostics/selfplay/policy_loss_audit.json
+```
+
+The report includes additive pawn and wall contributions to policy
+cross-entropy, value loss, total objective, and the same ten-ply phase buckets.
+
+
 After the audit, compare all three vanilla PUCT budgets against the same
 checkpoint and paired seed set:
 
