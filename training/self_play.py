@@ -115,6 +115,31 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
         sample["game_id"] = game_id
         sample["seed"] = seed
 
+    selected_pawn_stats = [
+        item["selected_action_root_stats"]
+        for item in action_log
+        if item["action"] < MOVE_ACTIONS and item.get("selected_action_root_stats")
+    ]
+    repeated_root_positions = sum(
+        item["root_diagnostics"].get("root_current_state_repetition_count", 0) > 1
+        for item in action_log
+    )
+    repetition_summary = {
+        "repeated_root_positions": repeated_root_positions,
+        "selected_pawn_moves": len(selected_pawn_stats),
+        "selected_pawn_moves_to_recent_state": sum(
+            item.get("next_state_repeated", False) for item in selected_pawn_stats
+        ),
+        "selected_pawn_progress_moves": sum(
+            item.get("distance_delta") is not None and item["distance_delta"] > 0
+            for item in selected_pawn_stats
+        ),
+        "selected_pawn_regression_moves": sum(
+            item.get("distance_delta") is not None and item["distance_delta"] < 0
+            for item in selected_pawn_stats
+        ),
+    }
+
     return samples, {
         "game_id": game_id,
         "seed": seed,
@@ -122,6 +147,7 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
         "result": result,
         "plies": state.ply,
         "samples": len(samples),
+        "repetition_diagnostics": repetition_summary,
         "actions": action_log,
     }
 
