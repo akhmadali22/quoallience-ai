@@ -8,7 +8,7 @@ import math
 import random
 from pathlib import Path
 
-from quoridor.engine import GameState
+from quoridor.engine import GameState, state_repetition_key
 from quoridor.neural_ai.encoder import apply_action_index
 from quoridor.neural_ai.mcts import MOVE_ACTIONS, MCTS
 from quoridor.neural_ai.policy import load_model
@@ -20,6 +20,39 @@ def exact_one_sided_sign_test(wins: int, losses: int) -> float:
     if decisive == 0:
         return 1.0
     return sum(math.comb(decisive, k) for k in range(wins, decisive + 1)) / (2 ** decisive)
+
+
+
+def compact_root_diagnostics(stats: dict) -> dict:
+    """Expose per-pawn PUCT terms without bloating evaluation traces with all walls."""
+    actions = stats.get("root_action_stats", {})
+    pawn_actions = {
+        action: details for action, details in actions.items()
+        if details.get("category") == "pawn"
+    }
+    wall_actions = [
+        (action, details) for action, details in actions.items()
+        if details.get("category") == "wall"
+    ]
+    top_walls = sorted(
+        wall_actions, key=lambda item: item[1].get("prior", 0.0), reverse=True
+    )[:5]
+    keys = (
+        "root_value", "root_prior_entropy", "root_active_prior_entropy",
+        "root_visit_entropy", "root_pawn_visit_ratio", "root_wall_visit_ratio",
+        "root_active_pawn_prior_mass", "root_active_wall_prior_mass",
+        "root_pawn_visits", "root_wall_visits", "root_legal_actions",
+        "root_active_actions", "root_repetition_history_length",
+        "root_repetition_window", "root_current_state_repetition_count",
+        "root_pawn_actions_with_repeated_next_state",
+        "root_pawn_actions_with_progress", "root_pawn_actions_with_regression",
+    )
+    compact = {key: stats.get(key) for key in keys}
+    compact["pawn_actions"] = pawn_actions
+    compact["top_wall_actions_by_prior"] = {
+        action: details for action, details in top_walls
+    }
+    return compact
 
 
 def play_game(
@@ -69,6 +102,7 @@ def play_game(
     }
     pawn_history = {0: [], 1: []}
     state = GameState.initial()
+    state_history = [state_repetition_key(state)]
     pawn_history[0].append(state.pawns[0])
     pawn_history[1].append(state.pawns[1])
     trace = []
@@ -81,7 +115,9 @@ def play_game(
             temperature=0.0,
             rng=rngs[label],
             recent_pawn_positions=pawn_history[player],
+            recent_state_keys=state_history,
         )
+        search_stats = searches[label].last_search_stats
         next_state = apply_action_index(state, action)
         if next_state.pawns[player] != state.pawns[player]:
             pawn_history[player].append(next_state.pawns[player])
@@ -91,8 +127,10 @@ def play_game(
             "agent": label,
             "action": action,
             "category": "pawn" if action < MOVE_ACTIONS else "wall",
+            "root_diagnostics": compact_root_diagnostics(search_stats),
         })
         state = next_state
+        state_history.append(state_repetition_key(state))
 
     winner_agent = None if state.winner is None else player_agents[state.winner]
     result = (
