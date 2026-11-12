@@ -86,6 +86,7 @@ def summarize_actions(action_stats: dict[str, dict], c_puct: float) -> dict:
             if details["category"] == category
         ]
         priors = [float(row["network_prior"]) for _, row in rows]
+        effective_priors = [float(row["effective_prior"]) for _, row in rows]
         visits = [int(row["visits"]) for _, row in rows]
         visited_q = [
             (float(row["q"]), int(row["visits"]))
@@ -95,10 +96,11 @@ def summarize_actions(action_stats: dict[str, dict], c_puct: float) -> dict:
         categories[category] = {
             "legal_actions": len(rows),
             "prior_mass": sum(priors),
+            "effective_prior_mass": sum(effective_priors),
             "uniform_legal_action_mass": (
                 len(rows) / len(action_stats) if action_stats else 0.0
             ),
-            "initial_exploration_mass": c_puct * sum(priors),
+            "initial_exploration_mass": c_puct * sum(effective_priors),
             "visits": sum(visits),
             "visit_ratio": None,
             "visit_weighted_q": (
@@ -123,7 +125,7 @@ def summarize_actions(action_stats: dict[str, dict], c_puct: float) -> dict:
     return categories
 
 
-def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str) -> dict:
+def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str, root_category_prior_mix: float = 0.0) -> dict:
     state = decode_replay_state(sample)
     legal = legal_action_indices(state)
     if not legal:
@@ -139,6 +141,7 @@ def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str
         randomize_selection_ties=False,
         progressive_widening=False,
         category_balanced_prior=False,
+        root_category_prior_mix=root_category_prior_mix,
         category_exploration=0.0,
         repetition_penalty=0.0,
         pawn_progress_bonus=0.0,
@@ -166,10 +169,11 @@ def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str
                 if kind == "wall" else None
             ),
             "prior": details["network_prior"],
+            "effective_prior": details["effective_prior"],
             "uniform_legal_action_prior": 1.0 / len(legal),
             "initial_q": 0.0,
-            "initial_u": c_puct * float(details["network_prior"]),
-            "initial_puct_score": c_puct * float(details["network_prior"]),
+            "initial_u": c_puct * float(details["effective_prior"]),
+            "initial_puct_score": c_puct * float(details["effective_prior"]),
             "visits": details["visits"],
             "q": details["q"],
             "final_u": details["u_score"],
@@ -191,6 +195,7 @@ def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str
             "wall_count": len(state.walls),
         },
         "budget": budget,
+        "root_category_prior_mix": root_category_prior_mix,
         "simulations": stats["simulations"],
         "root_value": stats["root_value"],
         "legal_actions": stats["root_legal_actions"],
@@ -212,6 +217,8 @@ def main() -> int:
     parser.add_argument("checkpoint", type=Path)
     parser.add_argument("replay", type=Path)
     parser.add_argument("--budgets", type=int, nargs="+", default=[8, 32, 64])
+    parser.add_argument("--root-category-prior-mixes", type=float, nargs="+", default=[0.0, 0.25, 0.5],
+                        help="Compare vanilla prior (0) with root-only mixing toward 50:50 pawn/wall category mass.")
     parser.add_argument("--max-ply", type=int, default=19)
     parser.add_argument("--c-puct", type=float, default=1.5)
     parser.add_argument("--device", default="cpu")
@@ -223,6 +230,9 @@ def main() -> int:
 
     if not args.budgets or any(value < 1 for value in args.budgets):
         parser.error("All simulation budgets must be positive")
+    if (not args.root_category_prior_mixes
+            or any(value < 0.0 or value > 1.0 for value in args.root_category_prior_mixes)):
+        parser.error("Root category prior mixes must be between 0 and 1")
     if args.max_ply < 0 or args.c_puct < 0 or args.threads < 1 or args.max_positions < 0:
         parser.error("max-ply/max-positions must be non-negative; c-puct non-negative; threads positive")
     if args.output.exists():
@@ -258,18 +268,20 @@ def main() -> int:
             flush=True,
         )
         for budget in args.budgets:
-            result = run_position(
-                model, sample, budget=budget, c_puct=args.c_puct, device=args.device
-            )
-            runs.append(result)
-            summary = result["pawn_wall"]
-            print(
-                f"  sims={budget} pawn_prior={result['network_pawn_prior_mass']:.4f} "
-                f"pawn_visits={summary['pawn']['visit_ratio']:.4f} "
-                f"pawn_q={summary['pawn']['visit_weighted_q']} "
-                f"wall_q={summary['wall']['visit_weighted_q']}",
-                flush=True,
-            )
+            for mix in args.root_category_prior_mixes:
+                result = run_position(
+                    model, sample, budget=budget, c_puct=args.c_puct,
+                    device=args.device, root_category_prior_mix=mix,
+                )
+                runs.append(result)
+                summary = result["pawn_wall"]
+                print(
+                    f"  sims={budget} mix={mix:.2f} "
+                    f"network_pawn_prior={result['network_pawn_prior_mass']:.4f} "
+                    f"effective_pawn_prior={summary['pawn']['effective_prior_mass']:.4f} "
+                    f"pawn_visits={summary['pawn']['visit_ratio']:.4f}",
+                    flush=True,
+                )
 
     report = {
         "checkpoint": str(args.checkpoint),
@@ -277,6 +289,7 @@ def main() -> int:
         "positions": len(samples),
         "ply_range": [0, args.max_ply],
         "budgets": args.budgets,
+        "root_category_prior_mixes": args.root_category_prior_mixes,
         "c_puct": args.c_puct,
         "device": args.device,
         "settings": {
@@ -284,25 +297,27 @@ def main() -> int:
             "progressive_widening": False,
             "root_dirichlet_noise": False,
             "category_balanced_prior": False,
+            "root_category_prior_mix": "varied per run; applied only at root after optional noise, default 0 preserves vanilla prior",
             "category_exploration": 0.0,
             "repetition_penalty": 0.0,
             "pawn_progress_bonus": 0.0,
             "randomize_selection_ties": False,
         },
         "interpretation": {
-            "initial_u": "c_puct * network prior, with root Q=0 and sqrt(max(1,N))=1 before the first simulation.",
+            "initial_u": "c_puct * effective root prior after the configured category mix, with root Q=0 and sqrt(max(1,N))=1 before the first simulation.",
             "final_u": "PUCT exploration term after the requested simulations.",
             "q": "Root edge mean value from the perspective of the root player.",
             "final_puct_score": "Final root Q + U. This is a post-search snapshot, not a historical trace of every selection decision.",
             "selection_trace": "Chronological trace of every actual PUCT selection in each simulation and tree depth. Each step records the highest-scoring overall, pawn, and wall candidate plus the action actually selected, with Q, U, normalized prior, PUCT score, and visit count. The score is computed from the node statistics immediately before that selection.",
             "uniform_legal_action_prior": "1 / number of legal root actions; useful as a branching-factor reference, not a policy target.",
+            "root_category_prior_mix": "At the root only, mixes the network category mass with a 50:50 pawn/wall allocation by alpha. Within-category neural rankings are preserved. PUCT Q + U formula and backup are unchanged. mix=0 is exact vanilla prior; mix=1 is category-balanced prior mass.",
         },
         "runs": runs,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(f"PUCT opening audit: {args.output}")
-    print(f"Completed {len(samples)} positions x {len(args.budgets)} budgets = {len(runs)} searches.")
+    print(f"Completed {len(samples)} positions x {len(args.budgets)} budgets x {len(args.root_category_prior_mixes)} prior mixes = {len(runs)} searches.")
     return 0
 
 
