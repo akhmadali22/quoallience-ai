@@ -51,7 +51,37 @@ def compact_root_diagnostics(stats: dict) -> dict:
     return compact
 
 
-def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device: str) -> tuple[list[dict], dict]:
+def summarize_selection_trace(trace: list[dict]) -> dict:
+    """Summarize root selection competition and backup changes per simulation."""
+    root_rows = [row for row in trace if row.get("selection_depth") == 0]
+    first_wall_ahead = next((row for row in root_rows
+        if row.get("top_wall") and row.get("top_pawn")
+        and row["top_wall"]["puct_score"] > row["top_pawn"]["puct_score"]), None)
+    first_pawn_selected = next((row for row in root_rows
+        if row.get("selected", {}).get("category") == "pawn"), None)
+    return {
+        "root_simulations_traced": len(root_rows),
+        "first_simulation_wall_score_exceeds_pawn": (
+            first_wall_ahead.get("simulation") if first_wall_ahead else None
+        ),
+        "first_simulation_pawn_selected": (
+            first_pawn_selected.get("simulation") if first_pawn_selected else None
+        ),
+        "pawn_never_selected": first_pawn_selected is None,
+        "root_simulations": [{
+            "simulation": row.get("simulation"),
+            "top_pawn": row.get("top_pawn"),
+            "top_wall": row.get("top_wall"),
+            "selected": row.get("selected"),
+            "selected_after_backup": row.get("selected_after_backup"),
+        } for row in root_rows],
+    }
+
+
+def play_game(
+    model, *, game_id: int, seed: int, config: SelfPlayConfig, device: str,
+    record_selection_trace: bool = False, trace_max_ply: int = 19,
+) -> tuple[list[dict], dict]:
     random.seed(seed)
     state = GameState.initial()
     search = MCTS(
@@ -78,6 +108,7 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
             add_root_noise=config.dirichlet_noise,
             recent_pawn_positions=pawn_positions[player],
             recent_state_keys=state_history,
+            record_selection_trace=(record_selection_trace and state.ply <= trace_max_ply),
         )
         search_stats = search.last_search_stats
         samples.append({
@@ -91,6 +122,12 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
             "root_pawn_visit_ratio": search_stats.get("root_pawn_visit_ratio"),
             "root_repetition_adjusted_actions": search_stats.get("root_repetition_adjusted_actions"),
             "root_diagnostics": compact_root_diagnostics(search_stats),
+            **({
+                "selection_trace": search_stats.get("selection_trace", []),
+                "selection_trace_summary": summarize_selection_trace(
+                    search_stats.get("selection_trace", [])
+                ),
+            } if record_selection_trace and state.ply <= trace_max_ply else {}),
         })
         next_state = apply_action_index(state, action)
         if action < MOVE_ACTIONS:
@@ -99,6 +136,9 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
             "ply": state.ply, "player": player, "action": action,
             "selected_action_root_stats": search_stats.get("root_action_stats", {}).get(str(action)),
             "root_diagnostics": compact_root_diagnostics(search_stats),
+            **({
+                "selection_trace": search_stats.get("selection_trace", []),
+            } if record_selection_trace and state.ply <= trace_max_ply else {}),
         })
         state = next_state
         state_history.append(state_repetition_key(state))
@@ -173,10 +213,16 @@ def main() -> int:
                         help="Optional root repetition preference; zero keeps vanilla PUCT.")
     parser.add_argument("--pawn-progress-bonus", type=float, default=0.0)
     parser.add_argument("--repetition-window", type=int, default=4)
+    parser.add_argument("--record-selection-trace", action="store_true",
+                        help="Record every PUCT selection and post-backup Q update for opening plies.")
+    parser.add_argument("--trace-max-ply", type=int, default=19,
+                        help="Last ply to trace when --record-selection-trace is enabled.")
     args = parser.parse_args()
 
     if args.games < 1 or args.simulations < 1 or args.max_plies < 1:
         parser.error("--games, --simulations, and --max-plies must be positive")
+    if args.trace_max_ply < 0:
+        parser.error("--trace-max-ply must be non-negative")
     if (args.c_puct < 0 or args.initial_wall_candidates < 0
             or args.category_exploration < 0 or args.repetition_penalty < 0
             or args.pawn_progress_bonus < 0 or args.repetition_window < 1):
@@ -201,7 +247,11 @@ def main() -> int:
     games_path = output / "games.jsonl"
     if samples_path.exists() or games_path.exists():
         parser.error(f"Output already contains replay data: {output}. Use a new --output-dir.")
-    save_checkpoint(model, snapshot_path, extra={"source_checkpoint": args.checkpoint, "seed": args.seed})
+    save_checkpoint(model, snapshot_path, extra={
+        "source_checkpoint": args.checkpoint, "seed": args.seed,
+        "selection_trace_enabled": args.record_selection_trace,
+        "selection_trace_max_ply": args.trace_max_ply if args.record_selection_trace else None,
+    })
     config = SelfPlayConfig(
         simulations=args.simulations, max_plies=args.max_plies,
         category_exploration=args.category_exploration,
@@ -218,7 +268,11 @@ def main() -> int:
             game_id = index + 1
             seed = args.seed + index
             print(f"[{index + 1}/{args.games}] game={game_id} seed={seed}", flush=True)
-            samples, summary = play_game(model, game_id=game_id, seed=seed, config=config, device=device)
+            samples, summary = play_game(
+                model, game_id=game_id, seed=seed, config=config, device=device,
+                record_selection_trace=args.record_selection_trace,
+                trace_max_ply=args.trace_max_ply,
+            )
             for sample in samples:
                 samples_file.write(json.dumps(sample, separators=(",", ":")) + "\n")
             samples_file.flush()
