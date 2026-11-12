@@ -338,6 +338,36 @@ def shortest_distance(
     return None
 
 
+def shortest_distance_to_position(
+    state: GameState,
+    player: int,
+    target: Position,
+) -> int | None:
+    """Return the shortest wall-aware distance from a player's pawn to a square.
+
+    The opposing pawn is ignored, matching shortest_distance()'s path metric.
+    """
+    if player not in (0, 1):
+        raise ValueError("Player must be 0 or 1")
+    if not inside(target):
+        raise ValueError("Target position is outside the board")
+
+    start = state.pawns[player]
+    queue = deque([(start, 0)])
+    visited = {start}
+    while queue:
+        current, distance = queue.popleft()
+        if current == target:
+            return distance
+        x, y = current
+        for nxt in ((x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)):
+            if not inside(nxt) or nxt in visited or blocked(state.walls, current, nxt):
+                continue
+            visited.add(nxt)
+            queue.append((nxt, distance + 1))
+    return None
+
+
 def legal_pawn_moves(
     state: GameState,
     player: int | None = None,
