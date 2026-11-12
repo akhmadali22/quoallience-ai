@@ -823,6 +823,7 @@ class MCTS:
                 "visits": edge.visits,
                 "active": active,
                 "selection_adjustment": root_action_adjustments.get(action, 0.0),
+                "repetition_blocked": action in repetition_blocked_actions,
                 "u_score": exploration,
                 "puct_score": puct_score,
                 "goal_directed_prior_weight": (
