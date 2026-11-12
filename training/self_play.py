@@ -7,12 +7,46 @@ import json
 import random
 from pathlib import Path
 
-from quoridor.engine import GameState
+from quoridor.engine import GameState, state_repetition_key
 from quoridor.neural_ai.encoder import apply_action_index, encode_state
 from quoridor.neural_ai.mcts import MOVE_ACTIONS, MCTS
 from quoridor.neural_ai.network import QuoridorNet
 from quoridor.neural_ai.policy import load_model, save_checkpoint
 from training.config import SelfPlayConfig
+
+
+
+def compact_root_diagnostics(stats: dict) -> dict:
+    """Keep complete pawn diagnostics and a compact wall-prior reference."""
+    actions = stats.get("root_action_stats", {})
+    pawn_actions = {
+        action: details for action, details in actions.items()
+        if details.get("category") == "pawn"
+    }
+    wall_actions = [
+        (action, details) for action, details in actions.items()
+        if details.get("category") == "wall"
+    ]
+    top_walls = sorted(
+        wall_actions, key=lambda item: item[1].get("prior", 0.0), reverse=True
+    )[:5]
+    keys = (
+        "root_value", "root_prior_entropy", "root_active_prior_entropy",
+        "root_visit_entropy", "root_pawn_visit_ratio", "root_wall_visit_ratio",
+        "root_pawn_prior_mass", "root_active_pawn_prior_mass",
+        "root_active_wall_prior_mass", "root_pawn_visits", "root_wall_visits",
+        "root_legal_actions", "root_active_actions",
+        "root_repetition_history_length", "root_repetition_window",
+        "root_current_state_repetition_count",
+        "root_pawn_actions_with_repeated_next_state",
+        "root_pawn_actions_with_progress", "root_pawn_actions_with_regression",
+    )
+    compact = {key: stats.get(key) for key in keys}
+    compact["pawn_actions"] = pawn_actions
+    compact["top_wall_actions_by_prior"] = {
+        action: details for action, details in top_walls
+    }
+    return compact
 
 
 def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device: str) -> tuple[list[dict], dict]:
@@ -31,6 +65,7 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
     samples: list[dict] = []
     action_log: list[dict] = []
     pawn_positions = {0: [state.pawns[0]], 1: [state.pawns[1]]}
+    state_history = [state_repetition_key(state)]
 
     while state.winner is None and state.ply < config.max_plies:
         player = state.current_player
@@ -40,6 +75,7 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
             temperature=temperature,
             add_root_noise=config.dirichlet_noise,
             recent_pawn_positions=pawn_positions[player],
+            recent_state_keys=state_history,
         )
         search_stats = search.last_search_stats
         samples.append({
@@ -52,12 +88,17 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
             "root_policy_entropy": search_stats.get("root_policy_entropy"),
             "root_pawn_visit_ratio": search_stats.get("root_pawn_visit_ratio"),
             "root_repetition_adjusted_actions": search_stats.get("root_repetition_adjusted_actions"),
+            "root_diagnostics": compact_root_diagnostics(search_stats),
         })
         next_state = apply_action_index(state, action)
         if action < MOVE_ACTIONS:
             pawn_positions[player].append(next_state.pawns[player])
-        action_log.append({"ply": state.ply, "player": player, "action": action})
+        action_log.append({
+            "ply": state.ply, "player": player, "action": action,
+            "root_diagnostics": compact_root_diagnostics(search_stats),
+        })
         state = next_state
+        state_history.append(state_repetition_key(state))
         if state.ply % 10 == 0:
             print(f"  game={game_id} ply={state.ply} winner={state.winner}", flush=True)
 
