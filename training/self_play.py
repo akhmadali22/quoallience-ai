@@ -213,7 +213,7 @@ def main() -> int:
                         help="Optional root repetition preference; zero keeps vanilla PUCT.")
     parser.add_argument("--pawn-progress-bonus", type=float, default=0.0)
     parser.add_argument("--repetition-window", type=int, default=4)
-    parser.add_argument("--record-selection-trace", action="store_true",
+    parser.add_argument("--opening-goal-directed-prior", action="store_true",\n                        help="Enable the root-only goal-directed prior for opening plies 0-9.")\n    parser.add_argument("--record-selection-trace", action="store_true",
                         help="Record every PUCT selection and post-backup Q update for opening plies.")
     parser.add_argument("--trace-max-ply", type=int, default=19,
                         help="Last ply to trace when --record-selection-trace is enabled.")
@@ -250,7 +250,7 @@ def main() -> int:
     save_checkpoint(model, snapshot_path, extra={
         "source_checkpoint": args.checkpoint, "seed": args.seed,
         "selection_trace_enabled": args.record_selection_trace,
-        "selection_trace_max_ply": args.trace_max_ply if args.record_selection_trace else None,
+        "selection_trace_max_ply": args.trace_max_ply if args.record_selection_trace else None,\n        "opening_goal_directed_prior": args.opening_goal_directed_prior,
     })
     config = SelfPlayConfig(
         simulations=args.simulations, max_plies=args.max_plies,
