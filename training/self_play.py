@@ -33,7 +33,7 @@ def compact_root_diagnostics(stats: dict) -> dict:
     keys = (
         "root_value", "root_prior_entropy", "root_active_prior_entropy",
         "root_visit_entropy", "root_pawn_visit_ratio", "root_wall_visit_ratio",
-        "root_pawn_prior_mass", "root_active_pawn_prior_mass",
+        "root_active_pawn_prior_mass",
         "root_active_wall_prior_mass", "root_pawn_visits", "root_wall_visits",
         "root_legal_actions", "root_active_actions",
         "root_repetition_history_length", "root_repetition_window",
@@ -95,6 +95,7 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
             pawn_positions[player].append(next_state.pawns[player])
         action_log.append({
             "ply": state.ply, "player": player, "action": action,
+            "selected_action_root_stats": search_stats.get("root_action_stats", {}).get(str(action)),
             "root_diagnostics": compact_root_diagnostics(search_stats),
         })
         state = next_state
