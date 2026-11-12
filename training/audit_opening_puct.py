@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 from statistics import mean
 
-from quoridor.engine import GameState, Wall
+from quoridor.engine import GameState, Wall, state_repetition_key
 from quoridor.neural_ai.encoder import (
     ACTION_SIZE,
     MOVE_ACTIONS,
@@ -125,7 +125,7 @@ def summarize_actions(action_stats: dict[str, dict], c_puct: float) -> dict:
     return categories
 
 
-def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str, root_category_prior_mix: float = 0.0, opening_goal_directed_prior: bool = False) -> dict:
+def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str, root_category_prior_mix: float = 0.0, opening_goal_directed_prior: bool = False, avoid_recent_state_repetition: bool = False, recent_state_keys: list[tuple] | None = None) -> dict:
     state = decode_replay_state(sample)
     legal = legal_action_indices(state)
     if not legal:
@@ -143,11 +143,12 @@ def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str
         category_balanced_prior=False,
         root_category_prior_mix=root_category_prior_mix,
         opening_goal_directed_prior=opening_goal_directed_prior,
+        avoid_recent_state_repetition=avoid_recent_state_repetition,
         category_exploration=0.0,
         repetition_penalty=0.0,
         pawn_progress_bonus=0.0,
     )
-    search.search(state, add_root_noise=False, record_selection_trace=True)
+    search.search(state, add_root_noise=False, recent_state_keys=recent_state_keys, record_selection_trace=True)
     stats = search.last_search_stats
     action_stats = stats["root_action_stats"]
 
@@ -180,6 +181,7 @@ def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str
             "final_u": details["u_score"],
             "final_puct_score": details["puct_score"],
             "active": details["active"],
+            "repetition_blocked": details.get("repetition_blocked", False),
         }
         action_rows.append(row)
 
@@ -198,6 +200,10 @@ def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str
         "budget": budget,
         "root_category_prior_mix": root_category_prior_mix,
         "opening_goal_directed_prior": opening_goal_directed_prior,
+        "avoid_recent_state_repetition": avoid_recent_state_repetition,
+        "root_repetition_blocked_actions": stats.get("root_repetition_blocked_actions", 0),
+        "root_repetition_allowed_actions": stats.get("root_repetition_allowed_actions"),
+        "root_repetition_fallback_all_actions": stats.get("root_repetition_fallback_all_actions", False),
         "root_goal_directed_prior": stats.get("root_goal_directed_prior", {}),
         "simulations": stats["simulations"],
         "root_value": stats["root_value"],
@@ -222,6 +228,8 @@ def main() -> int:
     parser.add_argument("--budgets", type=int, nargs="+", default=[8, 32, 64])
     parser.add_argument("--opening-goal-directed-prior", action="store_true",
                         help="Enable the root-only goal-directed prior on opening plies 0-9.")
+    parser.add_argument("--avoid-recent-state-repetition", action="store_true",
+                        help="Exclude root actions recreating one of the previous full states, when alternatives exist.")
     parser.add_argument("--root-category-prior-mixes", type=float, nargs="+", default=[0.0, 0.25, 0.5],
                         help="Compare vanilla prior (0) with root-only mixing toward 50:50 pawn/wall category mass.")
     parser.add_argument("--max-ply", type=int, default=19)
@@ -248,8 +256,9 @@ def main() -> int:
         parser.error("CUDA requested but unavailable")
     torch.set_num_threads(args.threads)
 
+    all_samples = load_samples(args.replay)
     samples = [
-        sample for sample in load_samples(args.replay)
+        sample for sample in all_samples
         if 0 <= int(sample.get("ply", -1)) <= args.max_ply
     ]
     samples.sort(key=lambda sample: (
@@ -261,6 +270,19 @@ def main() -> int:
         samples = samples[:args.max_positions]
     if not samples:
         parser.error(f"No replay positions found with ply <= {args.max_ply}")
+
+    # Reconstruct chronological full-state history from the same replay.
+    # This keeps baseline and avoidance comparisons on identical root states.
+    history_by_sample: dict[tuple[int, int], list[tuple]] = {}
+    grouped: dict[int, list[dict]] = {}
+    for item in all_samples:
+        grouped.setdefault(int(item.get("game_id", 0)), []).append(item)
+    for game_id, game_samples in grouped.items():
+        game_samples.sort(key=lambda item: int(item.get("ply", 0)))
+        history: list[tuple] = []
+        for item in game_samples:
+            history_by_sample[(game_id, int(item.get("ply", 0)))] = list(history)
+            history.append(state_repetition_key(decode_replay_state(item)))
 
     model = load_model(args.checkpoint, device=args.device)
     model.eval()
@@ -278,6 +300,10 @@ def main() -> int:
                     model, sample, budget=budget, c_puct=args.c_puct,
                     device=args.device, root_category_prior_mix=mix,
                     opening_goal_directed_prior=args.opening_goal_directed_prior,
+                    avoid_recent_state_repetition=args.avoid_recent_state_repetition,
+                    recent_state_keys=history_by_sample.get((
+                        int(sample.get("game_id", 0)), int(sample.get("ply", 0))
+                    ), []),
                 )
                 runs.append(result)
                 summary = result["pawn_wall"]
@@ -305,6 +331,7 @@ def main() -> int:
             "category_balanced_prior": False,
             "root_category_prior_mix": "varied per run; applied only at root after optional noise, default 0 preserves vanilla prior",
             "opening_goal_directed_prior": args.opening_goal_directed_prior,
+            "avoid_recent_state_repetition": args.avoid_recent_state_repetition,
             "category_exploration": 0.0,
             "repetition_penalty": 0.0,
             "pawn_progress_bonus": 0.0,
@@ -318,6 +345,7 @@ def main() -> int:
             "selection_trace": "Chronological trace of every actual PUCT selection in each simulation and tree depth. Each step records the highest-scoring overall, pawn, and wall candidate plus the action actually selected, with Q, U, normalized prior, PUCT score, and visit count. The score is computed from the node statistics immediately before that selection.",
             "uniform_legal_action_prior": "1 / number of legal root actions; useful as a branching-factor reference, not a policy target.",
             "root_category_prior_mix": "At the root only, mixes the network category mass with a 50:50 pawn/wall allocation by alpha. Within-category neural rankings are preserved. PUCT Q + U formula and backup are unchanged. mix=0 is exact vanilla prior; mix=1 is category-balanced prior mass.",
+            "avoid_recent_state_repetition": "Root selection excludes actions recreating one of the previous repetition_window full states. Original vanilla PUCT priors and Q+U scores are preserved. If every legal action repeats, selection falls back to all legal actions.",
         },
         "runs": runs,
     }
