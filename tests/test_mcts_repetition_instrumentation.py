@@ -178,3 +178,45 @@ def test_four_ply_root_cycle_counts_previous_occurrence():
     stats = mcts.last_search_stats
     assert stats["root_current_state_repetition_count"] == 2
     assert stats["root_repetition_root_lookback"] == 4
+
+
+def test_real_four_ply_pawn_cycle_is_detected_at_candidate_and_root():
+    state = GameState.initial()
+    history = [state_repetition_key(state)]
+
+    # Both players advance one square, then return to their original squares.
+    # The full Quoridor position, including side-to-move and wall inventory,
+    # is identical after exactly four plies.
+    for player, destination in (
+        (0, (4, 7)),
+        (1, (4, 1)),
+        (0, (4, 8)),
+    ):
+        action = next(
+            action for action in legal_action_indices(state)
+            if action < MOVE_ACTIONS
+            and apply_action_index(state, action).pawns[player] == destination
+        )
+        state = apply_action_index(state, action)
+        history.append(state_repetition_key(state))
+
+    # On ply 3, the next legal pawn move by player 1 returns to the initial
+    # position. The candidate detector must still see the state from t=0.
+    returning_action = next(
+        action for action in legal_action_indices(state)
+        if action < MOVE_ACTIONS
+        and state_repetition_key(apply_action_index(state, action)) == history[0]
+    )
+    mcts = make_mcts(simulations=2, repetition_window=4)
+    mcts.search(state, recent_state_keys=history)
+    candidate_stats = mcts.last_search_stats["root_action_stats"][str(returning_action)]
+    assert candidate_stats["next_state_repetition_count"] == 1
+    assert candidate_stats["next_state_repeated"] is True
+
+    state = apply_action_index(state, returning_action)
+    history.append(state_repetition_key(state))
+    assert state_repetition_key(state) == history[0]
+
+    # At t=4 the root detector must compare against t=0 (four prior plies).
+    mcts.search(state, recent_state_keys=history)
+    assert mcts.last_search_stats["root_current_state_repetition_count"] == 2
