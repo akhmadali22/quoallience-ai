@@ -324,6 +324,7 @@ def test_repetition_avoidance_selects_highest_vanilla_puct_among_allowed_actions
     assert root_trace
     for row in root_trace:
         assert row["repetition_filter_active"] is True
+        assert row["selected"]["action"] == row["top_overall"]["action"]
         assert row["selected"]["action"] != repeated_action
 
 
@@ -336,7 +337,7 @@ def test_repetition_avoidance_falls_back_when_every_legal_action_repeats():
     ]
     mcts = make_mcts(
         simulations=4, progressive_widening=False,
-        avoid_recent_state_repetition=True,
+        avoid_recent_state_repetition=True, repetition_window=len(history),
     )
     mcts.search(state, recent_state_keys=history)
     stats = mcts.last_search_stats
