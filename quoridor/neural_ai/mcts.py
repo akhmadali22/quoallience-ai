@@ -395,6 +395,9 @@ class MCTS:
         root_network_priors = dict(self._last_evaluation_network_priors) or {
             action: edge.prior for action, edge in self._all_root_edges(root).items()
         }
+        root_search_priors = {
+            action: edge.prior for action, edge in self._all_root_edges(root).items()
+        }
         root_action_adjustments = self._root_action_adjustments(state, recent_pawn_positions)
         # Repetition diagnostics use canonical full-state identities. They are
         # observational only and do not alter PUCT scores or game outcomes.
@@ -567,6 +570,7 @@ class MCTS:
                 "category": category,
                 "prior": edge.prior,
                 "effective_prior": edge.prior,
+                "search_prior": root_search_priors.get(action),
                 "network_prior": root_network_priors.get(action),
                 "selection_prior": selection_prior,
                 "q": edge.q,
