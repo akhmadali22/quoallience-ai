@@ -7,7 +7,7 @@ import json
 import random
 from pathlib import Path
 
-from quoridor.neural_ai.encoder import ACTION_SIZE
+from quoridor.neural_ai.encoder import ACTION_SIZE, MOVE_ACTIONS
 from quoridor.neural_ai.network import QuoridorNet
 from quoridor.neural_ai.policy import load_model, save_checkpoint
 from training.config import TrainConfig
@@ -108,6 +108,8 @@ def main() -> int:
     for epoch in range(args.epochs):
         random.shuffle(order)
         total_loss = total_policy = total_value = 0.0
+        total_policy_pawn = total_policy_wall = 0.0
+        total_target_pawn_mass = total_target_wall_mass = 0.0
         batches = 0
         for start in range(0, len(order), args.batch_size):
             indices = order[start:start + args.batch_size]
@@ -121,7 +123,16 @@ def main() -> int:
             log_probs = torch.log_softmax(masked_logits, dim=1)
             # Avoid 0 * -inf for actions excluded from this search target.
             log_probs = log_probs.masked_fill(~policy_mask, 0.0)
-            policy_loss = -(target_policy * log_probs).sum(dim=1).mean()
+            per_sample_policy_loss = -(target_policy * log_probs).sum(dim=1)
+            pawn_policy_loss = -(
+                target_policy[:, :MOVE_ACTIONS] * log_probs[:, :MOVE_ACTIONS]
+            ).sum(dim=1).mean()
+            wall_policy_loss = -(
+                target_policy[:, MOVE_ACTIONS:] * log_probs[:, MOVE_ACTIONS:]
+            ).sum(dim=1).mean()
+            policy_loss = per_sample_policy_loss.mean()
+            target_pawn_mass = target_policy[:, :MOVE_ACTIONS].sum(dim=1).mean()
+            target_wall_mass = target_policy[:, MOVE_ACTIONS:].sum(dim=1).mean()
             value_loss = torch.nn.functional.mse_loss(predicted_value, target_value)
             loss = policy_loss + args.value_loss_weight * value_loss
             loss.backward()
@@ -130,11 +141,19 @@ def main() -> int:
             total_loss += float(loss.item())
             total_policy += float(policy_loss.item())
             total_value += float(value_loss.item())
+            total_policy_pawn += float(pawn_policy_loss.item())
+            total_policy_wall += float(wall_policy_loss.item())
+            total_target_pawn_mass += float(target_pawn_mass.item())
+            total_target_wall_mass += float(target_wall_mass.item())
             batches += 1
         print(
             f"epoch={epoch + 1}/{args.epochs} "
             f"loss={total_loss / batches:.4f} "
             f"policy={total_policy / batches:.4f} "
+            f"policy_pawn={total_policy_pawn / batches:.4f} "
+            f"policy_wall={total_policy_wall / batches:.4f} "
+            f"target_pawn_mass={total_target_pawn_mass / batches:.3f} "
+            f"target_wall_mass={total_target_wall_mass / batches:.3f} "
             f"value={total_value / batches:.4f}",
             flush=True,
         )
@@ -146,6 +165,7 @@ def main() -> int:
             "value_loss_weight": args.value_loss_weight,
             "weight_decay": args.weight_decay,
             "policy_masked_samples": sum("policy_mask" in sample for sample in samples),
+            "policy_action_split": {"pawn": MOVE_ACTIONS, "wall": ACTION_SIZE - MOVE_ACTIONS},
         },
     )
     print(f"Saved checkpoint: {args.output}")
