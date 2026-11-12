@@ -405,8 +405,18 @@ class MCTS:
         repetition_history = list(recent_state_keys or [])
         if not repetition_history or repetition_history[-1] != state_repetition_key(state):
             repetition_history.append(state_repetition_key(state))
-        repetition_window = repetition_history[-self.repetition_window:]
-        repetition_counts = Counter(repetition_window)
+        # Candidate repetition looks back exactly N completed plies from the
+        # current root. The root itself is included, so a candidate matching
+        # the position four plies ago is detected when N=4.
+        candidate_repetition_history = repetition_history[-self.repetition_window:]
+        candidate_repetition_counts = Counter(candidate_repetition_history)
+        # Root repetition is a separate question: compare the current root
+        # with the preceding N positions. This needs N+1 keys including root,
+        # otherwise a four-ply cycle (same side-to-move position at t and t+4)
+        # is lost because the old occurrence falls just outside a four-key
+        # slice.
+        root_repetition_history = repetition_history[-(self.repetition_window + 1):]
+        root_repetition_counts = Counter(root_repetition_history)
         root_pawn_diagnostics: dict[int, dict[str, Any]] = {}
         root_player = state.current_player
         root_distance = shortest_distance(state, root_player)
@@ -425,8 +435,8 @@ class MCTS:
                     None if root_distance is None or next_distance is None
                     else root_distance - next_distance
                 ),
-                "next_state_repetition_count": repetition_counts.get(next_key, 0),
-                "next_state_repeated": repetition_counts.get(next_key, 0) > 0,
+                "next_state_repetition_count": candidate_repetition_counts.get(next_key, 0),
+                "next_state_repeated": candidate_repetition_counts.get(next_key, 0) > 0,
             }
 
         if add_root_noise and root.edges:
@@ -592,7 +602,8 @@ class MCTS:
             "root_pawn_progress_bonus": self.pawn_progress_bonus,
             "root_repetition_history_length": len(repetition_history),
             "root_repetition_window": self.repetition_window,
-            "root_current_state_repetition_count": repetition_counts.get(state_repetition_key(state), 0),
+            "root_current_state_repetition_count": root_repetition_counts.get(state_repetition_key(state), 0),
+            "root_repetition_root_lookback": self.repetition_window,
             "root_pawn_actions_with_repeated_next_state": sum(
                 item["next_state_repeated"] for item in root_pawn_diagnostics.values()
             ),
