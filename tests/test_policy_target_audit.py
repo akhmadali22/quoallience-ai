@@ -23,7 +23,7 @@ def test_policy_target_audit_reports_pawn_wall_mass_and_mask_counts():
     assert report["policy_mask_actions"]["pawn"]["mean"] == 1.5
     assert report["phase_buckets_by_ply"]["0-9"]["samples"] == 1
     assert report["phase_buckets_by_ply"]["10-19"]["zero_pawn_target_samples"] == 1
-    assert report["network_pawn_prior_mass"]["mean"] == 0.15
+    assert report["network_pawn_prior_mass"]["mean"] == pytest.approx(0.15)
     assert report["root_pawn_visit_ratio"]["mean"] == 0.125
 
 
