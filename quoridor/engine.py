@@ -75,6 +75,26 @@ class GameState:
         }
 
 
+def state_repetition_key(state: GameState) -> tuple:
+    """Return a hashable identity for a Quoridor position.
+
+    Ply is deliberately excluded: reaching the same board configuration,
+    side-to-move, and wall inventory at a different move number is the same
+    repetition position. Winner is included for completeness, although
+    callers normally record only non-terminal states.
+    """
+    return (
+        state.pawns,
+        tuple(sorted(
+            (wall.orientation, wall.x, wall.y)
+            for wall in state.walls
+        )),
+        state.walls_remaining,
+        state.current_player,
+        state.winner,
+    )
+
+
 def inside(p: Position) -> bool:
     x, y = p
     return 0 <= x < 9 and 0 <= y < 9
