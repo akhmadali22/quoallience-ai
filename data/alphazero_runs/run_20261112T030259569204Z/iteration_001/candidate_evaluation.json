@@ -1,0 +1,1784 @@
+{
+  "candidate": "/opt/KERJAAN/GPT/quoridor-ai/data/alphazero_runs/run_20261112T030259569204Z/iteration_001/candidate.pt",
+  "incumbent": "/opt/KERJAAN/GPT/quoridor-ai/models/checkpoints/neural_v1.pt",
+  "config": {
+    "pairs": 2,
+    "games": 4,
+    "simulations": 8,
+    "max_plies": 60,
+    "seed": 20361114,
+    "device": "cpu",
+    "c_puct": 1.5,
+    "category_exploration": 0.0,
+    "repetition_penalty": 0.0,
+    "pawn_progress_bonus": 0.0,
+    "repetition_window": 4,
+    "progressive_widening": false,
+    "initial_wall_candidates": 8,
+    "min_decisive_pairs": 1,
+    "alpha": 0.05,
+    "selection_temperature": 0.0,
+    "root_dirichlet_noise": false,
+    "paired_seats": true
+  },
+  "candidate_result": {
+    "wins": 0,
+    "losses": 0,
+    "draws": 4,
+    "score_rate": 0.5
+  },
+  "paired_result": {
+    "wins": 0,
+    "losses": 0,
+    "draws": 2,
+    "decisive_pairs": 0,
+    "one_sided_sign_test_p_value": 1.0
+  },
+  "draw_summary": {
+    "max_plies_draws": 4
+  },
+  "promotion": {
+    "eligible": false,
+    "reason": "not promoted: requires enough decisive pairs, more paired wins than losses, score rate above 0.5, and one-sided sign-test p-value below alpha"
+  },
+  "paired_results": [
+    {
+      "pair": 1,
+      "seed": 20361114,
+      "candidate_points": 1.0,
+      "result_for_candidate": "draw"
+    },
+    {
+      "pair": 2,
+      "seed": 20361115,
+      "candidate_points": 1.0,
+      "result_for_candidate": "draw"
+    }
+  ],
+  "games": [
+    {
+      "seed": 20361114,
+      "candidate_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_candidate": "draw",
+      "plies": 60,
+      "draw_reason": "max_plies",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "agent": "candidate",
+          "action": 113,
+          "category": "wall"
+        },
+        {
+          "ply": 1,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 105,
+          "category": "wall"
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "agent": "candidate",
+          "action": 142,
+          "category": "wall"
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 189,
+          "category": "wall"
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "agent": "candidate",
+          "action": 208,
+          "category": "wall"
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 111,
+          "category": "wall"
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "agent": "candidate",
+          "action": 180,
+          "category": "wall"
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 120,
+          "category": "wall"
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "agent": "candidate",
+          "action": 207,
+          "category": "wall"
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 190,
+          "category": "wall"
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "agent": "candidate",
+          "action": 145,
+          "category": "wall"
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 168,
+          "category": "wall"
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "agent": "candidate",
+          "action": 85,
+          "category": "wall"
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 151,
+          "category": "wall"
+        },
+        {
+          "ply": 14,
+          "player": 0,
+          "agent": "candidate",
+          "action": 133,
+          "category": "wall"
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 100,
+          "category": "wall"
+        },
+        {
+          "ply": 16,
+          "player": 0,
+          "agent": "candidate",
+          "action": 147,
+          "category": "wall"
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 204,
+          "category": "wall"
+        },
+        {
+          "ply": 18,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 19,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 150,
+          "category": "wall"
+        },
+        {
+          "ply": 20,
+          "player": 0,
+          "agent": "candidate",
+          "action": 162,
+          "category": "wall"
+        },
+        {
+          "ply": 21,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 22,
+          "player": 0,
+          "agent": "candidate",
+          "action": 78,
+          "category": "pawn"
+        },
+        {
+          "ply": 23,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 24,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 25,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 26,
+          "player": 0,
+          "agent": "candidate",
+          "action": 78,
+          "category": "pawn"
+        },
+        {
+          "ply": 27,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 28,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 29,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 30,
+          "player": 0,
+          "agent": "candidate",
+          "action": 78,
+          "category": "pawn"
+        },
+        {
+          "ply": 31,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 32,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 33,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 34,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 35,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 36,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 37,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 38,
+          "player": 0,
+          "agent": "candidate",
+          "action": 78,
+          "category": "pawn"
+        },
+        {
+          "ply": 39,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 40,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 41,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 42,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 43,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 44,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 45,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 46,
+          "player": 0,
+          "agent": "candidate",
+          "action": 78,
+          "category": "pawn"
+        },
+        {
+          "ply": 47,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 48,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 49,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 50,
+          "player": 0,
+          "agent": "candidate",
+          "action": 78,
+          "category": "pawn"
+        },
+        {
+          "ply": 51,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 52,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 53,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 54,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 55,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 56,
+          "player": 0,
+          "agent": "candidate",
+          "action": 67,
+          "category": "pawn"
+        },
+        {
+          "ply": 57,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 58,
+          "player": 0,
+          "agent": "candidate",
+          "action": 68,
+          "category": "pawn"
+        },
+        {
+          "ply": 59,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 4,
+          "category": "pawn"
+        }
+      ]
+    },
+    {
+      "seed": 20361114,
+      "candidate_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_candidate": "draw",
+      "plies": 60,
+      "draw_reason": "max_plies",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 168,
+          "category": "wall"
+        },
+        {
+          "ply": 1,
+          "player": 1,
+          "agent": "candidate",
+          "action": 125,
+          "category": "wall"
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 142,
+          "category": "wall"
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "agent": "candidate",
+          "action": 105,
+          "category": "wall"
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 91,
+          "category": "wall"
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "agent": "candidate",
+          "action": 151,
+          "category": "wall"
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 112,
+          "category": "wall"
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "agent": "candidate",
+          "action": 113,
+          "category": "wall"
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 133,
+          "category": "wall"
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "agent": "candidate",
+          "action": 144,
+          "category": "wall"
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 153,
+          "category": "wall"
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "agent": "candidate",
+          "action": 110,
+          "category": "wall"
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 166,
+          "category": "wall"
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "agent": "candidate",
+          "action": 117,
+          "category": "wall"
+        },
+        {
+          "ply": 14,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 103,
+          "category": "wall"
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "agent": "candidate",
+          "action": 150,
+          "category": "wall"
+        },
+        {
+          "ply": 16,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 147,
+          "category": "wall"
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "agent": "candidate",
+          "action": 199,
+          "category": "wall"
+        },
+        {
+          "ply": 18,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 162,
+          "category": "wall"
+        },
+        {
+          "ply": 19,
+          "player": 1,
+          "agent": "candidate",
+          "action": 85,
+          "category": "wall"
+        },
+        {
+          "ply": 20,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 67,
+          "category": "pawn"
+        },
+        {
+          "ply": 21,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 22,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 23,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 24,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 25,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 26,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 27,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 28,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 29,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 30,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 31,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 32,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 33,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 34,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 35,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 36,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 37,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 38,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 39,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 40,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 41,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 42,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 43,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 44,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 45,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 46,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 47,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 48,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 49,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 50,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 51,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 52,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 53,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 54,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 55,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 56,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 57,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 58,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 59,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        }
+      ]
+    },
+    {
+      "seed": 20361115,
+      "candidate_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_candidate": "draw",
+      "plies": 60,
+      "draw_reason": "max_plies",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "agent": "candidate",
+          "action": 142,
+          "category": "wall"
+        },
+        {
+          "ply": 1,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 144,
+          "category": "wall"
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "agent": "candidate",
+          "action": 168,
+          "category": "wall"
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 151,
+          "category": "wall"
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "agent": "candidate",
+          "action": 189,
+          "category": "wall"
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 111,
+          "category": "wall"
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "agent": "candidate",
+          "action": 91,
+          "category": "wall"
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 190,
+          "category": "wall"
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "agent": "candidate",
+          "action": 133,
+          "category": "wall"
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 138,
+          "category": "wall"
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "agent": "candidate",
+          "action": 105,
+          "category": "wall"
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 207,
+          "category": "wall"
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "agent": "candidate",
+          "action": 150,
+          "category": "wall"
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 153,
+          "category": "wall"
+        },
+        {
+          "ply": 14,
+          "player": 0,
+          "agent": "candidate",
+          "action": 113,
+          "category": "wall"
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 186,
+          "category": "wall"
+        },
+        {
+          "ply": 16,
+          "player": 0,
+          "agent": "candidate",
+          "action": 147,
+          "category": "wall"
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 100,
+          "category": "wall"
+        },
+        {
+          "ply": 18,
+          "player": 0,
+          "agent": "candidate",
+          "action": 103,
+          "category": "wall"
+        },
+        {
+          "ply": 19,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 96,
+          "category": "wall"
+        },
+        {
+          "ply": 20,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 21,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 3,
+          "category": "pawn"
+        },
+        {
+          "ply": 22,
+          "player": 0,
+          "agent": "candidate",
+          "action": 78,
+          "category": "pawn"
+        },
+        {
+          "ply": 23,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 12,
+          "category": "pawn"
+        },
+        {
+          "ply": 24,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 25,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 3,
+          "category": "pawn"
+        },
+        {
+          "ply": 26,
+          "player": 0,
+          "agent": "candidate",
+          "action": 78,
+          "category": "pawn"
+        },
+        {
+          "ply": 27,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 12,
+          "category": "pawn"
+        },
+        {
+          "ply": 28,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 29,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 3,
+          "category": "pawn"
+        },
+        {
+          "ply": 30,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 31,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 12,
+          "category": "pawn"
+        },
+        {
+          "ply": 32,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 33,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 3,
+          "category": "pawn"
+        },
+        {
+          "ply": 34,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 35,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 12,
+          "category": "pawn"
+        },
+        {
+          "ply": 36,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 37,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 3,
+          "category": "pawn"
+        },
+        {
+          "ply": 38,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 39,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 12,
+          "category": "pawn"
+        },
+        {
+          "ply": 40,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 41,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 13,
+          "category": "pawn"
+        },
+        {
+          "ply": 42,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 43,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 12,
+          "category": "pawn"
+        },
+        {
+          "ply": 44,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 45,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 3,
+          "category": "pawn"
+        },
+        {
+          "ply": 46,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 47,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 12,
+          "category": "pawn"
+        },
+        {
+          "ply": 48,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 49,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 3,
+          "category": "pawn"
+        },
+        {
+          "ply": 50,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 51,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 12,
+          "category": "pawn"
+        },
+        {
+          "ply": 52,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 53,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 13,
+          "category": "pawn"
+        },
+        {
+          "ply": 54,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 55,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 12,
+          "category": "pawn"
+        },
+        {
+          "ply": 56,
+          "player": 0,
+          "agent": "candidate",
+          "action": 77,
+          "category": "pawn"
+        },
+        {
+          "ply": 57,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 13,
+          "category": "pawn"
+        },
+        {
+          "ply": 58,
+          "player": 0,
+          "agent": "candidate",
+          "action": 76,
+          "category": "pawn"
+        },
+        {
+          "ply": 59,
+          "player": 1,
+          "agent": "incumbent",
+          "action": 12,
+          "category": "pawn"
+        }
+      ]
+    },
+    {
+      "seed": 20361115,
+      "candidate_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_candidate": "draw",
+      "plies": 60,
+      "draw_reason": "max_plies",
+      "action_trace": [
+        {
+          "ply": 0,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 168,
+          "category": "wall"
+        },
+        {
+          "ply": 1,
+          "player": 1,
+          "agent": "candidate",
+          "action": 144,
+          "category": "wall"
+        },
+        {
+          "ply": 2,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 142,
+          "category": "wall"
+        },
+        {
+          "ply": 3,
+          "player": 1,
+          "agent": "candidate",
+          "action": 113,
+          "category": "wall"
+        },
+        {
+          "ply": 4,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 91,
+          "category": "wall"
+        },
+        {
+          "ply": 5,
+          "player": 1,
+          "agent": "candidate",
+          "action": 153,
+          "category": "wall"
+        },
+        {
+          "ply": 6,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 112,
+          "category": "wall"
+        },
+        {
+          "ply": 7,
+          "player": 1,
+          "agent": "candidate",
+          "action": 105,
+          "category": "wall"
+        },
+        {
+          "ply": 8,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 133,
+          "category": "wall"
+        },
+        {
+          "ply": 9,
+          "player": 1,
+          "agent": "candidate",
+          "action": 85,
+          "category": "wall"
+        },
+        {
+          "ply": 10,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 125,
+          "category": "wall"
+        },
+        {
+          "ply": 11,
+          "player": 1,
+          "agent": "candidate",
+          "action": 151,
+          "category": "wall"
+        },
+        {
+          "ply": 12,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 166,
+          "category": "wall"
+        },
+        {
+          "ply": 13,
+          "player": 1,
+          "agent": "candidate",
+          "action": 110,
+          "category": "wall"
+        },
+        {
+          "ply": 14,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 147,
+          "category": "wall"
+        },
+        {
+          "ply": 15,
+          "player": 1,
+          "agent": "candidate",
+          "action": 207,
+          "category": "wall"
+        },
+        {
+          "ply": 16,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 103,
+          "category": "wall"
+        },
+        {
+          "ply": 17,
+          "player": 1,
+          "agent": "candidate",
+          "action": 150,
+          "category": "wall"
+        },
+        {
+          "ply": 18,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 67,
+          "category": "pawn"
+        },
+        {
+          "ply": 19,
+          "player": 1,
+          "agent": "candidate",
+          "action": 96,
+          "category": "wall"
+        },
+        {
+          "ply": 20,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 172,
+          "category": "wall"
+        },
+        {
+          "ply": 21,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 22,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 23,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 24,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 25,
+          "player": 1,
+          "agent": "candidate",
+          "action": 3,
+          "category": "pawn"
+        },
+        {
+          "ply": 26,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 27,
+          "player": 1,
+          "agent": "candidate",
+          "action": 12,
+          "category": "pawn"
+        },
+        {
+          "ply": 28,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 29,
+          "player": 1,
+          "agent": "candidate",
+          "action": 3,
+          "category": "pawn"
+        },
+        {
+          "ply": 30,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 31,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 32,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 33,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 34,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 35,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 36,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 37,
+          "player": 1,
+          "agent": "candidate",
+          "action": 3,
+          "category": "pawn"
+        },
+        {
+          "ply": 38,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 39,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 40,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 41,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 42,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 43,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 44,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 45,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 46,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 47,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 48,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 49,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 50,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 51,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 52,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 53,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 54,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 55,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        },
+        {
+          "ply": 56,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 75,
+          "category": "pawn"
+        },
+        {
+          "ply": 57,
+          "player": 1,
+          "agent": "candidate",
+          "action": 5,
+          "category": "pawn"
+        },
+        {
+          "ply": 58,
+          "player": 0,
+          "agent": "incumbent",
+          "action": 66,
+          "category": "pawn"
+        },
+        {
+          "ply": 59,
+          "player": 1,
+          "agent": "candidate",
+          "action": 4,
+          "category": "pawn"
+        }
+      ]
+    }
+  ]
+}
