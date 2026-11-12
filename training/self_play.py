@@ -39,6 +39,7 @@ def compact_root_diagnostics(stats: dict) -> dict:
         "root_active_wall_prior_mass", "root_pawn_visits", "root_wall_visits",
         "root_legal_actions", "root_active_actions",
         "root_repetition_history_length", "root_repetition_window",
+        "opening_goal_directed_prior", "root_goal_directed_prior",
         "root_current_state_repetition_count",
         "root_pawn_actions_with_repeated_next_state",
         "root_pawn_actions_with_progress", "root_pawn_actions_with_regression",
