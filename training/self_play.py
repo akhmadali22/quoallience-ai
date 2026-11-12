@@ -24,6 +24,9 @@ def play_game(model, *, game_id: int, seed: int, config: SelfPlayConfig, device:
         repetition_penalty=config.repetition_penalty,
         pawn_progress_bonus=config.pawn_progress_bonus,
         repetition_window=config.repetition_window,
+        c_puct=config.c_puct,
+        progressive_widening=config.progressive_widening,
+        initial_wall_candidates=config.initial_wall_candidates,
     )
     samples: list[dict] = []
     action_log: list[dict] = []
@@ -90,16 +93,24 @@ def main() -> int:
     parser.add_argument("--output-dir", default="data/neural_self_play")
     parser.add_argument("--channels", type=int, default=64)
     parser.add_argument("--residual-blocks", type=int, default=4)
-    parser.add_argument("--category-exploration", type=float, default=0.35, help="Adaptive exploration bonus for the less-visited action category.")
-    parser.add_argument("--repetition-penalty", type=float, default=0.75)
+    parser.add_argument("--c-puct", type=float, default=1.5)
+    parser.add_argument("--progressive-widening", action="store_true",
+                        help="Enable the optional wall-candidate progressive-widening extension.")
+    parser.add_argument("--initial-wall-candidates", type=int, default=8)
+    parser.add_argument("--category-exploration", type=float, default=0.0,
+                        help="Optional category exploration bonus; zero keeps vanilla PUCT.")
+    parser.add_argument("--repetition-penalty", type=float, default=0.0,
+                        help="Optional root repetition preference; zero keeps vanilla PUCT.")
     parser.add_argument("--pawn-progress-bonus", type=float, default=0.0)
     parser.add_argument("--repetition-window", type=int, default=4)
     args = parser.parse_args()
 
     if args.games < 1 or args.simulations < 1 or args.max_plies < 1:
         parser.error("--games, --simulations, and --max-plies must be positive")
-    if args.category_exploration < 0 or args.repetition_penalty < 0 or args.pawn_progress_bonus < 0 or args.repetition_window < 1:
-        parser.error("exploration and penalty values must be non-negative; repetition-window must be positive")
+    if (args.c_puct < 0 or args.initial_wall_candidates < 0
+            or args.category_exploration < 0 or args.repetition_penalty < 0
+            or args.pawn_progress_bonus < 0 or args.repetition_window < 1):
+        parser.error("PUCT and preference values must be non-negative; repetition-window must be positive")
 
     import torch
     torch.manual_seed(args.seed)
@@ -127,6 +138,9 @@ def main() -> int:
         repetition_penalty=args.repetition_penalty,
         pawn_progress_bonus=args.pawn_progress_bonus,
         repetition_window=args.repetition_window,
+        c_puct=args.c_puct,
+        progressive_widening=args.progressive_widening,
+        initial_wall_candidates=args.initial_wall_candidates,
     )
 
     with samples_path.open("a", encoding="utf-8") as samples_file, games_path.open("a", encoding="utf-8") as games_file:

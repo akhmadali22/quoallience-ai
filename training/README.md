@@ -87,9 +87,10 @@ functional gate, not a full Elo system or a significance test.
 ## Current limitations
 
 This first implementation intentionally favors a small, inspectable vertical
-slice over a distributed training system. It does not yet include symmetry
-augmentation, prioritized replay, batched inference, persistent tree reuse,
-model-vs-model promotion gates, or crash-resumable partial-game trajectories.
+slice over a distributed training system. It now includes a conservative
+paired-seat candidate-vs-incumbent promotion gate, but does not yet include
+symmetry augmentation, prioritized replay, batched inference, persistent tree
+reuse, a full Elo/rating system, or crash-resumable partial-game trajectories.
 Random-network self-play is only a bootstrap smoke test; meaningful strength
 requires many iterations and evaluation against fixed opponents. The existing
 heuristic is retained for that purpose.
@@ -501,3 +502,66 @@ Do not promote a checkpoint or conclude that a component improves playing
 strength from a handful of games or max-ply draws. Keep the checkpoint fixed
 during these experiments; retrain only after the search protocol and component
 effects have been measured consistently.
+
+## Iterative self-play, candidate evaluation, and promotion
+
+The bounded training loop automates the complete iteration:
+
+1. Generate fresh self-play games from the current incumbent checkpoint.
+2. Train a candidate from that same incumbent checkpoint using the new replay.
+3. Play the candidate against the incumbent with identical MCTS settings.
+4. Swap seats for every seed and apply a conservative paired-result promotion gate.
+5. Promote only accepted candidates; otherwise retain the incumbent for the next iteration.
+
+Run from the repository root:
+
+```bash
+python -m training.run_training_loop \
+  --initial-checkpoint models/checkpoints/neural_v1.pt \
+  --iterations 3 \
+  --games 20 \
+  --selfplay-simulations 32 \
+  --evaluation-simulations 64 \
+  --evaluation-pairs 50 \
+  --min-decisive-pairs 10 \
+  --device cpu
+```
+
+Each run gets a unique directory under `data/alphazero_runs/`. It preserves
+self-play replay, game summaries, candidate checkpoints, evaluation reports,
+promoted champion checkpoints, and `training_state.json`. Rejected candidates
+are retained for analysis and do not replace the incumbent. Later iterations
+train from the latest promoted champion, or from the original checkpoint if no
+candidate has passed promotion.
+
+The loop defaults to the controlled vanilla-PUCT baseline: C-PUCT 1.5,
+category exploration 0, repetition penalty 0, pawn progress bonus 0, and
+progressive widening disabled. To explicitly run the optional progressive
+widening variant in both self-play and candidate evaluation, add
+`--progressive-widening`. Do not compare candidates evaluated with different
+search settings.
+
+The standalone paired-seat evaluator can also be run directly:
+
+```bash
+python -m training.evaluate_candidate \
+  models/checkpoints/neural_candidate_v2.pt \
+  models/checkpoints/neural_v1.pt \
+  --pairs 50 --simulations 64 --max-plies 200 \
+  --min-decisive-pairs 10 --alpha 0.05 \
+  --output data/candidate_evaluation.json
+```
+
+Promotion is deliberately conservative. Results are grouped by paired seed
+(two games with seats swapped). A paired result is a win only when the candidate
+scores more than one point across those two games, a loss when it scores less,
+and a tie otherwise. The candidate must have at least the configured number of
+decisive pairs, more paired wins than losses, an overall score rate above 0.5,
+and a one-sided exact sign-test p-value below alpha. Max-ply draws count as half
+a point in the score rate but do not count as decisive pairs. Therefore an
+all-draw tournament cannot promote a candidate.
+
+This gate is evidence for promotion, not proof of general playing strength.
+Use enough pairs and varied seeds, and keep the evaluation MCTS settings fixed
+between candidate and incumbent. The loop is bounded by `--iterations`; it
+does not run indefinitely.

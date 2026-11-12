@@ -1,5 +1,5 @@
 from quoridor.engine import GameState
-from quoridor.neural_ai.encoder import legal_action_indices
+from quoridor.neural_ai.encoder import ACTION_SIZE, legal_action_indices
 from quoridor.neural_ai.mcts import MOVE_ACTIONS, Edge, MCTS, Node
 
 
@@ -310,7 +310,7 @@ def test_category_balanced_prior_splits_mass_equally_between_available_categorie
 
     class ZeroLogitModel:
         def __call__(self, inputs):
-            return torch.zeros((1, 193)), torch.zeros((1,))
+            return torch.zeros((1, ACTION_SIZE)), torch.zeros((1,))
 
     mcts = MCTS(ZeroLogitModel(), category_balanced_prior=True)
     priors, _ = mcts._evaluate(GameState.initial())
@@ -326,7 +326,7 @@ def test_category_balanced_prior_falls_back_when_only_one_category_exists():
 
     class ZeroLogitModel:
         def __call__(self, inputs):
-            return torch.zeros((1, 193)), torch.zeros((1,))
+            return torch.zeros((1, ACTION_SIZE)), torch.zeros((1,))
 
     mcts = MCTS(ZeroLogitModel(), category_balanced_prior=True)
     # A synthetic terminal-adjacent state is not needed: directly exercise
