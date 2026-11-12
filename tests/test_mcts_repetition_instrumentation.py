@@ -1,4 +1,4 @@
-from quoridor.engine import GameState, state_repetition_key
+from quoridor.engine import GameState, Wall, state_repetition_key
 from quoridor.neural_ai.encoder import apply_action_index, legal_action_indices
 from quoridor.neural_ai.mcts import MOVE_ACTIONS, MCTS
 
@@ -40,6 +40,19 @@ def test_repetition_key_ignores_ply_but_includes_complete_position():
         ply=state.ply,
     )
     assert state_repetition_key(state) != state_repetition_key(changed_side_to_move)
+
+
+
+def test_repetition_key_includes_walls_and_remaining_inventory():
+    state = GameState.initial()
+    changed_walls = GameState(
+        pawns=state.pawns,
+        walls=frozenset({Wall("H", 0, 0)}),
+        walls_remaining=(9, 10),
+        current_player=state.current_player,
+        ply=state.ply,
+    )
+    assert state_repetition_key(state) != state_repetition_key(changed_walls)
 
 
 def test_root_diagnostics_report_prior_q_u_and_pawn_progress():
@@ -98,3 +111,25 @@ def test_recent_state_history_is_bounded_by_repetition_window():
     ])
     assert mcts.last_search_stats["root_repetition_history_length"] == 3
     assert mcts.last_search_stats["root_repetition_window"] == 2
+
+
+
+def test_root_diagnostics_separate_network_prior_from_dirichlet_prior():
+    import torch
+
+    state = GameState.initial()
+    mcts = make_mcts(simulations=4, progressive_widening=False)
+    torch.manual_seed(17)
+    mcts.search(state, add_root_noise=True)
+    stats = mcts.last_search_stats
+    actions = stats["root_action_stats"]
+
+    network_mass = sum(item["network_prior"] for item in actions.values())
+    effective_mass = sum(item["effective_prior"] for item in actions.values())
+    assert abs(network_mass - 1.0) < 1e-6
+    assert abs(effective_mass - 1.0) < 1e-6
+    assert any(
+        abs(item["network_prior"] - item["effective_prior"]) > 1e-8
+        for item in actions.values()
+    )
+    assert stats["root_network_prior_entropy"] == stats["root_prior_entropy"]
