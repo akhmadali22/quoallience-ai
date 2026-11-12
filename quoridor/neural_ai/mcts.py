@@ -491,7 +491,7 @@ class MCTS:
         # Admit the initial wall candidates only after root noise and ranking.
         self._widen(root)
 
-        for _ in range(self.simulations):
+        for simulation_index in range(self.simulations):
             node = root
             path: list[tuple[Node, Edge]] = []
 
