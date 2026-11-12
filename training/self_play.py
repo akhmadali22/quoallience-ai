@@ -31,7 +31,9 @@ def compact_root_diagnostics(stats: dict) -> dict:
         wall_actions, key=lambda item: item[1].get("prior", 0.0), reverse=True
     )[:5]
     keys = (
-        "root_value", "root_prior_entropy", "root_active_prior_entropy",
+        "root_value", "root_prior_entropy", "root_network_prior_entropy",
+        "root_effective_prior_entropy", "root_network_pawn_prior_mass",
+        "root_network_wall_prior_mass", "root_active_prior_entropy",
         "root_visit_entropy", "root_pawn_visit_ratio", "root_wall_visit_ratio",
         "root_active_pawn_prior_mass",
         "root_active_wall_prior_mass", "root_pawn_visits", "root_wall_visits",
