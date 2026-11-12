@@ -434,6 +434,34 @@ visit count, so its rank by visits is expected to be first and is not an
 independent measure of search quality.
 
 
+
+## Root MCTS instrumentation and full-state repetition history
+
+Self-play replay samples and candidate-evaluation game traces now retain root
+search diagnostics without changing vanilla PUCT selection. Every legal pawn
+action records:
+- raw neural-network prior before Dirichlet noise;
+- effective prior after optional root noise and normalized active prior used by PUCT;
+- Q value, U exploration term, final-snapshot PUCT score, and visit count;
+- destination square and shortest-path distance before/after the move;
+- whether the resulting full game state appeared in the recent repetition window.
+
+The trace also stores the selected action's own root statistics, root pawn/wall
+visit ratios, prior and visit entropies, raw neural prior mass by action
+category, and the five highest-prior wall candidates. This separates a weak
+network prior from insufficient exploration or an unfavorable Q estimate.
+
+Repetition identity includes both pawn positions, the complete wall layout,
+remaining wall inventory, side to move, and winner. Ply is excluded because
+the same board position at a different move number is still the same position.
+The game runners pass the chronological state-key history into MCTS. The
+instrumentation counts prior occurrences of each pawn action's resulting state
+inside the configured recent window; it does not declare a draw, remove legal
+actions, or modify PUCT scores. The older root-only pawn-coordinate preference
+remains a separate optional experiment and is not the full-state repetition
+detector.
+
+
 ## Controlled vanilla-PUCT search experiments
 
 The experiment sequence separates search mechanics from network-component attribution.
