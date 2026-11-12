@@ -1,0 +1,149 @@
+{
+  "samples": 120,
+  "action_space": {
+    "total": 209,
+    "pawn": 81,
+    "wall": 128
+  },
+  "target_mass": {
+    "pawn": {
+      "mean": 0.65,
+      "median": 1.0,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "wall": {
+      "mean": 0.35,
+      "median": 0.0,
+      "min": 0.0,
+      "max": 1.0
+    }
+  },
+  "target_entropy_nats": {
+    "mean": 0.879552265544849,
+    "median": 0.7356219397587946,
+    "min": -0.0,
+    "max": 2.0794415416798357
+  },
+  "network_pawn_prior_mass": {
+    "mean": 0.6275121939921477,
+    "median": 1.0,
+    "min": 0.009757921689144971,
+    "max": 1.0
+  },
+  "root_pawn_visit_ratio": {
+    "mean": 0.65,
+    "median": 1.0,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "phase_buckets_by_ply": {
+    "0-9": {
+      "samples": 20,
+      "mean_pawn_target_mass": 0.05625,
+      "mean_wall_target_mass": 0.94375,
+      "mean_target_entropy_nats": 1.0397207708399179,
+      "mean_network_pawn_prior_mass": 0.015369828456215132,
+      "mean_root_pawn_visit_ratio": 0.05625,
+      "mean_searched_pawn_actions": 3.0,
+      "mean_searched_wall_actions": 112.1,
+      "zero_pawn_target_samples": 18,
+      "zero_wall_target_samples": 1
+    },
+    "10-19": {
+      "samples": 20,
+      "mean_pawn_target_mass": 0.00625,
+      "mean_wall_target_mass": 0.99375,
+      "mean_target_entropy_nats": 1.1436928479239097,
+      "mean_network_pawn_prior_mass": 0.03276046002561074,
+      "mean_root_pawn_visit_ratio": 0.00625,
+      "mean_searched_pawn_actions": 3.15,
+      "mean_searched_wall_actions": 81.75,
+      "zero_pawn_target_samples": 19,
+      "zero_wall_target_samples": 0
+    },
+    "20-29": {
+      "samples": 20,
+      "mean_pawn_target_mass": 0.8375,
+      "mean_wall_target_mass": 0.1625,
+      "mean_target_entropy_nats": 0.8243258677163565,
+      "mean_network_pawn_prior_mass": 0.7169428754710604,
+      "mean_root_pawn_visit_ratio": 0.8375,
+      "mean_searched_pawn_actions": 2.9,
+      "mean_searched_wall_actions": 22.4,
+      "zero_pawn_target_samples": 2,
+      "zero_wall_target_samples": 16
+    },
+    "30-39": {
+      "samples": 20,
+      "mean_pawn_target_mass": 1.0,
+      "mean_wall_target_mass": 0,
+      "mean_target_entropy_nats": 0.7913596124667895,
+      "mean_network_pawn_prior_mass": 1.0,
+      "mean_root_pawn_visit_ratio": 1.0,
+      "mean_searched_pawn_actions": 2.9,
+      "mean_searched_wall_actions": 0.0,
+      "zero_pawn_target_samples": 0,
+      "zero_wall_target_samples": 20
+    },
+    "40-49": {
+      "samples": 20,
+      "mean_pawn_target_mass": 1.0,
+      "mean_wall_target_mass": 0,
+      "mean_target_entropy_nats": 0.7389409397432813,
+      "mean_network_pawn_prior_mass": 1.0,
+      "mean_root_pawn_visit_ratio": 1.0,
+      "mean_searched_pawn_actions": 2.85,
+      "mean_searched_wall_actions": 0.0,
+      "zero_pawn_target_samples": 0,
+      "zero_wall_target_samples": 20
+    },
+    "50-59": {
+      "samples": 20,
+      "mean_pawn_target_mass": 1.0,
+      "mean_wall_target_mass": 0,
+      "mean_target_entropy_nats": 0.7392735545788391,
+      "mean_network_pawn_prior_mass": 1.0,
+      "mean_root_pawn_visit_ratio": 1.0,
+      "mean_searched_pawn_actions": 3.05,
+      "mean_searched_wall_actions": 0.0,
+      "zero_pawn_target_samples": 0,
+      "zero_wall_target_samples": 20
+    }
+  },
+  "policy_mask_actions": {
+    "pawn": {
+      "mean": 2.975,
+      "median": 3.0,
+      "min": 2.0,
+      "max": 4.0
+    },
+    "wall": {
+      "mean": 36.041666666666664,
+      "median": 0.0,
+      "min": 0.0,
+      "max": 128.0
+    }
+  },
+  "nonzero_target_actions": {
+    "pawn": {
+      "mean": 1.6833333333333333,
+      "median": 2.0,
+      "min": 0.0,
+      "max": 4.0
+    },
+    "wall": {
+      "mean": 1.6916666666666667,
+      "median": 0.0,
+      "min": 0.0,
+      "max": 8.0
+    }
+  },
+  "samples_with_zero_category_target": {
+    "pawn": 39,
+    "wall": 77
+  },
+  "legacy_samples_without_policy_mask": 0,
+  "total_target_mass_outside_mask": 0.0,
+  "interpretation": "Pawn/wall target masses are normalized MCTS visit-target mass per position, averaged across samples. They are not legal-action counts or model-predicted probabilities. Training CE is separately decomposed into pawn and wall contributions by training.train."
+}
