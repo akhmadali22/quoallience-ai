@@ -150,25 +150,36 @@ def analyze_position(index: int, sample: dict, incumbent: dict, candidate: dict)
             leaders[label] = None
             continue
         q_margin = pawn["q_for_selection"] - wall["q_for_selection"]
+        q_observed = pawn["visits"] > 0 and wall["visits"] > 0
+        q_observed_margin = (
+            pawn["q_observed"] - wall["q_observed"] if q_observed else None
+        )
         u_margin = pawn["u"] - wall["u"]
         prior_margin = pawn["selection_prior"] - wall["selection_prior"]
+        if not q_observed:
+            diagnosis = "insufficient_observed_q"
+        elif prior_margin < 0 and q_observed_margin < 0:
+            diagnosis = "prior_and_q_disadvantage"
+        elif prior_margin < 0 and q_observed_margin >= 0:
+            diagnosis = "prior_dominant_q_not_worse"
+        elif prior_margin >= 0 and q_observed_margin < 0:
+            diagnosis = "q_dominant_prior_not_smaller"
+        else:
+            diagnosis = "neither_prior_nor_q_disadvantage"
         leaders[label] = {
             "best_pawn_action": pawn["action"], "best_wall_action": wall["action"],
             "pawn_rank": ranks[pawn["action"]], "wall_rank": ranks[wall["action"]],
             "pawn_q_observed": pawn["q_observed"], "pawn_visits": pawn["visits"],
             "wall_q_observed": wall["q_observed"], "wall_visits": wall["visits"],
-            "q_margin_pawn_minus_wall": q_margin,
+            "q_margin_pawn_minus_wall_for_selection": q_margin,
+            "q_margin_pawn_minus_wall_observed": q_observed_margin,
+            "q_margin_is_observed": q_observed,
             "u_margin_pawn_minus_wall": u_margin,
             "selection_prior_margin_pawn_minus_wall": prior_margin,
             "puct_margin_pawn_minus_wall": pawn["puct_score"] - wall["puct_score"],
             "pawn_loses_on_final_score": pawn["puct_score"] < wall["puct_score"],
             "pawn_loses_on_initial_prior_only": prior_margin < 0,
-            "diagnosis": (
-                "prior_and_q_disadvantage" if prior_margin < 0 and q_margin < 0
-                else "prior_dominant_q_not_worse" if prior_margin < 0 and q_margin >= 0
-                else "q_dominant_prior_not_smaller" if prior_margin >= 0 and q_margin < 0
-                else "neither_prior_nor_q_disadvantage"
-            ),
+            "diagnosis": diagnosis,
         }
 
     action_rows = []
@@ -307,7 +318,7 @@ def summarize(results: list[dict]) -> dict:
                 "u_only_worsened": sum(d > 0 for d in u_only),
             },
             "best_category_action_diagnoses": dict(diagnoses),
-            "pawn_selected_by_visits": {
+            "pawn_received_any_visits": {
                 model: sum(r[model]["pawn_visits"] > 0 for r in rows)
                 for model in ("incumbent", "candidate")
             },
