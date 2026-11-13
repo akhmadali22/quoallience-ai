@@ -146,15 +146,23 @@ def metrics(model, samples: list[dict], indices: list[int], device: str) -> dict
 def probe_outputs(model, samples: list[dict], indices: list[int], device: str) -> list[dict]:
     """Fixed deterministic probe set, selected from held-out test games."""
     chosen = []
-    seen_buckets = set()
-    wanted = ((0, 0, 9), (10, 10, 19), (20, 20, 29), (30, 30, 59), (60, 60, 10**9))
+    seen_indices = set()
+    wanted = (("0-9", 0, 9), ("10-19", 10, 19), ("20-29", 20, 29),
+              ("30-59", 30, 59), ("60+", 60, 10**9))
+    test_game_ids = sorted({samples[i]["game_id"] for i in indices})
+    # Sample each ply bucket from every held-out game, not repeatedly from the
+    # first game in the split. This keeps the fixed probe set game-diverse.
     for label, lo, hi in wanted:
-        candidates = [i for i in indices if lo <= samples[i]["ply"] <= hi]
-        if candidates:
-            idx = min(candidates, key=lambda i: (samples[i]["game_id"], samples[i]["ply"]))
-            if idx not in seen_buckets:
-                chosen.append((label, idx))
-                seen_buckets.add(idx)
+        for game_id in test_game_ids:
+            candidates = [
+                i for i in indices
+                if samples[i]["game_id"] == game_id and lo <= samples[i]["ply"] <= hi
+            ]
+            if candidates:
+                idx = min(candidates, key=lambda i: (abs(samples[i]["ply"] - lo), samples[i]["ply"]))
+                if idx not in seen_indices:
+                    chosen.append((label, idx))
+                    seen_indices.add(idx)
     result = []
     model.eval()
     for label, idx in chosen:
