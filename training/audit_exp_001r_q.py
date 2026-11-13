@@ -356,12 +356,19 @@ def main() -> None:
                              c_puct=args.c_puct, device=args.device)
         results.append(analyze_position(index, sample, incumbent, candidate))
         leaders = results[-1]["category_leader_diagnosis"]
+        incumbent_diagnosis = (
+            leaders["incumbent"]["diagnosis"]
+            if leaders.get("incumbent") is not None else "no_category_leader"
+        )
+        candidate_diagnosis = (
+            leaders["candidate"]["diagnosis"]
+            if leaders.get("candidate") is not None else "no_category_leader"
+        )
         print(
             f"[{index}/30] game={sample['game_id']} ply={sample['ply']} "
             f"pawnQ={q_summary(incumbent['actions'], 'pawn')['mean_q_visit_weighted']}->"
             f"{q_summary(candidate['actions'], 'pawn')['mean_q_visit_weighted']} "
-            f"pawnWall={leaders['incumbent']['diagnosis']}->"
-            f"{leaders['candidate']['diagnosis']}",
+            f"pawnWall={incumbent_diagnosis}->{candidate_diagnosis}",
             flush=True,
         )
 
