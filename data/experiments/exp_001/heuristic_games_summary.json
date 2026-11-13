@@ -1,0 +1,27 @@
+{
+  "config": {
+    "games_requested": 50,
+    "max_attempts": 600,
+    "time_limit": 0.08,
+    "max_depth": 2,
+    "max_plies": 300,
+    "discount": 0.99,
+    "seed": 20261113
+  },
+  "results": {
+    "decisive_games": 50,
+    "drawn_games": 0,
+    "total_attempts": 50,
+    "draw_rate": 0.0,
+    "total_samples": 3780,
+    "avg_game_length": 75.6,
+    "min_game_length": 23,
+    "max_game_length": 104,
+    "winner_counts": {
+      "0": 28,
+      "1": 22
+    },
+    "elapsed_seconds": 210.7
+  },
+  "output": "data/experiments/exp_001/heuristic_decisive_games.jsonl"
+}

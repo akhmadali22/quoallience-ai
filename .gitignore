@@ -188,3 +188,7 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+.claude/CLAUDE.md
+.gemini/settings.json
+.mcp.json
+GEMINI.md
