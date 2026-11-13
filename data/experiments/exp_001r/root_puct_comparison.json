@@ -1,0 +1,6644 @@
+{
+  "experiment": "EXP-001R-root-puct-comparison",
+  "config": {
+    "simulations": 32,
+    "c_puct": 1.5,
+    "progressive_widening": false,
+    "category_balanced_prior": false,
+    "category_exploration": 0.0,
+    "repetition_penalty": 0.0,
+    "pawn_progress_bonus": 0.0,
+    "opening_goal_directed_prior": false,
+    "device": "cpu"
+  },
+  "positions": 30,
+  "candidate_selected_pawn": 7,
+  "incumbent_selected_pawn": 7,
+  "mean_delta": {
+    "root_value": -0.14141156300902366,
+    "pawn_prior_mass": 0.0,
+    "pawn_visit_ratio": 0.0
+  },
+  "results": [
+    {
+      "position_index": 1,
+      "game_id": 2,
+      "ply": 0,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.23755258321762085,
+        "network_pawn_prior_mass": 0.015288360065336258,
+        "network_wall_prior_mass": 0.9847116399346637,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 77,
+          "category": "pawn",
+          "prior": 0.009868252091109753,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08373489884040362,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02607838623225689,
+          "q": 0.24645367311313748,
+          "u": null,
+          "puct_score": 0.25315920200278313,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02607838623225689,
+            "q": 0.24645367311313748,
+            "u": null,
+            "puct_score": 0.25315920200278313,
+            "visits": 32
+          },
+          {
+            "action": 67,
+            "category": "pawn",
+            "prior": 0.00367015996016562,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.031142341131458435,
+            "visits": 0
+          },
+          {
+            "action": 75,
+            "category": "pawn",
+            "prior": 0.0017499474342912436,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.014848796933188465,
+            "visits": 0
+          },
+          {
+            "action": 77,
+            "category": "pawn",
+            "prior": 0.009868252091109753,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08373489884040362,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.0034409526269882917,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.029197452342655316,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.003848512191325426,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03265571005396305,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0002954210212919861,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.002506730584588393,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.001223251223564148,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.010379631216942803,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.009057299233973026,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.07685373540540633,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.010503397323191166,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08912428505249835,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.11291872709989548,
+        "network_pawn_prior_mass": 0.015288360065336258,
+        "network_wall_prior_mass": 0.9847116399346637,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 77,
+          "category": "pawn",
+          "prior": 0.009868252091109753,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08373489884040362,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 204,
+          "category": "wall",
+          "prior": 0.016921862959861755,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.14358677403587197,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02607838623225689,
+            "q": 0.07884369262804587,
+            "u": null,
+            "puct_score": 0.11045547167923253,
+            "visits": 6
+          },
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.021584952250123024,
+            "q": 0.07417512188355128,
+            "u": null,
+            "puct_score": 0.11996372194290936,
+            "visits": 3
+          },
+          {
+            "action": 166,
+            "category": "wall",
+            "prior": 0.018161214888095856,
+            "q": 0.08627620836098988,
+            "u": null,
+            "puct_score": 0.12480196442785083,
+            "visits": 3
+          },
+          {
+            "action": 91,
+            "category": "wall",
+            "prior": 0.025308853015303612,
+            "q": 0.03152124211192131,
+            "u": null,
+            "puct_score": 0.10310549119125918,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.018334079533815384,
+            "q": 0.08567425282672048,
+            "u": null,
+            "puct_score": 0.13753086265393935,
+            "visits": 2
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.021362068131566048,
+            "q": 0.0659396811388433,
+            "u": null,
+            "puct_score": 0.12636073637414572,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.01918645203113556,
+            "q": 0.05409758538007736,
+            "u": null,
+            "puct_score": 0.10836506879053012,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.023564832285046577,
+            "q": 0.040046637412160635,
+            "u": null,
+            "puct_score": 0.10669805076485543,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.021946024149656296,
+            "q": 0.06988473422825336,
+            "u": null,
+            "puct_score": 0.1319574665674164,
+            "visits": 2
+          },
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.025378448888659477,
+            "q": 0.06662106513977051,
+            "u": null,
+            "puct_score": 0.13840216108254338,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.12463385611772537,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 2,
+      "game_id": 2,
+      "ply": 10,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.21293674409389496,
+        "network_pawn_prior_mass": 0.005657949835947016,
+        "network_wall_prior_mass": 0.994342050164053,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 142,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.0024214850272983313,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.020546982229493152,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 142,
+          "category": "wall",
+          "prior": 0.026148200035095215,
+          "q": 0.23410461889579892,
+          "u": null,
+          "puct_score": 0.2408280988765285,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.026148200035095215,
+            "q": 0.23410461889579892,
+            "u": null,
+            "puct_score": 0.2408280988765285,
+            "visits": 32
+          },
+          {
+            "action": 22,
+            "category": "pawn",
+            "prior": 0.0013203918933868408,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.011203896973773757,
+            "visits": 0
+          },
+          {
+            "action": 30,
+            "category": "pawn",
+            "prior": 0.001462942105717957,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.012413475660636754,
+            "visits": 0
+          },
+          {
+            "action": 32,
+            "category": "pawn",
+            "prior": 0.0004531306913122535,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003844941495433725,
+            "visits": 0
+          },
+          {
+            "action": 40,
+            "category": "pawn",
+            "prior": 0.0024214850272983313,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.020546982229493152,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.003937835805118084,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03341364551020815,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.0037763346917927265,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03204326309275343,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.00038607805618084967,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003275981007570298,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0015050639631226659,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.01277089148019002,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.010390426963567734,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08816569822670647,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.07119155675172806,
+        "network_pawn_prior_mass": 0.005657949835947016,
+        "network_wall_prior_mass": 0.994342050164053,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 105,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.0024214850272983313,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.020546982229493152,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 166,
+          "category": "wall",
+          "prior": 0.016155971214175224,
+          "q": 0.11005913466215134,
+          "u": null,
+          "puct_score": 0.1557551228258317,
+          "visits": 2
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.018904728814959526,
+            "q": 0.0836299608151118,
+            "u": null,
+            "puct_score": 0.12373294747777769,
+            "visits": 3
+          },
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.026148200035095215,
+            "q": 0.03644287399947643,
+            "u": null,
+            "puct_score": 0.09191158384049555,
+            "visits": 3
+          },
+          {
+            "action": 153,
+            "category": "wall",
+            "prior": 0.025042172521352768,
+            "q": 0.04730533808469772,
+            "u": null,
+            "puct_score": 0.10042780921125001,
+            "visits": 3
+          },
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.023454027250409126,
+            "q": 0.06230345989267031,
+            "u": null,
+            "puct_score": 0.11205696607704206,
+            "visits": 3
+          },
+          {
+            "action": 91,
+            "category": "wall",
+            "prior": 0.02561130002140999,
+            "q": 0.02205202728509903,
+            "u": null,
+            "puct_score": 0.0944917244794075,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.018807275220751762,
+            "q": 0.07874068059027195,
+            "u": null,
+            "puct_score": 0.1319356890788053,
+            "visits": 2
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.01924053393304348,
+            "q": 0.0773604903370142,
+            "u": null,
+            "puct_score": 0.13178093954503353,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.01740529015660286,
+            "q": 0.06323472131043673,
+            "u": null,
+            "puct_score": 0.11246431713217883,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.022492818534374237,
+            "q": 0.04529174044728279,
+            "u": null,
+            "puct_score": 0.10891103983132462,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.020440723747015,
+            "q": 0.05883952236035839,
+            "u": null,
+            "puct_score": 0.11665462106399532,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.1417451873421669,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 3,
+      "game_id": 2,
+      "ply": 20,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.3388553559780121,
+        "network_pawn_prior_mass": 0.0015064309701786102,
+        "network_wall_prior_mass": 0.9984935690298213,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 25,
+          "category": "pawn",
+          "prior": 0.0005517610115930438,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.004681847525586705,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02563868835568428,
+          "q": 0.30849488265812397,
+          "u": null,
+          "puct_score": 0.3150873520213834,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02563868835568428,
+            "q": 0.30849488265812397,
+            "u": null,
+            "puct_score": 0.3150873520213834,
+            "visits": 32
+          },
+          {
+            "action": 23,
+            "category": "pawn",
+            "prior": 0.0004533380561042577,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003846701038368119,
+            "visits": 0
+          },
+          {
+            "action": 25,
+            "category": "pawn",
+            "prior": 0.0005517610115930438,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.004681847525586705,
+            "visits": 0
+          },
+          {
+            "action": 33,
+            "category": "pawn",
+            "prior": 0.0005013318732380867,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.004253942088877877,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.00428672693669796,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03637408493851297,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.004598001018166542,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03901533315555413,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0005008875741623342,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.004250172086132618,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0015134427230805159,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.01284198759842394,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.012042167596518993,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.10218118239576904,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.013153661042451859,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1116125172132149,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": -0.19051988422870636,
+        "network_pawn_prior_mass": 0.0015064309701786102,
+        "network_wall_prior_mass": 0.9984935690298213,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 85,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 25,
+          "category": "pawn",
+          "prior": 0.0005517610115930438,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.004681847525586705,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 124,
+          "category": "wall",
+          "prior": 0.011382884345948696,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.09658697840076132,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.012042167596518993,
+            "q": -0.1860230416059494,
+            "u": null,
+            "puct_score": -0.1349324504080649,
+            "visits": 1
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.013153661042451859,
+            "q": -0.16051171720027924,
+            "u": null,
+            "puct_score": -0.10470545859367178,
+            "visits": 1
+          },
+          {
+            "action": 103,
+            "category": "wall",
+            "prior": 0.01743597909808159,
+            "q": -0.11643850803375244,
+            "u": null,
+            "puct_score": -0.04246391225645636,
+            "visits": 1
+          },
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.023235425353050232,
+            "q": -0.16605642437934875,
+            "u": null,
+            "puct_score": -0.06747686148032324,
+            "visits": 1
+          },
+          {
+            "action": 107,
+            "category": "wall",
+            "prior": 0.012065786868333817,
+            "q": -0.17040488123893738,
+            "u": null,
+            "puct_score": -0.1192140819555059,
+            "visits": 1
+          },
+          {
+            "action": 110,
+            "category": "wall",
+            "prior": 0.017450818791985512,
+            "q": -0.12133920937776566,
+            "u": null,
+            "puct_score": -0.047301654110106214,
+            "visits": 1
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.020830532535910606,
+            "q": -0.2148934304714203,
+            "u": null,
+            "puct_score": -0.12651696388461736,
+            "visits": 1
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.02426501363515854,
+            "q": -0.1460476517677307,
+            "u": null,
+            "puct_score": -0.04309991564725517,
+            "visits": 1
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.020809805020689964,
+            "q": -0.12916794419288635,
+            "u": null,
+            "puct_score": -0.04087941700720854,
+            "visits": 1
+          },
+          {
+            "action": 122,
+            "category": "wall",
+            "prior": 0.012044406495988369,
+            "q": -0.20086917281150818,
+            "u": null,
+            "puct_score": -0.14976908276745612,
+            "visits": 1
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.5293752402067184,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 4,
+      "game_id": 2,
+      "ply": 40,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.3286474049091339,
+        "network_pawn_prior_mass": 0.005761836941184306,
+        "network_wall_prior_mass": 0.9942381630588156,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 125,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.005761836655437946,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.04889080767843093,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 125,
+          "category": "wall",
+          "prior": 0.056641679257154465,
+          "q": 0.4564307392574847,
+          "u": null,
+          "puct_score": 0.4709950001617789,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.056641679257154465,
+            "q": 0.4564307392574847,
+            "u": null,
+            "puct_score": 0.4709950001617789,
+            "visits": 32
+          },
+          {
+            "action": 22,
+            "category": "pawn",
+            "prior": 0.005761836655437946,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.04889080767843093,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.008842130191624165,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.07502796634443752,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.00651609618216753,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.055290912309331385,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0010196877410635352,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.008652337825880577,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0038434797897934914,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.032613009089971674,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.01750374585390091,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1485242160392616,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.03554745018482208,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.30163013191366544,
+            "visits": 0
+          },
+          {
+            "action": 87,
+            "category": "wall",
+            "prior": 0.006372195202857256,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05406987194930027,
+            "visits": 0
+          },
+          {
+            "action": 88,
+            "category": "wall",
+            "prior": 0.02480998821556568,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.21051974134090806,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": -0.16645577549934387,
+        "network_pawn_prior_mass": 0.005761836941184306,
+        "network_wall_prior_mass": 0.9942381630588156,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 85,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.005761836655437946,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.04889080767843093,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 198,
+          "category": "wall",
+          "prior": 0.012659380212426186,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.10741840845309754,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.01750374585390091,
+            "q": -0.19405777752399445,
+            "u": null,
+            "puct_score": -0.11979566950436364,
+            "visits": 1
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.03554745018482208,
+            "q": -0.06290806084871292,
+            "u": null,
+            "puct_score": 0.0879070051081198,
+            "visits": 1
+          },
+          {
+            "action": 88,
+            "category": "wall",
+            "prior": 0.02480998821556568,
+            "q": -0.23202963173389435,
+            "u": null,
+            "puct_score": -0.12676976106344032,
+            "visits": 1
+          },
+          {
+            "action": 110,
+            "category": "wall",
+            "prior": 0.02950267307460308,
+            "q": -0.13384559750556946,
+            "u": null,
+            "puct_score": -0.00867635013297044,
+            "visits": 1
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.04007754847407341,
+            "q": -0.19316181540489197,
+            "u": null,
+            "puct_score": -0.023127169176276857,
+            "visits": 1
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.04728630930185318,
+            "q": -0.14488430321216583,
+            "u": null,
+            "puct_score": 0.05573452652485858,
+            "visits": 1
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.02709394134581089,
+            "q": -0.12111563235521317,
+            "u": null,
+            "puct_score": -0.00616576872635223,
+            "visits": 1
+          },
+          {
+            "action": 119,
+            "category": "wall",
+            "prior": 0.016352610662579536,
+            "q": -0.10787641257047653,
+            "u": null,
+            "puct_score": -0.038498157792125204,
+            "visits": 1
+          },
+          {
+            "action": 120,
+            "category": "wall",
+            "prior": 0.016495302319526672,
+            "q": -0.11386102437973022,
+            "u": null,
+            "puct_score": -0.04387738014187946,
+            "visits": 1
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.056641679257154465,
+            "q": -0.1503598690032959,
+            "u": null,
+            "puct_score": 0.08995043591755952,
+            "visits": 1
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.4951031804084778,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 5,
+      "game_id": 2,
+      "ply": 60,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.5704771280288696,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 41,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 41,
+          "category": "pawn",
+          "prior": 0.9871383309364319,
+          "q": 0.3687497810460627,
+          "u": null,
+          "puct_score": 0.6225724035914466,
+          "visits": 32
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 41,
+            "category": "pawn",
+            "prior": 0.9871383309364319,
+            "q": 0.3687497810460627,
+            "u": null,
+            "puct_score": 0.6225724035914466,
+            "visits": 32
+          },
+          {
+            "action": 33,
+            "category": "pawn",
+            "prior": 0.004187289159744978,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03553032693082141,
+            "visits": 0
+          },
+          {
+            "action": 43,
+            "category": "pawn",
+            "prior": 0.008674373850226402,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.0736045033100802,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": -0.34379053115844727,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 41,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 41,
+          "category": "pawn",
+          "prior": 0.9871383309364319,
+          "q": -0.518219584474961,
+          "u": null,
+          "puct_score": -0.24802130886213292,
+          "visits": 30
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 41,
+            "category": "pawn",
+            "prior": 0.9871383309364319,
+            "q": -0.518219584474961,
+            "u": null,
+            "puct_score": -0.24802130886213292,
+            "visits": 30
+          },
+          {
+            "action": 33,
+            "category": "pawn",
+            "prior": 0.004187289159744978,
+            "q": -0.770443320274353,
+            "u": null,
+            "puct_score": -0.7526781568089423,
+            "visits": 1
+          },
+          {
+            "action": 43,
+            "category": "pawn",
+            "prior": 0.008674373850226402,
+            "q": -0.7711399793624878,
+            "u": null,
+            "puct_score": -0.7343377277074477,
+            "visits": 1
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.9142676591873169,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 6,
+      "game_id": 2,
+      "ply": 80,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.38328319787979126,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 40,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 30,
+          "category": "pawn",
+          "prior": 0.34345194697380066,
+          "q": 0.2883741527795792,
+          "u": null,
+          "puct_score": 0.5533092887300581,
+          "visits": 10
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 40,
+            "category": "pawn",
+            "prior": 0.656548023223877,
+            "q": 0.30723162469538773,
+            "u": null,
+            "puct_score": 0.54944879333814,
+            "visits": 22
+          },
+          {
+            "action": 30,
+            "category": "pawn",
+            "prior": 0.34345194697380066,
+            "q": 0.2883741527795792,
+            "u": null,
+            "puct_score": 0.5533092887300581,
+            "visits": 10
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.011028952896595001,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 40,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.656548023223877,
+          "q": -0.3415670972317457,
+          "u": null,
+          "puct_score": -0.12729806343238798,
+          "visits": 25
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 40,
+            "category": "pawn",
+            "prior": 0.656548023223877,
+            "q": -0.3415670972317457,
+            "u": null,
+            "puct_score": -0.12729806343238798,
+            "visits": 25
+          },
+          {
+            "action": 30,
+            "category": "pawn",
+            "prior": 0.34345194697380066,
+            "q": -0.5223751664161682,
+            "u": null,
+            "puct_score": -0.15808935448425954,
+            "visits": 7
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.37225424498319626,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 7,
+      "game_id": 18,
+      "ply": 0,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.23755258321762085,
+        "network_pawn_prior_mass": 0.015288360065336258,
+        "network_wall_prior_mass": 0.9847116399346637,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 77,
+          "category": "pawn",
+          "prior": 0.009868252091109753,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08373489884040362,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02607838623225689,
+          "q": 0.24645367311313748,
+          "u": null,
+          "puct_score": 0.25315920200278313,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02607838623225689,
+            "q": 0.24645367311313748,
+            "u": null,
+            "puct_score": 0.25315920200278313,
+            "visits": 32
+          },
+          {
+            "action": 67,
+            "category": "pawn",
+            "prior": 0.00367015996016562,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.031142341131458435,
+            "visits": 0
+          },
+          {
+            "action": 75,
+            "category": "pawn",
+            "prior": 0.0017499474342912436,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.014848796933188465,
+            "visits": 0
+          },
+          {
+            "action": 77,
+            "category": "pawn",
+            "prior": 0.009868252091109753,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08373489884040362,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.0034409526269882917,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.029197452342655316,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.003848512191325426,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03265571005396305,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0002954210212919861,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.002506730584588393,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.001223251223564148,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.010379631216942803,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.009057299233973026,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.07685373540540633,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.010503397323191166,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08912428505249835,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.11291872709989548,
+        "network_pawn_prior_mass": 0.015288360065336258,
+        "network_wall_prior_mass": 0.9847116399346637,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 77,
+          "category": "pawn",
+          "prior": 0.009868252091109753,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08373489884040362,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 204,
+          "category": "wall",
+          "prior": 0.016921862959861755,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.14358677403587197,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02607838623225689,
+            "q": 0.07884369262804587,
+            "u": null,
+            "puct_score": 0.11045547167923253,
+            "visits": 6
+          },
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.021584952250123024,
+            "q": 0.07417512188355128,
+            "u": null,
+            "puct_score": 0.11996372194290936,
+            "visits": 3
+          },
+          {
+            "action": 166,
+            "category": "wall",
+            "prior": 0.018161214888095856,
+            "q": 0.08627620836098988,
+            "u": null,
+            "puct_score": 0.12480196442785083,
+            "visits": 3
+          },
+          {
+            "action": 91,
+            "category": "wall",
+            "prior": 0.025308853015303612,
+            "q": 0.03152124211192131,
+            "u": null,
+            "puct_score": 0.10310549119125918,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.018334079533815384,
+            "q": 0.08567425282672048,
+            "u": null,
+            "puct_score": 0.13753086265393935,
+            "visits": 2
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.021362068131566048,
+            "q": 0.0659396811388433,
+            "u": null,
+            "puct_score": 0.12636073637414572,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.01918645203113556,
+            "q": 0.05409758538007736,
+            "u": null,
+            "puct_score": 0.10836506879053012,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.023564832285046577,
+            "q": 0.040046637412160635,
+            "u": null,
+            "puct_score": 0.10669805076485543,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.021946024149656296,
+            "q": 0.06988473422825336,
+            "u": null,
+            "puct_score": 0.1319574665674164,
+            "visits": 2
+          },
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.025378448888659477,
+            "q": 0.06662106513977051,
+            "u": null,
+            "puct_score": 0.13840216108254338,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.12463385611772537,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 8,
+      "game_id": 18,
+      "ply": 10,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.21293674409389496,
+        "network_pawn_prior_mass": 0.005657949835947016,
+        "network_wall_prior_mass": 0.994342050164053,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 142,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.0024214850272983313,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.020546982229493152,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 142,
+          "category": "wall",
+          "prior": 0.026148200035095215,
+          "q": 0.23410461889579892,
+          "u": null,
+          "puct_score": 0.2408280988765285,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.026148200035095215,
+            "q": 0.23410461889579892,
+            "u": null,
+            "puct_score": 0.2408280988765285,
+            "visits": 32
+          },
+          {
+            "action": 22,
+            "category": "pawn",
+            "prior": 0.0013203918933868408,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.011203896973773757,
+            "visits": 0
+          },
+          {
+            "action": 30,
+            "category": "pawn",
+            "prior": 0.001462942105717957,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.012413475660636754,
+            "visits": 0
+          },
+          {
+            "action": 32,
+            "category": "pawn",
+            "prior": 0.0004531306913122535,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003844941495433725,
+            "visits": 0
+          },
+          {
+            "action": 40,
+            "category": "pawn",
+            "prior": 0.0024214850272983313,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.020546982229493152,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.003937835805118084,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03341364551020815,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.0037763346917927265,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03204326309275343,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.00038607805618084967,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003275981007570298,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0015050639631226659,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.01277089148019002,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.010390426963567734,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08816569822670647,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.07119155675172806,
+        "network_pawn_prior_mass": 0.005657949835947016,
+        "network_wall_prior_mass": 0.994342050164053,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 105,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.0024214850272983313,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.020546982229493152,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 166,
+          "category": "wall",
+          "prior": 0.016155971214175224,
+          "q": 0.11005913466215134,
+          "u": null,
+          "puct_score": 0.1557551228258317,
+          "visits": 2
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.018904728814959526,
+            "q": 0.0836299608151118,
+            "u": null,
+            "puct_score": 0.12373294747777769,
+            "visits": 3
+          },
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.026148200035095215,
+            "q": 0.03644287399947643,
+            "u": null,
+            "puct_score": 0.09191158384049555,
+            "visits": 3
+          },
+          {
+            "action": 153,
+            "category": "wall",
+            "prior": 0.025042172521352768,
+            "q": 0.04730533808469772,
+            "u": null,
+            "puct_score": 0.10042780921125001,
+            "visits": 3
+          },
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.023454027250409126,
+            "q": 0.06230345989267031,
+            "u": null,
+            "puct_score": 0.11205696607704206,
+            "visits": 3
+          },
+          {
+            "action": 91,
+            "category": "wall",
+            "prior": 0.02561130002140999,
+            "q": 0.02205202728509903,
+            "u": null,
+            "puct_score": 0.0944917244794075,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.018807275220751762,
+            "q": 0.07874068059027195,
+            "u": null,
+            "puct_score": 0.1319356890788053,
+            "visits": 2
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.01924053393304348,
+            "q": 0.0773604903370142,
+            "u": null,
+            "puct_score": 0.13178093954503353,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.01740529015660286,
+            "q": 0.06323472131043673,
+            "u": null,
+            "puct_score": 0.11246431713217883,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.022492818534374237,
+            "q": 0.04529174044728279,
+            "u": null,
+            "puct_score": 0.10891103983132462,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.020440723747015,
+            "q": 0.05883952236035839,
+            "u": null,
+            "puct_score": 0.11665462106399532,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.1417451873421669,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 9,
+      "game_id": 18,
+      "ply": 20,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.354336142539978,
+        "network_pawn_prior_mass": 0.005339921693638771,
+        "network_wall_prior_mass": 0.9946600783063613,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 29,
+          "category": "pawn",
+          "prior": 0.0025895736180245876,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.021973260824055957,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.026399962604045868,
+          "q": 0.339867009781301,
+          "u": null,
+          "puct_score": 0.3466552252761435,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.026399962604045868,
+            "q": 0.339867009781301,
+            "u": null,
+            "puct_score": 0.3466552252761435,
+            "visits": 32
+          },
+          {
+            "action": 19,
+            "category": "pawn",
+            "prior": 0.0015863979933783412,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.01346103336728167,
+            "visits": 0
+          },
+          {
+            "action": 21,
+            "category": "pawn",
+            "prior": 0.0011639500735327601,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.009876443895587917,
+            "visits": 0
+          },
+          {
+            "action": 29,
+            "category": "pawn",
+            "prior": 0.0025895736180245876,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.021973260824055957,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.004368202295154333,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.037065425634389006,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.004517294466495514,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03833051466097698,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0004882040957454592,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.004142549127207515,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0016724008601158857,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.014190791891730248,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.01063910499215126,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.0902757995756025,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.012309656478464603,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.10445089901022644,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.12918055057525635,
+        "network_pawn_prior_mass": 0.005339921693638771,
+        "network_wall_prior_mass": 0.9946600783063613,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 29,
+          "category": "pawn",
+          "prior": 0.0025895736180245876,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.021973260824055957,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 110,
+          "category": "wall",
+          "prior": 0.0168480072170496,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.14296008206486638,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.026399962604045868,
+            "q": 0.05670453035272658,
+            "u": null,
+            "puct_score": 0.09403971557436021,
+            "visits": 5
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.02278357744216919,
+            "q": 0.05138526492131253,
+            "u": null,
+            "puct_score": 0.0997165313272236,
+            "visits": 3
+          },
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.023326631635427475,
+            "q": 0.06183989904820919,
+            "u": null,
+            "puct_score": 0.12781757680234623,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.02254505641758442,
+            "q": 0.07110119052231312,
+            "u": null,
+            "puct_score": 0.1348682397266705,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.018803467974066734,
+            "q": 0.048714654520154,
+            "u": null,
+            "puct_score": 0.1018988934639811,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.022225532680749893,
+            "q": 0.042455653892830014,
+            "u": null,
+            "puct_score": 0.10531895349145144,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.023602500557899475,
+            "q": 0.0579121895134449,
+            "u": null,
+            "puct_score": 0.12467014241204795,
+            "visits": 2
+          },
+          {
+            "action": 144,
+            "category": "wall",
+            "prior": 0.022591067478060722,
+            "q": 0.04318387620151043,
+            "u": null,
+            "puct_score": 0.10708106433756946,
+            "visits": 2
+          },
+          {
+            "action": 151,
+            "category": "wall",
+            "prior": 0.01848999224603176,
+            "q": 0.0549804805777967,
+            "u": null,
+            "puct_score": 0.10727807626805505,
+            "visits": 2
+          },
+          {
+            "action": 153,
+            "category": "wall",
+            "prior": 0.023345816880464554,
+            "q": 0.028386204037815332,
+            "u": null,
+            "puct_score": 0.09441814585949858,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.22515559196472168,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 10,
+      "game_id": 18,
+      "ply": 40,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.24265792965888977,
+        "network_pawn_prior_mass": 0.006793720577852661,
+        "network_wall_prior_mass": 0.9932062794221473,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 12,
+          "category": "pawn",
+          "prior": 0.00488158967345953,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.041421660797273184,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.025517357513308525,
+          "q": 0.22668939060531557,
+          "u": null,
+          "puct_score": 0.2332506618929319,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.025517357513308525,
+            "q": 0.22668939060531557,
+            "u": null,
+            "puct_score": 0.2332506618929319,
+            "visits": 32
+          },
+          {
+            "action": 12,
+            "category": "pawn",
+            "prior": 0.00488158967345953,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.041421660797273184,
+            "visits": 0
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.0019121310906484723,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.016224969883761306,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.006503299344331026,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05518232328468197,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.0060356417670845985,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.0512141172637429,
+            "visits": 0
+          },
+          {
+            "action": 88,
+            "category": "wall",
+            "prior": 0.014736289158463478,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.12504155649358858,
+            "visits": 0
+          },
+          {
+            "action": 94,
+            "category": "wall",
+            "prior": 0.0045862505212426186,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.038915625058588615,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.003934969659894705,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03338932384790313,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.01805131323635578,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1531704677857037,
+            "visits": 0
+          },
+          {
+            "action": 97,
+            "category": "wall",
+            "prior": 0.007097295485436916,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.060222547538995544,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.2781566083431244,
+        "network_pawn_prior_mass": 0.006793720577852661,
+        "network_wall_prior_mass": 0.9932062794221473,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 12,
+          "category": "pawn",
+          "prior": 0.00488158967345953,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.041421660797273184,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 112,
+          "category": "wall",
+          "prior": 0.02457580529153347,
+          "q": 0.1497379019856453,
+          "u": null,
+          "puct_score": 0.21924877437900275,
+          "visits": 2
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.025517357513308525,
+            "q": 0.19077128767967225,
+            "u": null,
+            "puct_score": 0.1977558667922961,
+            "visits": 30
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.02457580529153347,
+            "q": 0.1497379019856453,
+            "u": null,
+            "puct_score": 0.21924877437900275,
+            "visits": 2
+          },
+          {
+            "action": 12,
+            "category": "pawn",
+            "prior": 0.00488158967345953,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.041421660797273184,
+            "visits": 0
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.0019121310906484723,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.016224969883761306,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.006503299344331026,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05518232328468197,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.0060356417670845985,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.0512141172637429,
+            "visits": 0
+          },
+          {
+            "action": 88,
+            "category": "wall",
+            "prior": 0.014736289158463478,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.12504155649358858,
+            "visits": 0
+          },
+          {
+            "action": 94,
+            "category": "wall",
+            "prior": 0.0045862505212426186,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.038915625058588615,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.003934969659894705,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03338932384790313,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.01805131323635578,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1531704677857037,
+            "visits": 0
+          }
+        ]
+      },
+      "delta": {
+        "root_value": 0.03549867868423462,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 11,
+      "game_id": 18,
+      "ply": 60,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.4823572635650635,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 15,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 15,
+          "category": "pawn",
+          "prior": 0.9187492728233337,
+          "q": 0.3481703803263372,
+          "u": null,
+          "puct_score": 0.5844081442187683,
+          "visits": 32
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 15,
+            "category": "pawn",
+            "prior": 0.9187492728233337,
+            "q": 0.3481703803263372,
+            "u": null,
+            "puct_score": 0.5844081442187683,
+            "visits": 32
+          },
+          {
+            "action": 17,
+            "category": "pawn",
+            "prior": 0.05361508950591087,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.4549391271417607,
+            "visits": 0
+          },
+          {
+            "action": 25,
+            "category": "pawn",
+            "prior": 0.027635622769594193,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.23449603864658425,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": -0.7767219543457031,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 15,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 15,
+          "category": "pawn",
+          "prior": 0.9187492728233337,
+          "q": -0.7850779434045155,
+          "u": null,
+          "puct_score": -0.5335990334545082,
+          "visits": 30
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 15,
+            "category": "pawn",
+            "prior": 0.9187492728233337,
+            "q": -0.7850779434045155,
+            "u": null,
+            "puct_score": -0.5335990334545082,
+            "visits": 30
+          },
+          {
+            "action": 17,
+            "category": "pawn",
+            "prior": 0.05361508950591087,
+            "q": -0.9060946106910706,
+            "u": null,
+            "puct_score": -0.6786250471201902,
+            "visits": 1
+          },
+          {
+            "action": 25,
+            "category": "pawn",
+            "prior": 0.027635622769594193,
+            "q": -0.9077700972557068,
+            "u": null,
+            "puct_score": -0.7905220779324147,
+            "visits": 1
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -1.2590792179107666,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 12,
+      "game_id": 18,
+      "ply": 80,
+      "player_to_move": 0,
+      "heuristic_winner": 1,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.39855554699897766,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 37,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 55,
+          "category": "pawn",
+          "prior": 0.4841969609260559,
+          "q": 0.28436921288569766,
+          "u": null,
+          "puct_score": 0.5411534134557155,
+          "visits": 15
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 37,
+            "category": "pawn",
+            "prior": 0.5158030986785889,
+            "q": 0.28166108666097417,
+            "u": null,
+            "puct_score": 0.5248129847231011,
+            "visits": 17
+          },
+          {
+            "action": 55,
+            "category": "pawn",
+            "prior": 0.4841969609260559,
+            "q": 0.28436921288569766,
+            "u": null,
+            "puct_score": 0.5411534134557155,
+            "visits": 15
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": -0.8373151421546936,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 37,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 37,
+          "category": "pawn",
+          "prior": 0.5158030986785889,
+          "q": -0.7649484984576702,
+          "u": null,
+          "puct_score": -0.5074935475683593,
+          "visits": 16
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 37,
+            "category": "pawn",
+            "prior": 0.5158030986785889,
+            "q": -0.7649484984576702,
+            "u": null,
+            "puct_score": -0.5074935475683593,
+            "visits": 16
+          },
+          {
+            "action": 55,
+            "category": "pawn",
+            "prior": 0.4841969609260559,
+            "q": -0.7690487913787365,
+            "u": null,
+            "puct_score": -0.5273695437834256,
+            "visits": 16
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -1.2358706891536713,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 13,
+      "game_id": 31,
+      "ply": 0,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.23755258321762085,
+        "network_pawn_prior_mass": 0.015288360065336258,
+        "network_wall_prior_mass": 0.9847116399346637,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 77,
+          "category": "pawn",
+          "prior": 0.009868252091109753,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08373489884040362,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02607838623225689,
+          "q": 0.24645367311313748,
+          "u": null,
+          "puct_score": 0.25315920200278313,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02607838623225689,
+            "q": 0.24645367311313748,
+            "u": null,
+            "puct_score": 0.25315920200278313,
+            "visits": 32
+          },
+          {
+            "action": 67,
+            "category": "pawn",
+            "prior": 0.00367015996016562,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.031142341131458435,
+            "visits": 0
+          },
+          {
+            "action": 75,
+            "category": "pawn",
+            "prior": 0.0017499474342912436,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.014848796933188465,
+            "visits": 0
+          },
+          {
+            "action": 77,
+            "category": "pawn",
+            "prior": 0.009868252091109753,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08373489884040362,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.0034409526269882917,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.029197452342655316,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.003848512191325426,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03265571005396305,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0002954210212919861,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.002506730584588393,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.001223251223564148,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.010379631216942803,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.009057299233973026,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.07685373540540633,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.010503397323191166,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08912428505249835,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.11291872709989548,
+        "network_pawn_prior_mass": 0.015288360065336258,
+        "network_wall_prior_mass": 0.9847116399346637,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 77,
+          "category": "pawn",
+          "prior": 0.009868252091109753,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08373489884040362,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 204,
+          "category": "wall",
+          "prior": 0.016921862959861755,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.14358677403587197,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02607838623225689,
+            "q": 0.07884369262804587,
+            "u": null,
+            "puct_score": 0.11045547167923253,
+            "visits": 6
+          },
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.021584952250123024,
+            "q": 0.07417512188355128,
+            "u": null,
+            "puct_score": 0.11996372194290936,
+            "visits": 3
+          },
+          {
+            "action": 166,
+            "category": "wall",
+            "prior": 0.018161214888095856,
+            "q": 0.08627620836098988,
+            "u": null,
+            "puct_score": 0.12480196442785083,
+            "visits": 3
+          },
+          {
+            "action": 91,
+            "category": "wall",
+            "prior": 0.025308853015303612,
+            "q": 0.03152124211192131,
+            "u": null,
+            "puct_score": 0.10310549119125918,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.018334079533815384,
+            "q": 0.08567425282672048,
+            "u": null,
+            "puct_score": 0.13753086265393935,
+            "visits": 2
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.021362068131566048,
+            "q": 0.0659396811388433,
+            "u": null,
+            "puct_score": 0.12636073637414572,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.01918645203113556,
+            "q": 0.05409758538007736,
+            "u": null,
+            "puct_score": 0.10836506879053012,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.023564832285046577,
+            "q": 0.040046637412160635,
+            "u": null,
+            "puct_score": 0.10669805076485543,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.021946024149656296,
+            "q": 0.06988473422825336,
+            "u": null,
+            "puct_score": 0.1319574665674164,
+            "visits": 2
+          },
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.025378448888659477,
+            "q": 0.06662106513977051,
+            "u": null,
+            "puct_score": 0.13840216108254338,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.12463385611772537,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 14,
+      "game_id": 31,
+      "ply": 10,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.21293674409389496,
+        "network_pawn_prior_mass": 0.005657949835947016,
+        "network_wall_prior_mass": 0.994342050164053,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 142,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.0024214850272983313,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.020546982229493152,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 142,
+          "category": "wall",
+          "prior": 0.026148200035095215,
+          "q": 0.23410461889579892,
+          "u": null,
+          "puct_score": 0.2408280988765285,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.026148200035095215,
+            "q": 0.23410461889579892,
+            "u": null,
+            "puct_score": 0.2408280988765285,
+            "visits": 32
+          },
+          {
+            "action": 22,
+            "category": "pawn",
+            "prior": 0.0013203918933868408,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.011203896973773757,
+            "visits": 0
+          },
+          {
+            "action": 30,
+            "category": "pawn",
+            "prior": 0.001462942105717957,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.012413475660636754,
+            "visits": 0
+          },
+          {
+            "action": 32,
+            "category": "pawn",
+            "prior": 0.0004531306913122535,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003844941495433725,
+            "visits": 0
+          },
+          {
+            "action": 40,
+            "category": "pawn",
+            "prior": 0.0024214850272983313,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.020546982229493152,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.003937835805118084,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03341364551020815,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.0037763346917927265,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03204326309275343,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.00038607805618084967,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003275981007570298,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0015050639631226659,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.01277089148019002,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.010390426963567734,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08816569822670647,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.07119155675172806,
+        "network_pawn_prior_mass": 0.005657949835947016,
+        "network_wall_prior_mass": 0.994342050164053,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 105,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.0024214850272983313,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.020546982229493152,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 166,
+          "category": "wall",
+          "prior": 0.016155971214175224,
+          "q": 0.11005913466215134,
+          "u": null,
+          "puct_score": 0.1557551228258317,
+          "visits": 2
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.018904728814959526,
+            "q": 0.0836299608151118,
+            "u": null,
+            "puct_score": 0.12373294747777769,
+            "visits": 3
+          },
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.026148200035095215,
+            "q": 0.03644287399947643,
+            "u": null,
+            "puct_score": 0.09191158384049555,
+            "visits": 3
+          },
+          {
+            "action": 153,
+            "category": "wall",
+            "prior": 0.025042172521352768,
+            "q": 0.04730533808469772,
+            "u": null,
+            "puct_score": 0.10042780921125001,
+            "visits": 3
+          },
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.023454027250409126,
+            "q": 0.06230345989267031,
+            "u": null,
+            "puct_score": 0.11205696607704206,
+            "visits": 3
+          },
+          {
+            "action": 91,
+            "category": "wall",
+            "prior": 0.02561130002140999,
+            "q": 0.02205202728509903,
+            "u": null,
+            "puct_score": 0.0944917244794075,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.018807275220751762,
+            "q": 0.07874068059027195,
+            "u": null,
+            "puct_score": 0.1319356890788053,
+            "visits": 2
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.01924053393304348,
+            "q": 0.0773604903370142,
+            "u": null,
+            "puct_score": 0.13178093954503353,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.01740529015660286,
+            "q": 0.06323472131043673,
+            "u": null,
+            "puct_score": 0.11246431713217883,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.022492818534374237,
+            "q": 0.04529174044728279,
+            "u": null,
+            "puct_score": 0.10891103983132462,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.020440723747015,
+            "q": 0.05883952236035839,
+            "u": null,
+            "puct_score": 0.11665462106399532,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.1417451873421669,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 15,
+      "game_id": 31,
+      "ply": 20,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.354336142539978,
+        "network_pawn_prior_mass": 0.005339921693638771,
+        "network_wall_prior_mass": 0.9946600783063613,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 29,
+          "category": "pawn",
+          "prior": 0.0025895736180245876,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.021973260824055957,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.026399962604045868,
+          "q": 0.339867009781301,
+          "u": null,
+          "puct_score": 0.3466552252761435,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.026399962604045868,
+            "q": 0.339867009781301,
+            "u": null,
+            "puct_score": 0.3466552252761435,
+            "visits": 32
+          },
+          {
+            "action": 19,
+            "category": "pawn",
+            "prior": 0.0015863979933783412,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.01346103336728167,
+            "visits": 0
+          },
+          {
+            "action": 21,
+            "category": "pawn",
+            "prior": 0.0011639500735327601,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.009876443895587917,
+            "visits": 0
+          },
+          {
+            "action": 29,
+            "category": "pawn",
+            "prior": 0.0025895736180245876,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.021973260824055957,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.004368202295154333,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.037065425634389006,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.004517294466495514,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03833051466097698,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0004882040957454592,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.004142549127207515,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0016724008601158857,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.014190791891730248,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.01063910499215126,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.0902757995756025,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.012309656478464603,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.10445089901022644,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.12918055057525635,
+        "network_pawn_prior_mass": 0.005339921693638771,
+        "network_wall_prior_mass": 0.9946600783063613,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 29,
+          "category": "pawn",
+          "prior": 0.0025895736180245876,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.021973260824055957,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 110,
+          "category": "wall",
+          "prior": 0.0168480072170496,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.14296008206486638,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.026399962604045868,
+            "q": 0.05670453035272658,
+            "u": null,
+            "puct_score": 0.09403971557436021,
+            "visits": 5
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.02278357744216919,
+            "q": 0.05138526492131253,
+            "u": null,
+            "puct_score": 0.0997165313272236,
+            "visits": 3
+          },
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.023326631635427475,
+            "q": 0.06183989904820919,
+            "u": null,
+            "puct_score": 0.12781757680234623,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.02254505641758442,
+            "q": 0.07110119052231312,
+            "u": null,
+            "puct_score": 0.1348682397266705,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.018803467974066734,
+            "q": 0.048714654520154,
+            "u": null,
+            "puct_score": 0.1018988934639811,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.022225532680749893,
+            "q": 0.042455653892830014,
+            "u": null,
+            "puct_score": 0.10531895349145144,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.023602500557899475,
+            "q": 0.0579121895134449,
+            "u": null,
+            "puct_score": 0.12467014241204795,
+            "visits": 2
+          },
+          {
+            "action": 144,
+            "category": "wall",
+            "prior": 0.022591067478060722,
+            "q": 0.04318387620151043,
+            "u": null,
+            "puct_score": 0.10708106433756946,
+            "visits": 2
+          },
+          {
+            "action": 151,
+            "category": "wall",
+            "prior": 0.01848999224603176,
+            "q": 0.0549804805777967,
+            "u": null,
+            "puct_score": 0.10727807626805505,
+            "visits": 2
+          },
+          {
+            "action": 153,
+            "category": "wall",
+            "prior": 0.023345816880464554,
+            "q": 0.028386204037815332,
+            "u": null,
+            "puct_score": 0.09441814585949858,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.22515559196472168,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 16,
+      "game_id": 31,
+      "ply": 40,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.2672630548477173,
+        "network_pawn_prior_mass": 0.006769000528715347,
+        "network_wall_prior_mass": 0.9932309994712847,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 12,
+          "category": "pawn",
+          "prior": 0.004833826329559088,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.04101637425958028,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02531200274825096,
+          "q": 0.24465494835749269,
+          "u": null,
+          "puct_score": 0.2511634166491653,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02531200274825096,
+            "q": 0.24465494835749269,
+            "u": null,
+            "puct_score": 0.2511634166491653,
+            "visits": 32
+          },
+          {
+            "action": 12,
+            "category": "pawn",
+            "prior": 0.004833826329559088,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.04101637425958028,
+            "visits": 0
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.0019351745722815394,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.016420499848939094,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.006373150274157524,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.054077970335610986,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.005895570386201143,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05002557083100278,
+            "visits": 0
+          },
+          {
+            "action": 88,
+            "category": "wall",
+            "prior": 0.015538654290139675,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.13184984656094087,
+            "visits": 0
+          },
+          {
+            "action": 94,
+            "category": "wall",
+            "prior": 0.0045394254848361015,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.038518300392992685,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.003930001985281706,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.033347170808246875,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.017532363533973694,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1487670295407729,
+            "visits": 0
+          },
+          {
+            "action": 97,
+            "category": "wall",
+            "prior": 0.007261023391038179,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06161182314167959,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.34241917729377747,
+        "network_pawn_prior_mass": 0.006769000528715347,
+        "network_wall_prior_mass": 0.9932309994712847,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 12,
+          "category": "pawn",
+          "prior": 0.004833826329559088,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.04101637425958028,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02531200274825096,
+          "q": 0.2744863033294678,
+          "u": null,
+          "puct_score": 0.2809947716211404,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02531200274825096,
+            "q": 0.2744863033294678,
+            "u": null,
+            "puct_score": 0.2809947716211404,
+            "visits": 32
+          },
+          {
+            "action": 12,
+            "category": "pawn",
+            "prior": 0.004833826329559088,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.04101637425958028,
+            "visits": 0
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.0019351745722815394,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.016420499848939094,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.006373150274157524,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.054077970335610986,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.005895570386201143,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05002557083100278,
+            "visits": 0
+          },
+          {
+            "action": 88,
+            "category": "wall",
+            "prior": 0.015538654290139675,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.13184984656094087,
+            "visits": 0
+          },
+          {
+            "action": 94,
+            "category": "wall",
+            "prior": 0.0045394254848361015,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.038518300392992685,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.003930001985281706,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.033347170808246875,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.017532363533973694,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1487670295407729,
+            "visits": 0
+          },
+          {
+            "action": 97,
+            "category": "wall",
+            "prior": 0.007261023391038179,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06161182314167959,
+            "visits": 0
+          }
+        ]
+      },
+      "delta": {
+        "root_value": 0.07515612244606018,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 17,
+      "game_id": 31,
+      "ply": 60,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.18915489315986633,
+        "network_pawn_prior_mass": 0.01515990638027417,
+        "network_wall_prior_mass": 0.9848400936197258,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 125,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.009880810044705868,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08384145358113854,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 201,
+          "category": "wall",
+          "prior": 0.027236830443143845,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.23111217045607754,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.03371329605579376,
+            "q": 0.17863106826941172,
+            "u": null,
+            "puct_score": 0.19651024349353396,
+            "visits": 15
+          },
+          {
+            "action": 110,
+            "category": "wall",
+            "prior": 0.0327795036137104,
+            "q": 0.19058167561888695,
+            "u": null,
+            "puct_score": 0.23031643446973052,
+            "visits": 6
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.03025134839117527,
+            "q": 0.1790886918703715,
+            "u": null,
+            "puct_score": 0.2157588637985834,
+            "visits": 6
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.03138493746519089,
+            "q": 0.07801151275634766,
+            "u": null,
+            "puct_score": 0.21116652564138017,
+            "visits": 1
+          },
+          {
+            "action": 103,
+            "category": "wall",
+            "prior": 0.029523037374019623,
+            "q": 0.06143011152744293,
+            "u": null,
+            "puct_score": 0.186685751316527,
+            "visits": 1
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.03290776535868645,
+            "q": 0.0655950978398323,
+            "u": null,
+            "puct_score": 0.2052109223165713,
+            "visits": 1
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.029403608292341232,
+            "q": 0.09000244736671448,
+            "u": null,
+            "puct_score": 0.21475139247375974,
+            "visits": 1
+          },
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.03180043026804924,
+            "q": 0.05301451310515404,
+            "u": null,
+            "puct_score": 0.18793231266387686,
+            "visits": 1
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.005279096309095621,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.044794617662602364,
+            "visits": 0
+          },
+          {
+            "action": 22,
+            "category": "pawn",
+            "prior": 0.009880810044705868,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08384145358113854,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.6021929979324341,
+        "network_pawn_prior_mass": 0.01515990638027417,
+        "network_wall_prior_mass": 0.9848400936197258,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 125,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 22,
+          "category": "pawn",
+          "prior": 0.009880810044705868,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08384145358113854,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 125,
+          "category": "wall",
+          "prior": 0.03371329605579376,
+          "q": 0.34901617327705026,
+          "u": null,
+          "puct_score": 0.3576848642948065,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.03371329605579376,
+            "q": 0.34901617327705026,
+            "u": null,
+            "puct_score": 0.3576848642948065,
+            "visits": 32
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.005279096309095621,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.044794617662602364,
+            "visits": 0
+          },
+          {
+            "action": 22,
+            "category": "pawn",
+            "prior": 0.009880810044705868,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08384145358113854,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.008497280068695545,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.07210181242449729,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.03138493746519089,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.266310025770065,
+            "visits": 0
+          },
+          {
+            "action": 103,
+            "category": "wall",
+            "prior": 0.029523037374019623,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.25051127957816816,
+            "visits": 0
+          },
+          {
+            "action": 104,
+            "category": "wall",
+            "prior": 0.019082464277744293,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.16192007899326621,
+            "visits": 0
+          },
+          {
+            "action": 106,
+            "category": "wall",
+            "prior": 0.011322151869535446,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.0960716445426327,
+            "visits": 0
+          },
+          {
+            "action": 107,
+            "category": "wall",
+            "prior": 0.02566227689385414,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.2177516405282178,
+            "visits": 0
+          },
+          {
+            "action": 108,
+            "category": "wall",
+            "prior": 0.007968981750309467,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06761905253562642,
+            "visits": 0
+          }
+        ]
+      },
+      "delta": {
+        "root_value": 0.41303810477256775,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 18,
+      "game_id": 31,
+      "ply": 80,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.30204498767852783,
+        "network_pawn_prior_mass": 0.0612586772006489,
+        "network_wall_prior_mass": 0.9387413227993511,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.025409618392586708,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.21560776099542456,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 112,
+          "category": "wall",
+          "prior": 0.04592881351709366,
+          "q": 0.2034937838713328,
+          "u": null,
+          "puct_score": 0.3009235100344582,
+          "visits": 3
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.046054232865571976,
+            "q": 0.2671328780275804,
+            "u": null,
+            "puct_score": 0.28108941813867927,
+            "visits": 27
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.04592881351709366,
+            "q": 0.2034937838713328,
+            "u": null,
+            "puct_score": 0.3009235100344582,
+            "visits": 3
+          },
+          {
+            "action": 103,
+            "category": "wall",
+            "prior": 0.042471230030059814,
+            "q": 0.08753275126218796,
+            "u": null,
+            "puct_score": 0.26772291925334596,
+            "visits": 1
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.03572125360369682,
+            "q": 0.11007668823003769,
+            "u": null,
+            "puct_score": 0.2616291316876265,
+            "visits": 1
+          },
+          {
+            "action": 40,
+            "category": "pawn",
+            "prior": 0.016978025436401367,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1440633225540234,
+            "visits": 0
+          },
+          {
+            "action": 50,
+            "category": "pawn",
+            "prior": 0.018871033564209938,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.16012602911171117,
+            "visits": 0
+          },
+          {
+            "action": 58,
+            "category": "pawn",
+            "prior": 0.025409618392586708,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.21560776099542456,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.007538231555372477,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06396401561044696,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.022289229556918144,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.18913038381096817,
+            "visits": 0
+          },
+          {
+            "action": 99,
+            "category": "wall",
+            "prior": 0.005653121042996645,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.04796832254168086,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.5389690399169922,
+        "network_pawn_prior_mass": 0.0612586772006489,
+        "network_wall_prior_mass": 0.9387413227993511,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 58,
+          "category": "pawn",
+          "prior": 0.025409618392586708,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.21560776099542456,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 112,
+          "category": "wall",
+          "prior": 0.04592881351709366,
+          "q": 0.34177809208631516,
+          "u": null,
+          "puct_score": 0.38508019260325976,
+          "visits": 8
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.046054232865571976,
+            "q": 0.31898293147484463,
+            "u": null,
+            "puct_score": 0.3346142563992754,
+            "visits": 24
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.04592881351709366,
+            "q": 0.34177809208631516,
+            "u": null,
+            "puct_score": 0.38508019260325976,
+            "visits": 8
+          },
+          {
+            "action": 40,
+            "category": "pawn",
+            "prior": 0.016978025436401367,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1440633225540234,
+            "visits": 0
+          },
+          {
+            "action": 50,
+            "category": "pawn",
+            "prior": 0.018871033564209938,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.16012602911171117,
+            "visits": 0
+          },
+          {
+            "action": 58,
+            "category": "pawn",
+            "prior": 0.025409618392586708,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.21560776099542456,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.007538231555372477,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06396401561044696,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.022289229556918144,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.18913038381096817,
+            "visits": 0
+          },
+          {
+            "action": 99,
+            "category": "wall",
+            "prior": 0.005653121042996645,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.04796832254168086,
+            "visits": 0
+          },
+          {
+            "action": 103,
+            "category": "wall",
+            "prior": 0.042471230030059814,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.360380335982316,
+            "visits": 0
+          },
+          {
+            "action": 104,
+            "category": "wall",
+            "prior": 0.016840973868966103,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.14290040144521007,
+            "visits": 0
+          }
+        ]
+      },
+      "delta": {
+        "root_value": 0.23692405223846436,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 19,
+      "game_id": 34,
+      "ply": 0,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.23755258321762085,
+        "network_pawn_prior_mass": 0.015288360065336258,
+        "network_wall_prior_mass": 0.9847116399346637,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 77,
+          "category": "pawn",
+          "prior": 0.009868252091109753,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08373489884040362,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02607838623225689,
+          "q": 0.24645367311313748,
+          "u": null,
+          "puct_score": 0.25315920200278313,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02607838623225689,
+            "q": 0.24645367311313748,
+            "u": null,
+            "puct_score": 0.25315920200278313,
+            "visits": 32
+          },
+          {
+            "action": 67,
+            "category": "pawn",
+            "prior": 0.00367015996016562,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.031142341131458435,
+            "visits": 0
+          },
+          {
+            "action": 75,
+            "category": "pawn",
+            "prior": 0.0017499474342912436,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.014848796933188465,
+            "visits": 0
+          },
+          {
+            "action": 77,
+            "category": "pawn",
+            "prior": 0.009868252091109753,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08373489884040362,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.0034409526269882917,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.029197452342655316,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.003848512191325426,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03265571005396305,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0002954210212919861,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.002506730584588393,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.001223251223564148,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.010379631216942803,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.009057299233973026,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.07685373540540633,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.010503397323191166,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08912428505249835,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.11291872709989548,
+        "network_pawn_prior_mass": 0.015288360065336258,
+        "network_wall_prior_mass": 0.9847116399346637,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 77,
+          "category": "pawn",
+          "prior": 0.009868252091109753,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08373489884040362,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 204,
+          "category": "wall",
+          "prior": 0.016921862959861755,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.14358677403587197,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02607838623225689,
+            "q": 0.07884369262804587,
+            "u": null,
+            "puct_score": 0.11045547167923253,
+            "visits": 6
+          },
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.021584952250123024,
+            "q": 0.07417512188355128,
+            "u": null,
+            "puct_score": 0.11996372194290936,
+            "visits": 3
+          },
+          {
+            "action": 166,
+            "category": "wall",
+            "prior": 0.018161214888095856,
+            "q": 0.08627620836098988,
+            "u": null,
+            "puct_score": 0.12480196442785083,
+            "visits": 3
+          },
+          {
+            "action": 91,
+            "category": "wall",
+            "prior": 0.025308853015303612,
+            "q": 0.03152124211192131,
+            "u": null,
+            "puct_score": 0.10310549119125918,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.018334079533815384,
+            "q": 0.08567425282672048,
+            "u": null,
+            "puct_score": 0.13753086265393935,
+            "visits": 2
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.021362068131566048,
+            "q": 0.0659396811388433,
+            "u": null,
+            "puct_score": 0.12636073637414572,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.01918645203113556,
+            "q": 0.05409758538007736,
+            "u": null,
+            "puct_score": 0.10836506879053012,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.023564832285046577,
+            "q": 0.040046637412160635,
+            "u": null,
+            "puct_score": 0.10669805076485543,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.021946024149656296,
+            "q": 0.06988473422825336,
+            "u": null,
+            "puct_score": 0.1319574665674164,
+            "visits": 2
+          },
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.025378448888659477,
+            "q": 0.06662106513977051,
+            "u": null,
+            "puct_score": 0.13840216108254338,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.12463385611772537,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 20,
+      "game_id": 34,
+      "ply": 10,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.21293674409389496,
+        "network_pawn_prior_mass": 0.005657949835947016,
+        "network_wall_prior_mass": 0.994342050164053,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 142,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.0024214850272983313,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.020546982229493152,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 142,
+          "category": "wall",
+          "prior": 0.026148200035095215,
+          "q": 0.23410461889579892,
+          "u": null,
+          "puct_score": 0.2408280988765285,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.026148200035095215,
+            "q": 0.23410461889579892,
+            "u": null,
+            "puct_score": 0.2408280988765285,
+            "visits": 32
+          },
+          {
+            "action": 22,
+            "category": "pawn",
+            "prior": 0.0013203918933868408,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.011203896973773757,
+            "visits": 0
+          },
+          {
+            "action": 30,
+            "category": "pawn",
+            "prior": 0.001462942105717957,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.012413475660636754,
+            "visits": 0
+          },
+          {
+            "action": 32,
+            "category": "pawn",
+            "prior": 0.0004531306913122535,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003844941495433725,
+            "visits": 0
+          },
+          {
+            "action": 40,
+            "category": "pawn",
+            "prior": 0.0024214850272983313,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.020546982229493152,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.003937835805118084,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03341364551020815,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.0037763346917927265,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03204326309275343,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.00038607805618084967,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003275981007570298,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0015050639631226659,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.01277089148019002,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.010390426963567734,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08816569822670647,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.07119155675172806,
+        "network_pawn_prior_mass": 0.005657949835947016,
+        "network_wall_prior_mass": 0.994342050164053,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 105,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.0024214850272983313,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.020546982229493152,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 166,
+          "category": "wall",
+          "prior": 0.016155971214175224,
+          "q": 0.11005913466215134,
+          "u": null,
+          "puct_score": 0.1557551228258317,
+          "visits": 2
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.018904728814959526,
+            "q": 0.0836299608151118,
+            "u": null,
+            "puct_score": 0.12373294747777769,
+            "visits": 3
+          },
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.026148200035095215,
+            "q": 0.03644287399947643,
+            "u": null,
+            "puct_score": 0.09191158384049555,
+            "visits": 3
+          },
+          {
+            "action": 153,
+            "category": "wall",
+            "prior": 0.025042172521352768,
+            "q": 0.04730533808469772,
+            "u": null,
+            "puct_score": 0.10042780921125001,
+            "visits": 3
+          },
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.023454027250409126,
+            "q": 0.06230345989267031,
+            "u": null,
+            "puct_score": 0.11205696607704206,
+            "visits": 3
+          },
+          {
+            "action": 91,
+            "category": "wall",
+            "prior": 0.02561130002140999,
+            "q": 0.02205202728509903,
+            "u": null,
+            "puct_score": 0.0944917244794075,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.018807275220751762,
+            "q": 0.07874068059027195,
+            "u": null,
+            "puct_score": 0.1319356890788053,
+            "visits": 2
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.01924053393304348,
+            "q": 0.0773604903370142,
+            "u": null,
+            "puct_score": 0.13178093954503353,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.01740529015660286,
+            "q": 0.06323472131043673,
+            "u": null,
+            "puct_score": 0.11246431713217883,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.022492818534374237,
+            "q": 0.04529174044728279,
+            "u": null,
+            "puct_score": 0.10891103983132462,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.020440723747015,
+            "q": 0.05883952236035839,
+            "u": null,
+            "puct_score": 0.11665462106399532,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.1417451873421669,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 21,
+      "game_id": 34,
+      "ply": 20,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.354336142539978,
+        "network_pawn_prior_mass": 0.005339921693638771,
+        "network_wall_prior_mass": 0.9946600783063613,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 29,
+          "category": "pawn",
+          "prior": 0.0025895736180245876,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.021973260824055957,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.026399962604045868,
+          "q": 0.339867009781301,
+          "u": null,
+          "puct_score": 0.3466552252761435,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.026399962604045868,
+            "q": 0.339867009781301,
+            "u": null,
+            "puct_score": 0.3466552252761435,
+            "visits": 32
+          },
+          {
+            "action": 19,
+            "category": "pawn",
+            "prior": 0.0015863979933783412,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.01346103336728167,
+            "visits": 0
+          },
+          {
+            "action": 21,
+            "category": "pawn",
+            "prior": 0.0011639500735327601,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.009876443895587917,
+            "visits": 0
+          },
+          {
+            "action": 29,
+            "category": "pawn",
+            "prior": 0.0025895736180245876,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.021973260824055957,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.004368202295154333,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.037065425634389006,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.004517294466495514,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03833051466097698,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0004882040957454592,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.004142549127207515,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0016724008601158857,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.014190791891730248,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.01063910499215126,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.0902757995756025,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.012309656478464603,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.10445089901022644,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.12918055057525635,
+        "network_pawn_prior_mass": 0.005339921693638771,
+        "network_wall_prior_mass": 0.9946600783063613,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 29,
+          "category": "pawn",
+          "prior": 0.0025895736180245876,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.021973260824055957,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 110,
+          "category": "wall",
+          "prior": 0.0168480072170496,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.14296008206486638,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.026399962604045868,
+            "q": 0.05670453035272658,
+            "u": null,
+            "puct_score": 0.09403971557436021,
+            "visits": 5
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.02278357744216919,
+            "q": 0.05138526492131253,
+            "u": null,
+            "puct_score": 0.0997165313272236,
+            "visits": 3
+          },
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.023326631635427475,
+            "q": 0.06183989904820919,
+            "u": null,
+            "puct_score": 0.12781757680234623,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.02254505641758442,
+            "q": 0.07110119052231312,
+            "u": null,
+            "puct_score": 0.1348682397266705,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.018803467974066734,
+            "q": 0.048714654520154,
+            "u": null,
+            "puct_score": 0.1018988934639811,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.022225532680749893,
+            "q": 0.042455653892830014,
+            "u": null,
+            "puct_score": 0.10531895349145144,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.023602500557899475,
+            "q": 0.0579121895134449,
+            "u": null,
+            "puct_score": 0.12467014241204795,
+            "visits": 2
+          },
+          {
+            "action": 144,
+            "category": "wall",
+            "prior": 0.022591067478060722,
+            "q": 0.04318387620151043,
+            "u": null,
+            "puct_score": 0.10708106433756946,
+            "visits": 2
+          },
+          {
+            "action": 151,
+            "category": "wall",
+            "prior": 0.01848999224603176,
+            "q": 0.0549804805777967,
+            "u": null,
+            "puct_score": 0.10727807626805505,
+            "visits": 2
+          },
+          {
+            "action": 153,
+            "category": "wall",
+            "prior": 0.023345816880464554,
+            "q": 0.028386204037815332,
+            "u": null,
+            "puct_score": 0.09441814585949858,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.22515559196472168,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 22,
+      "game_id": 34,
+      "ply": 40,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.2672630548477173,
+        "network_pawn_prior_mass": 0.006769000528715347,
+        "network_wall_prior_mass": 0.9932309994712847,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 12,
+          "category": "pawn",
+          "prior": 0.004833826329559088,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.04101637425958028,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02531200274825096,
+          "q": 0.24465494835749269,
+          "u": null,
+          "puct_score": 0.2511634166491653,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02531200274825096,
+            "q": 0.24465494835749269,
+            "u": null,
+            "puct_score": 0.2511634166491653,
+            "visits": 32
+          },
+          {
+            "action": 12,
+            "category": "pawn",
+            "prior": 0.004833826329559088,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.04101637425958028,
+            "visits": 0
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.0019351745722815394,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.016420499848939094,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.006373150274157524,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.054077970335610986,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.005895570386201143,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05002557083100278,
+            "visits": 0
+          },
+          {
+            "action": 88,
+            "category": "wall",
+            "prior": 0.015538654290139675,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.13184984656094087,
+            "visits": 0
+          },
+          {
+            "action": 94,
+            "category": "wall",
+            "prior": 0.0045394254848361015,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.038518300392992685,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.003930001985281706,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.033347170808246875,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.017532363533973694,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1487670295407729,
+            "visits": 0
+          },
+          {
+            "action": 97,
+            "category": "wall",
+            "prior": 0.007261023391038179,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06161182314167959,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.34241917729377747,
+        "network_pawn_prior_mass": 0.006769000528715347,
+        "network_wall_prior_mass": 0.9932309994712847,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 12,
+          "category": "pawn",
+          "prior": 0.004833826329559088,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.04101637425958028,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02531200274825096,
+          "q": 0.2744863033294678,
+          "u": null,
+          "puct_score": 0.2809947716211404,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02531200274825096,
+            "q": 0.2744863033294678,
+            "u": null,
+            "puct_score": 0.2809947716211404,
+            "visits": 32
+          },
+          {
+            "action": 12,
+            "category": "pawn",
+            "prior": 0.004833826329559088,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.04101637425958028,
+            "visits": 0
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.0019351745722815394,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.016420499848939094,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.006373150274157524,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.054077970335610986,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.005895570386201143,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05002557083100278,
+            "visits": 0
+          },
+          {
+            "action": 88,
+            "category": "wall",
+            "prior": 0.015538654290139675,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.13184984656094087,
+            "visits": 0
+          },
+          {
+            "action": 94,
+            "category": "wall",
+            "prior": 0.0045394254848361015,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.038518300392992685,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.003930001985281706,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.033347170808246875,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.017532363533973694,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1487670295407729,
+            "visits": 0
+          },
+          {
+            "action": 97,
+            "category": "wall",
+            "prior": 0.007261023391038179,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06161182314167959,
+            "visits": 0
+          }
+        ]
+      },
+      "delta": {
+        "root_value": 0.07515612244606018,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 23,
+      "game_id": 34,
+      "ply": 60,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.24048708379268646,
+        "network_pawn_prior_mass": 0.006232634629834514,
+        "network_wall_prior_mass": 0.9937673653701655,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 14,
+          "category": "pawn",
+          "prior": 0.00431425217539072,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.03660764212749608,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 125,
+          "category": "wall",
+          "prior": 0.03214595466852188,
+          "q": 0.1628832221031189,
+          "u": null,
+          "puct_score": 0.29926695171732315,
+          "visits": 1
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.03424189239740372,
+            "q": 0.24008532917058026,
+            "u": null,
+            "puct_score": 0.2504621891660114,
+            "visits": 27
+          },
+          {
+            "action": 103,
+            "category": "wall",
+            "prior": 0.03245936334133148,
+            "q": 0.2132042460143566,
+            "u": null,
+            "puct_score": 0.26828960999302637,
+            "visits": 4
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.03214595466852188,
+            "q": 0.1628832221031189,
+            "u": null,
+            "puct_score": 0.29926695171732315,
+            "visits": 1
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.00431425217539072,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03660764212749608,
+            "visits": 0
+          },
+          {
+            "action": 16,
+            "category": "pawn",
+            "prior": 0.0019183827098459005,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.016278016409473035,
+            "visits": 0
+          },
+          {
+            "action": 99,
+            "category": "wall",
+            "prior": 0.006529402919113636,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.055403818704105504,
+            "visits": 0
+          },
+          {
+            "action": 100,
+            "category": "wall",
+            "prior": 0.0214109867811203,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1816782398930623,
+            "visits": 0
+          },
+          {
+            "action": 101,
+            "category": "wall",
+            "prior": 0.006589923985302448,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05591735695874262,
+            "visits": 0
+          },
+          {
+            "action": 102,
+            "category": "wall",
+            "prior": 0.007559868507087231,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06414760880622691,
+            "visits": 0
+          },
+          {
+            "action": 104,
+            "category": "wall",
+            "prior": 0.016978515312075615,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.14406747383615479,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.6372628808021545,
+        "network_pawn_prior_mass": 0.006232634629834514,
+        "network_wall_prior_mass": 0.9937673653701655,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 14,
+          "category": "pawn",
+          "prior": 0.00431425217539072,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.03660764212749608,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.03424189239740372,
+          "q": 0.6186989210546017,
+          "u": null,
+          "puct_score": 0.6275035295355735,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.03424189239740372,
+            "q": 0.6186989210546017,
+            "u": null,
+            "puct_score": 0.6275035295355735,
+            "visits": 32
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.00431425217539072,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03660764212749608,
+            "visits": 0
+          },
+          {
+            "action": 16,
+            "category": "pawn",
+            "prior": 0.0019183827098459005,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.016278016409473035,
+            "visits": 0
+          },
+          {
+            "action": 99,
+            "category": "wall",
+            "prior": 0.006529402919113636,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.055403818704105504,
+            "visits": 0
+          },
+          {
+            "action": 100,
+            "category": "wall",
+            "prior": 0.0214109867811203,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1816782398930623,
+            "visits": 0
+          },
+          {
+            "action": 101,
+            "category": "wall",
+            "prior": 0.006589923985302448,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05591735695874262,
+            "visits": 0
+          },
+          {
+            "action": 102,
+            "category": "wall",
+            "prior": 0.007559868507087231,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06414760880622691,
+            "visits": 0
+          },
+          {
+            "action": 103,
+            "category": "wall",
+            "prior": 0.03245936334133148,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.27542681989334883,
+            "visits": 0
+          },
+          {
+            "action": 104,
+            "category": "wall",
+            "prior": 0.016978515312075615,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.14406747383615479,
+            "visits": 0
+          },
+          {
+            "action": 106,
+            "category": "wall",
+            "prior": 0.012593815103173256,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.10686206034654627,
+            "visits": 0
+          }
+        ]
+      },
+      "delta": {
+        "root_value": 0.3967757970094681,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 24,
+      "game_id": 34,
+      "ply": 78,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.29600852727890015,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 0,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 0,
+          "category": "pawn",
+          "prior": 0.45556023716926575,
+          "q": 1.0,
+          "u": null,
+          "puct_score": 1.133295068858641,
+          "visits": 28
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 0,
+            "category": "pawn",
+            "prior": 0.45556023716926575,
+            "q": 1.0,
+            "u": null,
+            "puct_score": 1.133295068858641,
+            "visits": 28
+          },
+          {
+            "action": 18,
+            "category": "pawn",
+            "prior": 0.43902909755706787,
+            "q": 0.2846188619732857,
+            "u": null,
+            "puct_score": 1.029675985680994,
+            "visits": 4
+          },
+          {
+            "action": 10,
+            "category": "pawn",
+            "prior": 0.1054106131196022,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.894438758799445,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.7462189793586731,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 0,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 18,
+          "category": "pawn",
+          "prior": 0.43902909755706787,
+          "q": 0.6142869591712952,
+          "u": null,
+          "puct_score": 1.1464706189625153,
+          "visits": 6
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 0,
+            "category": "pawn",
+            "prior": 0.45556023716926575,
+            "q": 1.0,
+            "u": null,
+            "puct_score": 1.1431687776629846,
+            "visits": 26
+          },
+          {
+            "action": 18,
+            "category": "pawn",
+            "prior": 0.43902909755706787,
+            "q": 0.6142869591712952,
+            "u": null,
+            "puct_score": 1.1464706189625153,
+            "visits": 6
+          },
+          {
+            "action": 10,
+            "category": "pawn",
+            "prior": 0.1054106131196022,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.894438758799445,
+            "visits": 0
+          }
+        ]
+      },
+      "delta": {
+        "root_value": 0.45021045207977295,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 25,
+      "game_id": 44,
+      "ply": 0,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.23755258321762085,
+        "network_pawn_prior_mass": 0.015288360065336258,
+        "network_wall_prior_mass": 0.9847116399346637,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 77,
+          "category": "pawn",
+          "prior": 0.009868252091109753,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08373489884040362,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02607838623225689,
+          "q": 0.24645367311313748,
+          "u": null,
+          "puct_score": 0.25315920200278313,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02607838623225689,
+            "q": 0.24645367311313748,
+            "u": null,
+            "puct_score": 0.25315920200278313,
+            "visits": 32
+          },
+          {
+            "action": 67,
+            "category": "pawn",
+            "prior": 0.00367015996016562,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.031142341131458435,
+            "visits": 0
+          },
+          {
+            "action": 75,
+            "category": "pawn",
+            "prior": 0.0017499474342912436,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.014848796933188465,
+            "visits": 0
+          },
+          {
+            "action": 77,
+            "category": "pawn",
+            "prior": 0.009868252091109753,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08373489884040362,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.0034409526269882917,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.029197452342655316,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.003848512191325426,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03265571005396305,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0002954210212919861,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.002506730584588393,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.001223251223564148,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.010379631216942803,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.009057299233973026,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.07685373540540633,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.010503397323191166,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08912428505249835,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.11291872709989548,
+        "network_pawn_prior_mass": 0.015288360065336258,
+        "network_wall_prior_mass": 0.9847116399346637,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 77,
+          "category": "pawn",
+          "prior": 0.009868252091109753,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.08373489884040362,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 204,
+          "category": "wall",
+          "prior": 0.016921862959861755,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.14358677403587197,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02607838623225689,
+            "q": 0.07884369262804587,
+            "u": null,
+            "puct_score": 0.11045547167923253,
+            "visits": 6
+          },
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.021584952250123024,
+            "q": 0.07417512188355128,
+            "u": null,
+            "puct_score": 0.11996372194290936,
+            "visits": 3
+          },
+          {
+            "action": 166,
+            "category": "wall",
+            "prior": 0.018161214888095856,
+            "q": 0.08627620836098988,
+            "u": null,
+            "puct_score": 0.12480196442785083,
+            "visits": 3
+          },
+          {
+            "action": 91,
+            "category": "wall",
+            "prior": 0.025308853015303612,
+            "q": 0.03152124211192131,
+            "u": null,
+            "puct_score": 0.10310549119125918,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.018334079533815384,
+            "q": 0.08567425282672048,
+            "u": null,
+            "puct_score": 0.13753086265393935,
+            "visits": 2
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.021362068131566048,
+            "q": 0.0659396811388433,
+            "u": null,
+            "puct_score": 0.12636073637414572,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.01918645203113556,
+            "q": 0.05409758538007736,
+            "u": null,
+            "puct_score": 0.10836506879053012,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.023564832285046577,
+            "q": 0.040046637412160635,
+            "u": null,
+            "puct_score": 0.10669805076485543,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.021946024149656296,
+            "q": 0.06988473422825336,
+            "u": null,
+            "puct_score": 0.1319574665674164,
+            "visits": 2
+          },
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.025378448888659477,
+            "q": 0.06662106513977051,
+            "u": null,
+            "puct_score": 0.13840216108254338,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.12463385611772537,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 26,
+      "game_id": 44,
+      "ply": 10,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.21293674409389496,
+        "network_pawn_prior_mass": 0.005657949835947016,
+        "network_wall_prior_mass": 0.994342050164053,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 142,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.0024214850272983313,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.020546982229493152,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 142,
+          "category": "wall",
+          "prior": 0.026148200035095215,
+          "q": 0.23410461889579892,
+          "u": null,
+          "puct_score": 0.2408280988765285,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.026148200035095215,
+            "q": 0.23410461889579892,
+            "u": null,
+            "puct_score": 0.2408280988765285,
+            "visits": 32
+          },
+          {
+            "action": 22,
+            "category": "pawn",
+            "prior": 0.0013203918933868408,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.011203896973773757,
+            "visits": 0
+          },
+          {
+            "action": 30,
+            "category": "pawn",
+            "prior": 0.001462942105717957,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.012413475660636754,
+            "visits": 0
+          },
+          {
+            "action": 32,
+            "category": "pawn",
+            "prior": 0.0004531306913122535,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003844941495433725,
+            "visits": 0
+          },
+          {
+            "action": 40,
+            "category": "pawn",
+            "prior": 0.0024214850272983313,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.020546982229493152,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.003937835805118084,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03341364551020815,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.0037763346917927265,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03204326309275343,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.00038607805618084967,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.003275981007570298,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0015050639631226659,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.01277089148019002,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.010390426963567734,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.08816569822670647,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.07119155675172806,
+        "network_pawn_prior_mass": 0.005657949835947016,
+        "network_wall_prior_mass": 0.994342050164053,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 105,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 40,
+          "category": "pawn",
+          "prior": 0.0024214850272983313,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.020546982229493152,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 166,
+          "category": "wall",
+          "prior": 0.016155971214175224,
+          "q": 0.11005913466215134,
+          "u": null,
+          "puct_score": 0.1557551228258317,
+          "visits": 2
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.018904728814959526,
+            "q": 0.0836299608151118,
+            "u": null,
+            "puct_score": 0.12373294747777769,
+            "visits": 3
+          },
+          {
+            "action": 142,
+            "category": "wall",
+            "prior": 0.026148200035095215,
+            "q": 0.03644287399947643,
+            "u": null,
+            "puct_score": 0.09191158384049555,
+            "visits": 3
+          },
+          {
+            "action": 153,
+            "category": "wall",
+            "prior": 0.025042172521352768,
+            "q": 0.04730533808469772,
+            "u": null,
+            "puct_score": 0.10042780921125001,
+            "visits": 3
+          },
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.023454027250409126,
+            "q": 0.06230345989267031,
+            "u": null,
+            "puct_score": 0.11205696607704206,
+            "visits": 3
+          },
+          {
+            "action": 91,
+            "category": "wall",
+            "prior": 0.02561130002140999,
+            "q": 0.02205202728509903,
+            "u": null,
+            "puct_score": 0.0944917244794075,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.018807275220751762,
+            "q": 0.07874068059027195,
+            "u": null,
+            "puct_score": 0.1319356890788053,
+            "visits": 2
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.01924053393304348,
+            "q": 0.0773604903370142,
+            "u": null,
+            "puct_score": 0.13178093954503353,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.01740529015660286,
+            "q": 0.06323472131043673,
+            "u": null,
+            "puct_score": 0.11246431713217883,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.022492818534374237,
+            "q": 0.04529174044728279,
+            "u": null,
+            "puct_score": 0.10891103983132462,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.020440723747015,
+            "q": 0.05883952236035839,
+            "u": null,
+            "puct_score": 0.11665462106399532,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.1417451873421669,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 27,
+      "game_id": 44,
+      "ply": 20,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.354336142539978,
+        "network_pawn_prior_mass": 0.005339921693638771,
+        "network_wall_prior_mass": 0.9946600783063613,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 29,
+          "category": "pawn",
+          "prior": 0.0025895736180245876,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.021973260824055957,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.026399962604045868,
+          "q": 0.339867009781301,
+          "u": null,
+          "puct_score": 0.3466552252761435,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.026399962604045868,
+            "q": 0.339867009781301,
+            "u": null,
+            "puct_score": 0.3466552252761435,
+            "visits": 32
+          },
+          {
+            "action": 19,
+            "category": "pawn",
+            "prior": 0.0015863979933783412,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.01346103336728167,
+            "visits": 0
+          },
+          {
+            "action": 21,
+            "category": "pawn",
+            "prior": 0.0011639500735327601,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.009876443895587917,
+            "visits": 0
+          },
+          {
+            "action": 29,
+            "category": "pawn",
+            "prior": 0.0025895736180245876,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.021973260824055957,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.004368202295154333,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.037065425634389006,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.004517294466495514,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.03833051466097698,
+            "visits": 0
+          },
+          {
+            "action": 83,
+            "category": "wall",
+            "prior": 0.0004882040957454592,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.004142549127207515,
+            "visits": 0
+          },
+          {
+            "action": 84,
+            "category": "wall",
+            "prior": 0.0016724008601158857,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.014190791891730248,
+            "visits": 0
+          },
+          {
+            "action": 85,
+            "category": "wall",
+            "prior": 0.01063910499215126,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.0902757995756025,
+            "visits": 0
+          },
+          {
+            "action": 86,
+            "category": "wall",
+            "prior": 0.012309656478464603,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.10445089901022644,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.12918055057525635,
+        "network_pawn_prior_mass": 0.005339921693638771,
+        "network_wall_prior_mass": 0.9946600783063613,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 29,
+          "category": "pawn",
+          "prior": 0.0025895736180245876,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.021973260824055957,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 110,
+          "category": "wall",
+          "prior": 0.0168480072170496,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.14296008206486638,
+          "visits": 0
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.026399962604045868,
+            "q": 0.05670453035272658,
+            "u": null,
+            "puct_score": 0.09403971557436021,
+            "visits": 5
+          },
+          {
+            "action": 112,
+            "category": "wall",
+            "prior": 0.02278357744216919,
+            "q": 0.05138526492131253,
+            "u": null,
+            "puct_score": 0.0997165313272236,
+            "visits": 3
+          },
+          {
+            "action": 105,
+            "category": "wall",
+            "prior": 0.023326631635427475,
+            "q": 0.06183989904820919,
+            "u": null,
+            "puct_score": 0.12781757680234623,
+            "visits": 2
+          },
+          {
+            "action": 111,
+            "category": "wall",
+            "prior": 0.02254505641758442,
+            "q": 0.07110119052231312,
+            "u": null,
+            "puct_score": 0.1348682397266705,
+            "visits": 2
+          },
+          {
+            "action": 113,
+            "category": "wall",
+            "prior": 0.018803467974066734,
+            "q": 0.048714654520154,
+            "u": null,
+            "puct_score": 0.1018988934639811,
+            "visits": 2
+          },
+          {
+            "action": 125,
+            "category": "wall",
+            "prior": 0.022225532680749893,
+            "q": 0.042455653892830014,
+            "u": null,
+            "puct_score": 0.10531895349145144,
+            "visits": 2
+          },
+          {
+            "action": 133,
+            "category": "wall",
+            "prior": 0.023602500557899475,
+            "q": 0.0579121895134449,
+            "u": null,
+            "puct_score": 0.12467014241204795,
+            "visits": 2
+          },
+          {
+            "action": 144,
+            "category": "wall",
+            "prior": 0.022591067478060722,
+            "q": 0.04318387620151043,
+            "u": null,
+            "puct_score": 0.10708106433756946,
+            "visits": 2
+          },
+          {
+            "action": 151,
+            "category": "wall",
+            "prior": 0.01848999224603176,
+            "q": 0.0549804805777967,
+            "u": null,
+            "puct_score": 0.10727807626805505,
+            "visits": 2
+          },
+          {
+            "action": 153,
+            "category": "wall",
+            "prior": 0.023345816880464554,
+            "q": 0.028386204037815332,
+            "u": null,
+            "puct_score": 0.09441814585949858,
+            "visits": 2
+          }
+        ]
+      },
+      "delta": {
+        "root_value": -0.22515559196472168,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 28,
+      "game_id": 44,
+      "ply": 40,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.2672630548477173,
+        "network_pawn_prior_mass": 0.006769000528715347,
+        "network_wall_prior_mass": 0.9932309994712847,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 12,
+          "category": "pawn",
+          "prior": 0.004833826329559088,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.04101637425958028,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02531200274825096,
+          "q": 0.24465494835749269,
+          "u": null,
+          "puct_score": 0.2511634166491653,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02531200274825096,
+            "q": 0.24465494835749269,
+            "u": null,
+            "puct_score": 0.2511634166491653,
+            "visits": 32
+          },
+          {
+            "action": 12,
+            "category": "pawn",
+            "prior": 0.004833826329559088,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.04101637425958028,
+            "visits": 0
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.0019351745722815394,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.016420499848939094,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.006373150274157524,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.054077970335610986,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.005895570386201143,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05002557083100278,
+            "visits": 0
+          },
+          {
+            "action": 88,
+            "category": "wall",
+            "prior": 0.015538654290139675,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.13184984656094087,
+            "visits": 0
+          },
+          {
+            "action": 94,
+            "category": "wall",
+            "prior": 0.0045394254848361015,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.038518300392992685,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.003930001985281706,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.033347170808246875,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.017532363533973694,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1487670295407729,
+            "visits": 0
+          },
+          {
+            "action": 97,
+            "category": "wall",
+            "prior": 0.007261023391038179,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06161182314167959,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.34241917729377747,
+        "network_pawn_prior_mass": 0.006769000528715347,
+        "network_wall_prior_mass": 0.9932309994712847,
+        "pawn_visits": 0,
+        "wall_visits": 32,
+        "pawn_visit_ratio": 0.0,
+        "wall_visit_ratio": 1.0,
+        "selected_action": 168,
+        "selected_category": "wall",
+        "best_pawn_by_final_puct": {
+          "action": 12,
+          "category": "pawn",
+          "prior": 0.004833826329559088,
+          "q": 0.0,
+          "u": null,
+          "puct_score": 0.04101637425958028,
+          "visits": 0
+        },
+        "best_wall_by_final_puct": {
+          "action": 168,
+          "category": "wall",
+          "prior": 0.02531200274825096,
+          "q": 0.2744863033294678,
+          "u": null,
+          "puct_score": 0.2809947716211404,
+          "visits": 32
+        },
+        "top_actions_by_visits": [
+          {
+            "action": 168,
+            "category": "wall",
+            "prior": 0.02531200274825096,
+            "q": 0.2744863033294678,
+            "u": null,
+            "puct_score": 0.2809947716211404,
+            "visits": 32
+          },
+          {
+            "action": 12,
+            "category": "pawn",
+            "prior": 0.004833826329559088,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.04101637425958028,
+            "visits": 0
+          },
+          {
+            "action": 14,
+            "category": "pawn",
+            "prior": 0.0019351745722815394,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.016420499848939094,
+            "visits": 0
+          },
+          {
+            "action": 81,
+            "category": "wall",
+            "prior": 0.006373150274157524,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.054077970335610986,
+            "visits": 0
+          },
+          {
+            "action": 82,
+            "category": "wall",
+            "prior": 0.005895570386201143,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.05002557083100278,
+            "visits": 0
+          },
+          {
+            "action": 88,
+            "category": "wall",
+            "prior": 0.015538654290139675,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.13184984656094087,
+            "visits": 0
+          },
+          {
+            "action": 94,
+            "category": "wall",
+            "prior": 0.0045394254848361015,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.038518300392992685,
+            "visits": 0
+          },
+          {
+            "action": 95,
+            "category": "wall",
+            "prior": 0.003930001985281706,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.033347170808246875,
+            "visits": 0
+          },
+          {
+            "action": 96,
+            "category": "wall",
+            "prior": 0.017532363533973694,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.1487670295407729,
+            "visits": 0
+          },
+          {
+            "action": 97,
+            "category": "wall",
+            "prior": 0.007261023391038179,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.06161182314167959,
+            "visits": 0
+          }
+        ]
+      },
+      "delta": {
+        "root_value": 0.07515612244606018,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 29,
+      "game_id": 44,
+      "ply": 60,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.4008023738861084,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 13,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.5842958688735962,
+          "q": 0.31249983484546345,
+          "u": null,
+          "puct_score": 0.573442698525757,
+          "visits": 18
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 13,
+            "category": "pawn",
+            "prior": 0.5842958688735962,
+            "q": 0.31249983484546345,
+            "u": null,
+            "puct_score": 0.573442698525757,
+            "visits": 18
+          },
+          {
+            "action": 15,
+            "category": "pawn",
+            "prior": 0.41570422053337097,
+            "q": 0.3351413080734866,
+            "u": null,
+            "puct_score": 0.5702991056943528,
+            "visits": 14
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.877602219581604,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 13,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 13,
+          "category": "pawn",
+          "prior": 0.5842958688735962,
+          "q": 0.8484484255313873,
+          "u": null,
+          "puct_score": 1.0845395879087958,
+          "visits": 20
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 13,
+            "category": "pawn",
+            "prior": 0.5842958688735962,
+            "q": 0.8484484255313873,
+            "u": null,
+            "puct_score": 1.0845395879087958,
+            "visits": 20
+          },
+          {
+            "action": 15,
+            "category": "pawn",
+            "prior": 0.41570422053337097,
+            "q": 0.8095533351103464,
+            "u": null,
+            "puct_score": 1.0808892554421152,
+            "visits": 12
+          }
+        ]
+      },
+      "delta": {
+        "root_value": 0.4767998456954956,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    },
+    {
+      "position_index": 30,
+      "game_id": 44,
+      "ply": 64,
+      "player_to_move": 0,
+      "heuristic_winner": 0,
+      "state_round_trip_valid": true,
+      "incumbent": {
+        "root_value": 0.291219025850296,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 7,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 7,
+          "category": "pawn",
+          "prior": 0.12752871215343475,
+          "q": 1.0,
+          "u": null,
+          "puct_score": 1.0470485623197643,
+          "visits": 22
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 7,
+            "category": "pawn",
+            "prior": 0.12752871215343475,
+            "q": 1.0,
+            "u": null,
+            "puct_score": 1.0470485623197643,
+            "visits": 22
+          },
+          {
+            "action": 15,
+            "category": "pawn",
+            "prior": 0.5852012038230896,
+            "q": 0.3047615389029185,
+            "u": null,
+            "puct_score": 0.8013211931042041,
+            "visits": 9
+          },
+          {
+            "action": 17,
+            "category": "pawn",
+            "prior": 0.1695990264415741,
+            "q": 0.16812115907669067,
+            "u": null,
+            "puct_score": 0.8876688409041004,
+            "visits": 1
+          },
+          {
+            "action": 25,
+            "category": "pawn",
+            "prior": 0.11767112463712692,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.9984725352163176,
+            "visits": 0
+          }
+        ]
+      },
+      "candidate": {
+        "root_value": 0.8526246547698975,
+        "network_pawn_prior_mass": 1.0,
+        "network_wall_prior_mass": 0,
+        "pawn_visits": 32,
+        "wall_visits": 0,
+        "pawn_visit_ratio": 1.0,
+        "wall_visit_ratio": 0.0,
+        "selected_action": 15,
+        "selected_category": "pawn",
+        "best_pawn_by_final_puct": {
+          "action": 7,
+          "category": "pawn",
+          "prior": 0.12752871215343475,
+          "q": 1.0,
+          "u": null,
+          "puct_score": 1.2705292333386442,
+          "visits": 3
+        },
+        "best_wall_by_final_puct": null,
+        "top_actions_by_visits": [
+          {
+            "action": 15,
+            "category": "pawn",
+            "prior": 0.5852012038230896,
+            "q": 0.8128086406251659,
+            "u": null,
+            "puct_score": 1.0197084965423682,
+            "visits": 23
+          },
+          {
+            "action": 17,
+            "category": "pawn",
+            "prior": 0.1695990264415741,
+            "q": 0.8160309791564941,
+            "u": null,
+            "puct_score": 1.0216160311071827,
+            "visits": 6
+          },
+          {
+            "action": 7,
+            "category": "pawn",
+            "prior": 0.12752871215343475,
+            "q": 1.0,
+            "u": null,
+            "puct_score": 1.2705292333386442,
+            "visits": 3
+          },
+          {
+            "action": 25,
+            "category": "pawn",
+            "prior": 0.11767112463712692,
+            "q": 0.0,
+            "u": null,
+            "puct_score": 0.9984725352163176,
+            "visits": 0
+          }
+        ]
+      },
+      "delta": {
+        "root_value": 0.5614056289196014,
+        "pawn_prior_mass": 0.0,
+        "pawn_visit_ratio": 0.0
+      }
+    }
+  ]
+}
