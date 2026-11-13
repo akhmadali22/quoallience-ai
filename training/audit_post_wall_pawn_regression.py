@@ -105,10 +105,18 @@ def restore_state(data: dict) -> GameState:
 
 
 def root_trace_summary(stats: dict) -> dict:
+    """Classify whether regression leads initially, after Q updates, or by visits."""
     rows = [row for row in stats.get("selection_trace", []) if row.get("selection_depth") == 0]
     first = rows[0] if rows else None
-    first_regression_win = None
-    first_progress_win = None
+    first_regression_overtake = None
+    initial_q_gap = None
+    if first:
+        candidates = first.get("candidate_pawn_actions", [])
+        regs = [x for x in candidates if x.get("distance_delta") is not None and x["distance_delta"] < 0]
+        progs = [x for x in candidates if x.get("distance_delta") is not None and x["distance_delta"] > 0]
+        if regs and progs:
+            initial_q_gap = max(regs, key=lambda x: x["puct_score"])["q"] - max(progs, key=lambda x: x["puct_score"])["q"]
+
     for row in rows:
         candidates = row.get("candidate_pawn_actions", [])
         regressions = [x for x in candidates if x.get("distance_delta") is not None and x["distance_delta"] < 0]
@@ -116,10 +124,19 @@ def root_trace_summary(stats: dict) -> dict:
         if regressions and progresses:
             best_reg = max(regressions, key=lambda x: x["puct_score"])
             best_prog = max(progresses, key=lambda x: x["puct_score"])
-            if best_reg["puct_score"] > best_prog["puct_score"] and first_regression_win is None:
-                first_regression_win = row["simulation"]
-            if best_prog["puct_score"] > best_reg["puct_score"] and first_progress_win is None:
-                first_progress_win = row["simulation"]
+            if best_reg["puct_score"] > best_prog["puct_score"]:
+                first_regression_overtake = {
+                    "simulation": row["simulation"],
+                    "best_regression_before_selection": best_reg,
+                    "best_progress_before_selection": best_prog,
+                    "q_gap_regression_minus_progress": best_reg["q"] - best_prog["q"],
+                    "initial_q_gap_regression_minus_progress": initial_q_gap,
+                    "q_gap_improved_since_initial": (
+                        initial_q_gap is not None
+                        and (best_reg["q"] - best_prog["q"]) > initial_q_gap + 1e-12
+                    ),
+                }
+                break
 
     actions = stats.get("root_action_stats", {})
     pawn_rows = [(int(a), v) for a, v in actions.items() if v.get("category") == "pawn"]
@@ -143,19 +160,20 @@ def root_trace_summary(stats: dict) -> dict:
             and best_reg_final[1].get("puct_score", -1e9) > best_prog_final[1].get("puct_score", -1e9)
         )
         if initial_reg_wins:
-            category = "regression_ahead_on_first_selection"
-        elif first_regression_win is not None:
-            category = "regression_overtakes_after_search_updates"
+            category = "regression_ahead_on_first_selection_prior_driven"
+        elif first_regression_overtake and first_regression_overtake["q_gap_improved_since_initial"]:
+            category = "regression_overtakes_after_q_improves"
         elif selected_is_regression and not final_reg_wins:
             category = "regression_selected_by_visits_despite_lower_final_puct"
+        elif first_regression_overtake:
+            category = "regression_overtakes_without_q_gap_improvement"
         else:
-            category = "regression_not_final_selection"
+            category = "regression_never_overtakes_progress"
 
     return {
         "root_selection_steps": len(rows),
         "first_root_snapshot": first,
-        "first_simulation_regression_puct_exceeds_progress": first_regression_win,
-        "first_simulation_progress_puct_exceeds_regression": first_progress_win,
+        "first_regression_overtake": first_regression_overtake,
         "classification": category,
         "final_selected_pawn_action": (
             {"action": selected[0], **selected[1]} if selected else None
@@ -168,7 +186,6 @@ def root_trace_summary(stats: dict) -> dict:
         ),
         "selection_trace": rows,
     }
-
 
 def response_probe(model, state: GameState, action: int, budget: int, c_puct: float, device: str) -> dict:
     """Let the opponent search/respond, then evaluate the resulting root-player state."""
