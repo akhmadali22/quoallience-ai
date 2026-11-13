@@ -184,13 +184,17 @@ def response_probe(model, state: GameState, action: int, budget: int, c_puct: fl
         return {"opponent_reply": None, "terminal": after_our_move.winner is not None}
     reply = max(visits, key=visits.get)
     after_reply = apply_action_index(after_our_move, reply)
-    with torch.inference_mode():
-        tensor = torch.tensor(encode_state(after_reply), dtype=torch.float32, device=device).unsqueeze(0)
-        _policy, value = model(tensor)
+    if after_reply.winner is not None:
+        value_for_original = 1.0 if after_reply.winner == state.current_player else -1.0
+    else:
+        with torch.inference_mode():
+            tensor = torch.tensor(encode_state(after_reply), dtype=torch.float32, device=device).unsqueeze(0)
+            _policy, value = model(tensor)
+        value_for_original = float(value[0].item())
     return {
         "opponent_reply": reply,
         "state_after_reply": after_reply.to_dict(),
-        "value_for_original_player": float(value[0].item()),
+        "value_for_original_player": value_for_original,
         "terminal": after_reply.winner is not None,
         "winner": after_reply.winner,
     }
@@ -258,10 +262,10 @@ def run_replay(model, position: dict, *, budget: int, c_puct: float, device: str
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("checkpoint", type=Path)
+    parser.add_argument("candidate_checkpoint", type=Path)
+    parser.add_argument("incumbent_checkpoint", type=Path)
     parser.add_argument("source_evaluation", type=Path,
                         help="Paired-evaluation JSON containing per-game action_trace.")
-    parser.add_argument("--source-agent", choices=("candidate", "incumbent", "both"), default="both")
     parser.add_argument("--simulations", type=int, default=32)
     parser.add_argument("--c-puct", type=float, default=None)
     parser.add_argument("--device", default="cpu")
@@ -283,7 +287,7 @@ def main() -> int:
     source = json.loads(args.source_evaluation.read_text(encoding="utf-8"))
     config = source.get("config", {})
     c_puct = float(args.c_puct if args.c_puct is not None else config.get("c_puct", 1.5))
-    agents = ("candidate", "incumbent") if args.source_agent == "both" else (args.source_agent,)
+    agents = ("candidate", "incumbent")
     positions = []
     for agent in agents:
         positions.extend(reconstruct_positions(source, agent))
@@ -293,8 +297,12 @@ def main() -> int:
     if not positions:
         parser.error("No post-wall regression positions with at least one unblocked progress action were found.")
 
-    model = load_model(args.checkpoint, device=args.device)
-    model.eval()
+    models = {
+        "candidate": load_model(args.candidate_checkpoint, device=args.device),
+        "incumbent": load_model(args.incumbent_checkpoint, device=args.device),
+    }
+    for model in models.values():
+        model.eval()
     runs = []
     for index, position in enumerate(positions, 1):
         print(
@@ -302,6 +310,7 @@ def main() -> int:
             f"agent={position['source_agent']} ply={position['ply']}",
             flush=True,
         )
+        model = models[position["source_agent"]]
         runs.append(run_replay(
             model, position, budget=args.simulations, c_puct=c_puct,
             device=args.device,
@@ -317,7 +326,8 @@ def main() -> int:
         classifications[variant] = counts
     report = {
         "experiment": "post_wall_pawn_regression_selection_audit",
-        "checkpoint": str(args.checkpoint),
+        "candidate_checkpoint": str(args.candidate_checkpoint),
+        "incumbent_checkpoint": str(args.incumbent_checkpoint),
         "source_evaluation": str(args.source_evaluation),
         "positions": len(runs),
         "simulations": args.simulations,
