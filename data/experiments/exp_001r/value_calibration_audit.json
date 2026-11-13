@@ -1,0 +1,426 @@
+{
+  "experiment": "EXP-001R-value-calibration-audit",
+  "models": {
+    "incumbent": "models/checkpoints/neural_v1.pt",
+    "candidate": "models/checkpoints/exp_001r_vonly_strict.pt"
+  },
+  "dataset": "data/experiments/exp_001/heuristic_decisive_games.jsonl",
+  "test_game_ids": [
+    2,
+    18,
+    31,
+    34,
+    44
+  ],
+  "positions": 441,
+  "games": 5,
+  "method": {
+    "same_identical_states_for_both_models": true,
+    "target": "undiscounted +/-1 from player-to-move perspective",
+    "game_level_split_reused_from_training_report": true,
+    "positions_are_not_independent_units_for_bootstrap": true,
+    "bootstrap_unit": "game_id",
+    "bootstrap_samples": 10000,
+    "bootstrap_seed": 20261113004
+  },
+  "metrics": {
+    "overall": {
+      "count": 441,
+      "incumbent": {
+        "count": 441,
+        "mse": 1.053506242360818,
+        "mae": 0.9936724422237405,
+        "sign_accuracy": 0.5600907029478458,
+        "prediction_mean": 0.09538378798001068,
+        "target_mean": 0.006802721088435374,
+        "mean_error": 0.0885810668915753
+      },
+      "candidate": {
+        "count": 441,
+        "mse": 0.6315931754799813,
+        "mae": 0.7256825090050191,
+        "sign_accuracy": 0.81859410430839,
+        "prediction_mean": 0.05916966187668428,
+        "target_mean": 0.006802721088435374,
+        "mean_error": 0.052366940788248904
+      },
+      "delta_candidate_minus_incumbent": {
+        "mse": -0.42191306688083663,
+        "mae": -0.26798993321872144,
+        "sign_accuracy": 0.25850340136054417,
+        "mean_error": -0.036214126103326395
+      }
+    },
+    "by_winner": {
+      "0": {
+        "count": 247,
+        "incumbent": {
+          "count": 247,
+          "mse": 0.6355145320142244,
+          "mae": 0.791465105150255,
+          "sign_accuracy": 0.9838056680161943,
+          "prediction_mean": 0.08365899935314763,
+          "target_mean": 0.012145748987854251,
+          "mean_error": 0.07151325036529338
+        },
+        "candidate": {
+          "count": 247,
+          "mse": 0.5410496016176068,
+          "mae": 0.6932250546660983,
+          "sign_accuracy": 0.979757085020243,
+          "prediction_mean": 0.036197542058311494,
+          "target_mean": 0.012145748987854251,
+          "mean_error": 0.024051793070457243
+        },
+        "delta_candidate_minus_incumbent": {
+          "mse": -0.09446493039661752,
+          "mae": -0.09824005048415674,
+          "sign_accuracy": -0.004048582995951344,
+          "mean_error": -0.04746145729483614
+        }
+      },
+      "1": {
+        "count": 194,
+        "incumbent": {
+          "count": 194,
+          "mse": 1.585691564296945,
+          "mae": 1.2511219899410133,
+          "sign_accuracy": 0.020618556701030927,
+          "prediction_mean": 0.11031174051008888,
+          "target_mean": 0.0,
+          "mean_error": 0.11031174051008888
+        },
+        "candidate": {
+          "count": 194,
+          "mse": 0.7468728803459941,
+          "mae": 0.7670072060241604,
+          "sign_accuracy": 0.6134020618556701,
+          "prediction_mean": 0.08841767009904551,
+          "target_mean": 0.0,
+          "mean_error": 0.08841767009904551
+        },
+        "delta_candidate_minus_incumbent": {
+          "mse": -0.8388186839509508,
+          "mae": -0.4841147839168529,
+          "sign_accuracy": 0.5927835051546392,
+          "mean_error": -0.021894070411043368
+        }
+      }
+    },
+    "by_player_to_move": {
+      "0": {
+        "count": 222,
+        "incumbent": {
+          "count": 222,
+          "mse": 1.1008763817048042,
+          "mae": 0.9953744410797283,
+          "sign_accuracy": 0.5630630630630631,
+          "prediction_mean": 0.3204730530982619,
+          "target_mean": 0.12612612612612611,
+          "mean_error": 0.19434692697213576
+        },
+        "candidate": {
+          "count": 222,
+          "mse": 0.6604463978274726,
+          "mae": 0.746032030590147,
+          "sign_accuracy": 0.8108108108108109,
+          "prediction_mean": 0.1276275458418437,
+          "target_mean": 0.12612612612612611,
+          "mean_error": 0.0015014197157175691
+        },
+        "delta_candidate_minus_incumbent": {
+          "mse": -0.44042998387733157,
+          "mae": -0.24934241048958128,
+          "sign_accuracy": 0.24774774774774777,
+          "mean_error": -0.1928455072564182
+        }
+      },
+      "1": {
+        "count": 219,
+        "incumbent": {
+          "count": 219,
+          "mse": 1.0054871969984212,
+          "mae": 0.991947128314931,
+          "sign_accuracy": 0.5570776255707762,
+          "prediction_mean": -0.13278889172890151,
+          "target_mean": -0.1141552511415525,
+          "mean_error": -0.018633640587349003
+        },
+        "candidate": {
+          "count": 219,
+          "mse": 0.6023447035112914,
+          "mae": 0.7050542268502318,
+          "sign_accuracy": 0.8264840182648402,
+          "prediction_mean": -0.010226001320874582,
+          "target_mean": -0.1141552511415525,
+          "mean_error": 0.10392924982067793
+        },
+        "delta_candidate_minus_incumbent": {
+          "mse": -0.4031424934871297,
+          "mae": -0.28689290146469926,
+          "sign_accuracy": 0.26940639269406397,
+          "mean_error": 0.12256289040802693
+        }
+      }
+    },
+    "by_ply_bucket": {
+      "0-9": {
+        "count": 50,
+        "incumbent": {
+          "count": 50,
+          "mse": 0.9614598032719958,
+          "mae": 0.9568924382328987,
+          "sign_accuracy": 0.6,
+          "prediction_mean": 0.027308492958545684,
+          "target_mean": 0.0,
+          "mean_error": 0.027308492958545684
+        },
+        "candidate": {
+          "count": 50,
+          "mse": 0.970941264418751,
+          "mae": 0.9777134841680527,
+          "sign_accuracy": 0.6,
+          "prediction_mean": 0.0434485325217247,
+          "target_mean": 0.0,
+          "mean_error": 0.0434485325217247
+        },
+        "delta_candidate_minus_incumbent": {
+          "mse": 0.009481461146755188,
+          "mae": 0.020821045935153992,
+          "sign_accuracy": 0.0,
+          "mean_error": 0.01614003956317902
+        }
+      },
+      "10-19": {
+        "count": 50,
+        "incumbent": {
+          "count": 50,
+          "mse": 0.9605121658783509,
+          "mae": 0.954810298383236,
+          "sign_accuracy": 0.6,
+          "prediction_mean": 0.05505985587835312,
+          "target_mean": 0.0,
+          "mean_error": 0.05505985587835312
+        },
+        "candidate": {
+          "count": 50,
+          "mse": 0.957744902062784,
+          "mae": 0.9699149525538087,
+          "sign_accuracy": 0.62,
+          "prediction_mean": 0.030129190124571322,
+          "target_mean": 0.0,
+          "mean_error": 0.030129190124571322
+        },
+        "delta_candidate_minus_incumbent": {
+          "mse": -0.0027672638155669116,
+          "mae": 0.015104654170572718,
+          "sign_accuracy": 0.020000000000000018,
+          "mean_error": -0.024930665753781795
+        }
+      },
+      "20-29": {
+        "count": 50,
+        "incumbent": {
+          "count": 50,
+          "mse": 0.9529798662831248,
+          "mae": 0.9484631244838237,
+          "sign_accuracy": 0.6,
+          "prediction_mean": 0.08179307773709298,
+          "target_mean": 0.0,
+          "mean_error": 0.08179307773709298
+        },
+        "candidate": {
+          "count": 50,
+          "mse": 0.8431501849430825,
+          "mae": 0.9048277668654918,
+          "sign_accuracy": 0.76,
+          "prediction_mean": 0.0498844513297081,
+          "target_mean": 0.0,
+          "mean_error": 0.0498844513297081
+        },
+        "delta_candidate_minus_incumbent": {
+          "mse": -0.10982968134004234,
+          "mae": -0.04363535761833193,
+          "sign_accuracy": 0.16000000000000003,
+          "mean_error": -0.03190862640738488
+        }
+      },
+      "30-59": {
+        "count": 150,
+        "incumbent": {
+          "count": 150,
+          "mse": 0.9953334462335534,
+          "mae": 0.9685550304191808,
+          "sign_accuracy": 0.6066666666666667,
+          "prediction_mean": 0.09740263959392906,
+          "target_mean": 0.0,
+          "mean_error": 0.09740263959392906
+        },
+        "candidate": {
+          "count": 150,
+          "mse": 0.6516819063754916,
+          "mae": 0.7460504632877807,
+          "sign_accuracy": 0.8533333333333334,
+          "prediction_mean": 0.03470610149825613,
+          "target_mean": 0.0,
+          "mean_error": 0.03470610149825613
+        },
+        "delta_candidate_minus_incumbent": {
+          "mse": -0.34365153985806174,
+          "mae": -0.2225045671314001,
+          "sign_accuracy": 0.2466666666666667,
+          "mean_error": -0.06269653809567294
+        }
+      },
+      "60+": {
+        "count": 141,
+        "incumbent": {
+          "count": 141,
+          "mse": 1.21665705088237,
+          "mae": 1.0632482227148548,
+          "sign_accuracy": 0.46808510638297873,
+          "prediction_mean": 0.13649491653472173,
+          "target_mean": 0.02127659574468085,
+          "mean_error": 0.11521832079004087
+        },
+        "candidate": {
+          "count": 141,
+          "mse": 0.2992091266604053,
+          "mae": 0.4645078496360187,
+          "sign_accuracy": 0.950354609929078,
+          "prediction_mean": 0.10436026215658965,
+          "target_mean": 0.02127659574468085,
+          "mean_error": 0.0830836664119088
+        },
+        "delta_candidate_minus_incumbent": {
+          "mse": -0.9174479242219646,
+          "mae": -0.5987403730788361,
+          "sign_accuracy": 0.4822695035460993,
+          "mean_error": -0.032134654378132066
+        }
+      }
+    }
+  },
+  "calibration_bins": {
+    "incumbent": [
+      {
+        "range": [
+          -0.6,
+          -0.2
+        ],
+        "count": 23,
+        "mean_prediction": -0.23259107315022012,
+        "observed_win_rate": 0.7391304347826086
+      },
+      {
+        "range": [
+          -0.2,
+          0.2
+        ],
+        "count": 198,
+        "mean_prediction": -0.11790593028582416,
+        "observed_win_rate": 0.41414141414141414
+      },
+      {
+        "range": [
+          0.2,
+          0.6
+        ],
+        "count": 220,
+        "mean_prediction": 0.32163281535560434,
+        "observed_win_rate": 0.5590909090909091
+      }
+    ],
+    "candidate": [
+      {
+        "range": [
+          -1.0,
+          -0.6
+        ],
+        "count": 41,
+        "mean_prediction": -0.7517959446441836,
+        "observed_win_rate": 0.0
+      },
+      {
+        "range": [
+          -0.6,
+          -0.2
+        ],
+        "count": 61,
+        "mean_prediction": -0.32550097000403483,
+        "observed_win_rate": 0.16393442622950818
+      },
+      {
+        "range": [
+          -0.2,
+          0.2
+        ],
+        "count": 197,
+        "mean_prediction": 0.011795262484645783,
+        "observed_win_rate": 0.4263959390862944
+      },
+      {
+        "range": [
+          0.2,
+          0.6
+        ],
+        "count": 82,
+        "mean_prediction": 0.3494875961687507,
+        "observed_win_rate": 0.8292682926829268
+      },
+      {
+        "range": [
+          0.6,
+          1.0
+        ],
+        "count": 60,
+        "mean_prediction": 0.7631894032160441,
+        "observed_win_rate": 1.0
+      }
+    ]
+  },
+  "game_level_analysis": {
+    "games": 5,
+    "per_game": {
+      "2": {
+        "mse": -0.9309535815033009,
+        "mae": -0.4866787195395753,
+        "sign_accuracy": 0.7346938775510204
+      },
+      "18": {
+        "mse": -0.7447643093662605,
+        "mae": -0.48149743296865677,
+        "sign_accuracy": 0.44791666666666663
+      },
+      "31": {
+        "mse": -0.08242647026603,
+        "mae": -0.06890398318352609,
+        "sign_accuracy": 0.009708737864077666
+      },
+      "34": {
+        "mse": -0.14048320283864618,
+        "mae": -0.14978180967177024,
+        "sign_accuracy": -0.012658227848101222
+      },
+      "44": {
+        "mse": -0.05761135917400606,
+        "mae": -0.08208337288636425,
+        "sign_accuracy": -0.01538461538461533
+      }
+    },
+    "bootstrap_95_ci": {
+      "mse": {
+        "low": -0.7240103048284385,
+        "high": -0.08411177234374366
+      },
+      "mae": {
+        "low": -0.4172268229376469,
+        "high": -0.09035130436231018
+      },
+      "sign_accuracy": {
+        "low": -0.009275389720271088,
+        "high": 0.5278680142943253
+      }
+    }
+  }
+}

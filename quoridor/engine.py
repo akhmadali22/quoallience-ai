@@ -75,6 +75,26 @@ class GameState:
         }
 
 
+def state_repetition_key(state: GameState) -> tuple:
+    """Return a hashable identity for a Quoridor position.
+
+    Ply is deliberately excluded: reaching the same board configuration,
+    side-to-move, and wall inventory at a different move number is the same
+    repetition position. Winner is included for completeness, although
+    callers normally record only non-terminal states.
+    """
+    return (
+        state.pawns,
+        tuple(sorted(
+            (wall.orientation, wall.x, wall.y)
+            for wall in state.walls
+        )),
+        state.walls_remaining,
+        state.current_player,
+        state.winner,
+    )
+
+
 def inside(p: Position) -> bool:
     x, y = p
     return 0 <= x < 9 and 0 <= y < 9
@@ -242,6 +262,42 @@ def has_path(state: GameState, player: int) -> bool:
         PROFILE["has_path_time"] += perf_counter() - started
 
 
+def shortest_path_metrics(state: GameState, player: int, *, count_cap: int = 1_000_000) -> tuple[int | None, int]:
+    """Return shortest distance and count of shortest routes to the goal row."""
+    if player not in (0, 1):
+        raise ValueError("Player must be 0 or 1")
+    if count_cap < 1:
+        raise ValueError("count_cap must be positive")
+    start = state.pawns[player]
+    goal_y = 0 if player == 0 else 8
+    distances = {start: 0}
+    ways = {start: 1}
+    queue = deque([start])
+    goal_distance = None
+    goal_routes = 0
+    while queue:
+        current = queue.popleft()
+        distance = distances[current]
+        if goal_distance is not None and distance > goal_distance:
+            break
+        if current[1] == goal_y:
+            goal_distance = distance
+            goal_routes = min(count_cap, goal_routes + ways[current])
+            continue
+        x, y = current
+        for nxt in ((x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)):
+            if not inside(nxt) or blocked(state.walls, current, nxt):
+                continue
+            next_distance = distance + 1
+            if nxt not in distances:
+                distances[nxt] = next_distance
+                ways[nxt] = ways[current]
+                queue.append(nxt)
+            elif distances[nxt] == next_distance:
+                ways[nxt] = min(count_cap, ways[nxt] + ways[current])
+    return goal_distance, goal_routes
+
+
 def shortest_distance(
     state: GameState,
     player: int,
@@ -279,6 +335,36 @@ def shortest_distance(
             visited.add(nxt)
             queue.append((nxt, distance + 1))
 
+    return None
+
+
+def shortest_distance_to_position(
+    state: GameState,
+    player: int,
+    target: Position,
+) -> int | None:
+    """Return the shortest wall-aware distance from a player's pawn to a square.
+
+    The opposing pawn is ignored, matching shortest_distance()'s path metric.
+    """
+    if player not in (0, 1):
+        raise ValueError("Player must be 0 or 1")
+    if not inside(target):
+        raise ValueError("Target position is outside the board")
+
+    start = state.pawns[player]
+    queue = deque([(start, 0)])
+    visited = {start}
+    while queue:
+        current, distance = queue.popleft()
+        if current == target:
+            return distance
+        x, y = current
+        for nxt in ((x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)):
+            if not inside(nxt) or nxt in visited or blocked(state.walls, current, nxt):
+                continue
+            visited.add(nxt)
+            queue.append((nxt, distance + 1))
     return None
 
 
@@ -344,6 +430,13 @@ def walls_overlap_or_cross(
     existing: frozenset[Wall],
     candidate: Wall,
 ) -> bool:
+    # An identical wall is already occupying this exact segment.
+    # Sets silently collapse duplicates, so this must be rejected before
+    # applying the action or the player would lose a wall without changing
+    # the board.
+    if candidate in existing:
+        return True
+
     x = candidate.x
     y = candidate.y
 
