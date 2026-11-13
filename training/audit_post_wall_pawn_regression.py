@@ -248,13 +248,17 @@ def run_replay(model, position: dict, *, budget: int, c_puct: float, device: str
         })
         if response_probe_enabled:
             pawn_stats = search.last_search_stats.get("root_action_stats", {})
+            fallback_all = search.last_search_stats.get("root_repetition_fallback_all_actions", False)
+            eligible = lambda x: (not avoid) or fallback_all or not x.get("repetition_blocked", False)
             regressions = [
                 (int(a), x) for a, x in pawn_stats.items()
-                if x.get("category") == "pawn" and x.get("distance_delta") is not None and x["distance_delta"] < 0
+                if x.get("category") == "pawn" and x.get("distance_delta") is not None
+                and x["distance_delta"] < 0 and eligible(x)
             ]
             progresses = [
                 (int(a), x) for a, x in pawn_stats.items()
-                if x.get("category") == "pawn" and x.get("distance_delta") is not None and x["distance_delta"] > 0
+                if x.get("category") == "pawn" and x.get("distance_delta") is not None
+                and x["distance_delta"] > 0 and eligible(x)
             ]
             best_reg = max(regressions, key=lambda item: item[1].get("visits", 0), default=None)
             best_prog = max(progresses, key=lambda item: item[1].get("visits", 0), default=None)
