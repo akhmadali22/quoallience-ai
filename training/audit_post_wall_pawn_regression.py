@@ -190,6 +190,16 @@ def root_trace_summary(stats: dict) -> dict:
 def response_probe(model, state: GameState, action: int, budget: int, c_puct: float, device: str) -> dict:
     """Let the opponent search/respond, then evaluate the resulting root-player state."""
     after_our_move = apply_action_index(state, action)
+    if after_our_move.winner is not None:
+        return {
+            "opponent_reply": None,
+            "state_after_reply": after_our_move.to_dict(),
+            "value_for_original_player": (
+                1.0 if after_our_move.winner == state.current_player else -1.0
+            ),
+            "terminal": True,
+            "winner": after_our_move.winner,
+        }
     reply_search = MCTS(
         model, simulations=budget, c_puct=c_puct, device=device,
         progressive_widening=False, category_exploration=0.0,
