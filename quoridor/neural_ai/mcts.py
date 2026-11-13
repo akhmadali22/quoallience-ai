@@ -454,7 +454,7 @@ class MCTS:
                 return dict(max(candidates, key=lambda row: row["puct_score"]))
 
             selected = next(row for row in scored if row["action"] == best_action)
-            trace_sink.append({
+            trace_row = {
                 "simulation": simulation_index,
                 "selection_depth": selection_depth,
                 "node_ply": node.state.ply,
@@ -467,7 +467,32 @@ class MCTS:
                 "top_wall": best_in("wall"),
                 "top_score_tie_actions": list(tied_actions),
                 "selected": dict(selected),
-            })
+            }
+            # Post-wall regression diagnosis needs every root pawn candidate,
+            # not only the category winner. This is trace-only instrumentation:
+            # it never participates in action scoring or selection.
+            if selection_depth == 0:
+                from .encoder import decode_action
+                distance_before = shortest_distance(node.state, node.state.current_player)
+                pawn_candidates = []
+                for candidate in scored:
+                    if candidate["category"] != "pawn":
+                        continue
+                    kind, destination = decode_action(candidate["action"])
+                    next_state = apply_action_index(node.state, candidate["action"])
+                    distance_after = shortest_distance(next_state, node.state.current_player)
+                    pawn_candidates.append({
+                        **candidate,
+                        "destination": list(destination) if kind == "move" else None,
+                        "distance_before": distance_before,
+                        "distance_after": distance_after,
+                        "distance_delta": (
+                            None if distance_before is None or distance_after is None
+                            else distance_before - distance_after
+                        ),
+                    })
+                trace_row["candidate_pawn_actions"] = pawn_candidates
+            trace_sink.append(trace_row)
         return best_action, best_edge
 
     @staticmethod
@@ -720,6 +745,18 @@ class MCTS:
                         "value_sum": edge.value_sum,
                         "q_delta": q_after - q_before,
                     }
+                    # Record the post-backup snapshot for every root pawn
+                    # candidate. Unselected candidates retain their prior Q/N.
+                    if trace_row.get("selection_depth") == 0:
+                        for candidate in trace_row.get("candidate_pawn_actions", []):
+                            if candidate["action"] == trace_row["selected"]["action"]:
+                                candidate["q_after_backup"] = edge.q
+                                candidate["visits_after_backup"] = edge.visits
+                                candidate["value_sum_after_backup"] = edge.value_sum
+                            else:
+                                candidate["q_after_backup"] = candidate["q"]
+                                candidate["visits_after_backup"] = candidate["visits"]
+                                candidate["value_sum_after_backup"] = candidate["q"] * candidate["visits"]
 
         all_root_edges = self._all_root_edges(root)
         total = sum(edge.visits for edge in all_root_edges.values())
