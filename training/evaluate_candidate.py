@@ -78,6 +78,7 @@ def play_game(
     initial_wall_candidates: int,
     candidate_opening_goal_directed_prior: bool,
     candidate_avoid_recent_state_repetition: bool,
+    avoid_recent_state_repetition: bool,
 ) -> dict:
     models = {
         "candidate": candidate_model,
@@ -104,7 +105,8 @@ def play_game(
                 candidate_opening_goal_directed_prior and label == "candidate"
             ),
             avoid_recent_state_repetition=(
-                candidate_avoid_recent_state_repetition and label == "candidate"
+                avoid_recent_state_repetition
+                or (candidate_avoid_recent_state_repetition and label == "candidate")
             ),
         )
         for label, model in models.items()
@@ -116,6 +118,11 @@ def play_game(
     pawn_history = {0: [], 1: []}
     state = GameState.initial()
     state_history = [state_repetition_key(state)]
+    state_snapshots = [{
+        "ply": state.ply,
+        "key": state_repetition_key(state),
+        "walls_remaining": list(state.walls_remaining),
+    }]
     pawn_history[0].append(state.pawns[0])
     pawn_history[1].append(state.pawns[1])
     trace = []
@@ -145,6 +152,11 @@ def play_game(
         })
         state = next_state
         state_history.append(state_repetition_key(state))
+        state_snapshots.append({
+            "ply": state.ply,
+            "key": state_repetition_key(state),
+            "walls_remaining": list(state.walls_remaining),
+        })
 
     winner_agent = None if state.winner is None else player_agents[state.winner]
     result = (
@@ -157,7 +169,39 @@ def play_game(
         for item in trace
         if item["category"] == "pawn" and item.get("selected_action_root_stats")
     ]
+    both_walls_exhausted_ply = next((
+        item["ply"] for item in state_snapshots
+        if item["walls_remaining"] == [0, 0]
+    ), None)
+    post_wall_snapshots = [
+        item for item in state_snapshots
+        if both_walls_exhausted_ply is not None
+        and item["ply"] >= both_walls_exhausted_ply
+    ]
+    seen_post_wall_states: dict[tuple, int] = {}
+    post_wall_repeat_events = []
+    for item in post_wall_snapshots:
+        previous_ply = seen_post_wall_states.get(item["key"])
+        if previous_ply is not None:
+            post_wall_repeat_events.append({
+                "first_ply": previous_ply,
+                "repeat_ply": item["ply"],
+                "cycle_length": item["ply"] - previous_ply,
+            })
+        else:
+            seen_post_wall_states[item["key"]] = item["ply"]
     repetition_summary = {
+        "both_players_out_of_walls_ply": both_walls_exhausted_ply,
+        "post_wall_exhaustion_plies": (
+            max(0, state.ply - both_walls_exhausted_ply)
+            if both_walls_exhausted_ply is not None else None
+        ),
+        "post_wall_unique_full_states": len(seen_post_wall_states),
+        "post_wall_repeated_state_events": len(post_wall_repeat_events),
+        "post_wall_repeat_events": post_wall_repeat_events,
+        "post_wall_longest_cycle_length": max(
+            (item["cycle_length"] for item in post_wall_repeat_events), default=None
+        ),
         "repeated_root_positions": sum(
             item["root_diagnostics"].get("root_current_state_repetition_count", 0) > 1
             for item in trace
@@ -182,6 +226,8 @@ def play_game(
         "winner_agent": winner_agent,
         "result_for_candidate": result,
         "plies": state.ply,
+        "final_walls_remaining": list(state.walls_remaining),
+        "both_players_out_of_walls_ply": both_walls_exhausted_ply,
         "draw_reason": "max_plies" if winner_agent is None else None,
         "repetition_diagnostics": repetition_summary,
         "action_trace": trace,
@@ -211,7 +257,11 @@ def main() -> int:
     )
     parser.add_argument(
         "--candidate-avoid-recent-state-repetition", action="store_true",
-        help="Apply full-state repetition avoidance to candidate only; incumbent remains vanilla PUCT.",
+        help="Legacy asymmetric option: apply repetition avoidance to candidate only.",
+    )
+    parser.add_argument(
+        "--avoid-recent-state-repetition", action="store_true",
+        help="Apply identical full-state repetition avoidance to both candidate and incumbent.",
     )
     parser.add_argument("--min-decisive-pairs", type=int, default=10)
     parser.add_argument("--alpha", type=float, default=0.05)
@@ -265,6 +315,7 @@ def main() -> int:
                 initial_wall_candidates=args.initial_wall_candidates,
                 candidate_opening_goal_directed_prior=args.candidate_opening_goal_directed_prior,
                 candidate_avoid_recent_state_repetition=args.candidate_avoid_recent_state_repetition,
+                avoid_recent_state_repetition=args.avoid_recent_state_repetition,
             )
             games.append(game)
             pair_games.append(game)
@@ -324,6 +375,11 @@ def main() -> int:
             "initial_wall_candidates": args.initial_wall_candidates,
             "candidate_opening_goal_directed_prior": args.candidate_opening_goal_directed_prior,
             "candidate_avoid_recent_state_repetition": args.candidate_avoid_recent_state_repetition,
+            "avoid_recent_state_repetition": args.avoid_recent_state_repetition,
+            "repetition_avoidance_scope": (
+                "both_models" if args.avoid_recent_state_repetition else
+                "candidate_only_legacy" if args.candidate_avoid_recent_state_repetition else "disabled"
+            ),
             "min_decisive_pairs": args.min_decisive_pairs,
             "alpha": args.alpha,
             "selection_temperature": 0.0,
