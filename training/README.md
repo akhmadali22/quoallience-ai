@@ -988,3 +988,49 @@ and no checkpoint, prior, heuristic, or value head is changed.
 The output is a fixed-budget multi-ply tactical diagnostic, not exhaustive
 minimax. It tests whether a move's advantage survives a specific sequence of
 MCTS-selected replies; it does not prove that the sequence is optimal.
+
+
+### Per-ply regression bias attribution (instrumentation only)
+
+After the deeper continuation result, capture every legal root action at every
+continuation ply to locate when pawn regression begins to receive more prior or
+search support. This reruns the same fixed 100 roots, both checkpoints, both
+root-search conditions, and the same four continuation plies:
+
+```bash
+python -m training.probe_post_wall_regression_deeper \
+  models/checkpoints/exp_001r_vonly_strict.pt \
+  models/checkpoints/neural_v1.pt \
+  data/diagnostics/post_wall_pawn_regression_audit.json \
+  data/diagnostics/paired_match_repetition_avoidance_stage1.json \
+  data/diagnostics/post_wall_pawn_regression_response_probes_100.json \
+  --continuation-plies 4 \
+  --output data/diagnostics/post_wall_pawn_regression_per_ply_attribution.json \
+  --csv data/diagnostics/post_wall_pawn_regression_per_ply_attribution.csv
+```
+
+Each continuation search records every legal action, including unvisited pawn
+moves and pending/inactive wall candidates:
+- neural network prior, effective edge prior, and normalized selection prior
+  when the action is active;
+- initial Q and visits (both exactly zero for a newly created root edge);
+- final backed-up Q and raw edge visits after the full simulation budget;
+- active/selected flags, repetition filtering, and pawn shortest-distance delta.
+
+Pawn actions are classified from the perspective of the player currently moving
+at that ply: regression, progress, or neutral. Horizontal and vertical wall
+actions remain separate categories. Thus a response by the opponent is not
+incorrectly classified using the original root player's goal direction.
+
+The JSON also contains pooled per-ply category summaries, separated by
+checkpoint, vanilla/repetition condition, and whether the branch began with the
+saved regression or progress action. Compare prior mass first, then final Q,
+then raw visits. Initial Q is expected to be zero for all root edges; any
+nonzero value would indicate an instrumentation or lifecycle error.
+
+This is observational only. It does not change checkpoint weights, neural priors,
+heuristics, action legality, repetition filtering, PUCT constants, tie-breaking,
+or move selection. Each search still selects the action with the highest raw
+visit count after the same fixed budget. The result is a fixed-budget MCTS
+diagnostic, not minimax proof. No experiment is executed by this script's
+GitHub commit; run it locally with the exact checkpoint and source files above.
