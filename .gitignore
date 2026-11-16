@@ -192,3 +192,4 @@ __screenshots__/
 .gemini/settings.json
 .mcp.json
 GEMINI.md
+data/diagnostics/post_wall_pawn_regression_audit.json
