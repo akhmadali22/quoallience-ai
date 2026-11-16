@@ -70,27 +70,39 @@ def final_candidate_map(variant):
 
 
 def visit_totals(variant):
-    """Sum actual edge visits from the final root trace snapshot.
+    """Sum final visits across every root pawn edge.
 
-    The audit runner's historical `root_visits` field contains the probability
-    distribution returned by MCTS.search(), not integer visit counts. The trace
-    records each candidate's visits_after_backup, which is the correct source.
+    Do not assume the last trace row is a complete final snapshot. Trace rows
+    are per-selection snapshots; collect the greatest post-backup visit count
+    observed for each action across all root-depth rows. Edge visits are
+    monotonic, so the maximum is the final count. Fall back to the pre-selection
+    visits field for older traces that predate visits_after_backup.
     """
     trace = variant.get("selection_trace") or []
-    rows = candidate_rows(trace[-1]) if trace else []
     totals = {"regression": 0, "progress": 0}
-    for row in rows:
-        delta = number(row.get("distance_delta"))
-        if delta is None:
+    final_by_action = {}
+    for snapshot in trace:
+        if snapshot.get("selection_depth") != 0:
             continue
-        category = "regression" if delta < 0 else "progress" if delta > 0 else None
-        if category is None:
-            continue
-        count = row.get("visits_after_backup", row.get("visits", 0))
-        try:
-            totals[category] += int(count or 0)
-        except (TypeError, ValueError, OverflowError):
-            pass
+        for row in candidate_rows(snapshot):
+            aid = action_id(row)
+            delta = number(row.get("distance_delta"))
+            if aid is None or delta is None:
+                continue
+            category = "regression" if delta < 0 else "progress" if delta > 0 else None
+            if category is None:
+                continue
+            raw = row.get("visits_after_backup")
+            if raw is None:
+                raw = row.get("visits", 0)
+            count = number(raw)
+            if count is None:
+                continue
+            previous = final_by_action.get(aid)
+            if previous is None or count > previous[1]:
+                final_by_action[aid] = (category, int(count))
+    for category, count in final_by_action.values():
+        totals[category] += count
     return totals
 
 
