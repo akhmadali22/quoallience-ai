@@ -944,8 +944,8 @@ python -m training.probe_post_wall_regression_deeper \
   data/diagnostics/paired_match_repetition_avoidance_stage1.json \
   data/diagnostics/post_wall_pawn_regression_response_probes_100.json \
   --continuation-plies 4 \
-  --output data/diagnostics/post_wall_pawn_regression_deeper_4ply.json \
-  --csv data/diagnostics/post_wall_pawn_regression_deeper_4ply.csv
+  --output data/diagnostics/post_wall_pawn_regression_deeper_4ply_visitfix.json \
+  --csv data/diagnostics/post_wall_pawn_regression_deeper_4ply_visitfix.csv
 ```
 
 The reference probe report fixes the exact same 100 unique roots as the previous
@@ -964,6 +964,20 @@ repetition-avoidance condition enables full-state repetition filtering at every
 continuation ply using the reconstructed chronological history. The final
 position is evaluated by the unchanged matching checkpoint from the original
 root player's perspective; terminal wins/losses use exact values.
+
+Continuation visit instrumentation reads raw edge counts from
+`MCTS.last_search_stats["root_action_stats"][action]["visits"]`, not from the
+normalized policy returned by `MCTS.search()`. Every continuation verifies that
+the sum of root edge visits equals the requested simulation budget, and records
+the selected edge count, total root visits, requested simulations, and complete
+per-action root visit counts.
+
+**Historical result warning:** the visit fields in
+`post_wall_pawn_regression_deeper_4ply.json` and its CSV are invalid. The earlier
+runner incorrectly summed normalized policy probabilities and truncated the
+selected probability to an integer. Its final value evaluations and selected
+moves remain usable; do not use its visit statistics. Rerun with the
+`_visitfix` output paths above for corrected visit data.
 
 This produces 200 paired comparisons (100 roots × 2 root-search conditions),
 or up to 1,600 continuation MCTS searches (200 comparisons × 2 move branches

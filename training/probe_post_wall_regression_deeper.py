@@ -173,19 +173,42 @@ def continue_branch(
             repetition_penalty=0.0,
             pawn_progress_bonus=0.0,
         )
-        visits = search.search(
+        policy = search.search(
             state,
             add_root_noise=False,
             recent_state_keys=history,
             record_selection_trace=False,
         )
-        if not visits:
+        if not policy:
             raise RuntimeError(
                 f"No continuation action at ply={state.ply}, player={player}, "
                 f"avoid_repetition={avoid_repetition}"
             )
-        action = max(visits, key=visits.get)
-        selected_visits = int(visits[action])
+
+        # MCTS.search() returns normalized visit probabilities, not raw visit
+        # counts. Read the backed-up edge counts from last_search_stats instead.
+        search_stats = search.last_search_stats
+        root_action_stats = search_stats.get("root_action_stats", {})
+        root_action_visits = {
+            int(action): int(action_stats["visits"])
+            for action, action_stats in root_action_stats.items()
+        }
+        root_visit_total = sum(root_action_visits.values())
+        if not root_action_visits or root_visit_total != budget:
+            raise RuntimeError(
+                "Continuation root visit accounting mismatch: "
+                f"ply={state.ply}, expected={budget}, actual={root_visit_total}, "
+                f"stats_simulations={search_stats.get('simulations')}"
+            )
+        if set(root_action_visits) != set(policy):
+            raise RuntimeError(
+                "Continuation policy/action visit keys differ: "
+                f"ply={state.ply}, policy={len(policy)}, "
+                f"visit_counts={len(root_action_visits)}"
+            )
+
+        action = max(root_action_visits, key=root_action_visits.get)
+        selected_visits = root_action_visits[action]
         state = apply_action_index(state, int(action))
         history.append(state_repetition_key(state))
         moves.append({
@@ -193,7 +216,12 @@ def continue_branch(
             "player": player,
             "action": int(action),
             "selected_action_visits": selected_visits,
-            "root_visit_total": int(sum(visits.values())),
+            "root_visit_total": root_visit_total,
+            "root_simulations_requested": int(search_stats["simulations"]),
+            "root_action_visit_counts": {
+                str(action): count
+                for action, count in sorted(root_action_visits.items())
+            },
             "state_ply_after_move": int(state.ply),
             "terminal_after_move": state.winner is not None,
         })
@@ -392,7 +420,7 @@ def main() -> int:
         "sample_identity": "Exactly the 100 unique roots listed in the prior representative response-probe report.",
         "checkpoint_split": "Candidate-origin roots use candidate checkpoint; incumbent-origin roots use incumbent checkpoint.",
         "root_actions": "Best-visit regression and progress actions recovered from the saved root traces; no root search rerun.",
-        "continuation": {
+        "visit_instrumentation": {\n            "version": 2,\n            "source": "MCTS.last_search_stats.root_action_stats[*].visits",\n            "root_visit_total_validation": "Every completed continuation search must sum to the requested simulation budget.",\n            "historical_report_warning": "Visit fields in post_wall_pawn_regression_deeper_4ply.json and its CSV are invalid because they summed normalized policy probabilities; final values and move choices remain usable.",\n        },\n        "continuation": {
             "additional_plies_after_root_action": args.continuation_plies,
             "simulations_per_continuation_ply": budget,
             "c_puct": c_puct,
