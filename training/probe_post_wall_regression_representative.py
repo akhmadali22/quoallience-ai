@@ -18,6 +18,7 @@ from pathlib import Path
 from statistics import mean
 
 import torch
+import ijson
 
 from training.audit_post_wall_pawn_regression import (
     load_model,
@@ -150,11 +151,40 @@ def main():
         parser.error(f"Audit JSON not found: {args.audit_json}")
 
     torch.set_num_threads(args.threads)
-    report = json.loads(args.audit_json.read_text(encoding="utf-8"))
-    runs = report.get("runs", [])
-    if not runs:
+    # First pass reads only compact root metadata; second pass materializes
+    # the 100 selected roots. The 450 MB trace is never loaded as one object.
+    metadata = []
+    for index, run in enumerate(ijson.items(args.audit_json.open("rb"), "runs.item")):
+        source = run.get("source") or {}
+        metadata.append({
+            "_index": index,
+            "source": {
+                "source_agent": source.get("source_agent"),
+                "source_game_index": source.get("source_game_index"),
+                "ply": source.get("ply"),
+            },
+        })
+    if not metadata:
         parser.error("Audit JSON contains no runs.")
-    selected = stratified_sample(runs, args.positions, args.seed)
+    selected_meta = stratified_sample(metadata, args.positions, args.seed)
+    selected_indices = {row["_index"] for row in selected_meta}
+    selected = []
+    for index, run in enumerate(ijson.items(args.audit_json.open("rb"), "runs.item")):
+        if index in selected_indices:
+            selected.append(run)
+    selected.sort(key=lambda run: (
+        (run.get("source") or {}).get("source_agent", ""),
+        int((run.get("source") or {}).get("source_game_index", 0)),
+        int((run.get("source") or {}).get("ply", 0)),
+    ))
+
+    def top_level_scalar(key, default):
+        scalar_events = {"string", "number", "boolean", "null"}
+        with args.audit_json.open("rb") as handle:
+            for prefix, event, value in ijson.parse(handle):
+                if prefix == key and event in scalar_events:
+                    return value
+        return default
 
     models = {
         "candidate": load_model(args.candidate_checkpoint, device=args.device),
@@ -163,8 +193,8 @@ def main():
     for model in models.values():
         model.eval()
 
-    c_puct = float(report.get("c_puct", 1.5))
-    budget = int(report.get("simulations", 32))
+    c_puct = float(top_level_scalar("c_puct", 1.5))
+    budget = int(top_level_scalar("simulations", 32))
     output_rows = []
     total_jobs = len(selected) * len(VARIANTS)
     job = 0
