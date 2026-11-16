@@ -853,3 +853,34 @@ Keep the source evaluation, both checkpoints, simulation budget, and output
 path fixed for reproducibility. Do not interpret shortest-path regression by
 itself as a bad move: the opponent pawn and jump rules can make geometric
 distance an incomplete measure of move quality.
+
+
+### Reduce the post-wall pawn regression audit
+
+The full audit JSON can be hundreds of MB because it preserves every root selection
+trace. Reduce it without loading the entire file into memory:
+
+```bash
+python -m training.summarize_post_wall_regression_audit \
+  data/diagnostics/post_wall_pawn_regression_audit.json \
+  --output data/diagnostics/post_wall_pawn_regression_summary.json \
+  --csv data/diagnostics/post_wall_pawn_regression_response_probes.csv
+```
+
+The reducer streams `runs.item` with `ijson`. It reports separate results for
+vanilla PUCT and PUCT with repetition avoidance:
+- mean best-action prior for regression vs progress;
+- mean final Q for regression vs progress and the percentage of roots where
+  regression Q is higher;
+- total regression-action visits vs progress-action visits, including their ratio
+  and visit share;
+- percentage of roots where regression has the higher PUCT score on the first
+  root selection;
+- response-probe value difference after the opponent's vanilla-PUCT reply.
+
+Prior and Q comparisons are paired per root: the highest-PUCT regression action
+is compared with the highest-PUCT progress action in that snapshot. Visit totals
+sum visits over all root pawn actions in each distance-delta category. Response
+probes are included only when both categories have a recorded probe; their count
+is limited by the original audit's `--response-probe-limit` (20 by default).
+The response value remains a one-ply tactical proxy, not a minimax result.
