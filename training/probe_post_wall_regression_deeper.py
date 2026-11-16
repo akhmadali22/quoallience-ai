@@ -379,12 +379,18 @@ def continue_branch(
         action_diagnostics, category_summary = build_action_diagnostics(
             root_action_stats, int(action)
         )
-        if len(action_diagnostics) != len(legal_action_indices(state)):
+        legal_actions = set(legal_action_indices(state))
+        diagnostic_actions = {item["action"] for item in action_diagnostics}
+        if diagnostic_actions != legal_actions:
             raise RuntimeError(
-                "Per-action instrumentation did not cover every legal action: "
-                f"ply={state.ply}, diagnostics={len(action_diagnostics)}, "
-                f"legal={len(legal_action_indices(state))}"
+                "Per-action instrumentation did not cover the exact legal-action set: "
+                f"ply={state.ply}, missing={len(legal_actions - diagnostic_actions)}, "
+                f"extra={len(diagnostic_actions - legal_actions)}"
             )
+        if any(item["initial_q"] != 0.0 or item["initial_visits"] != 0 for item in action_diagnostics):
+            raise RuntimeError("Fresh root edges must start with Q=0 and visits=0")
+        if sum(item["raw_visits"] for item in action_diagnostics) != root_visit_total:
+            raise RuntimeError("Per-action raw visits do not sum to the validated root visit total")
         state = apply_action_index(state, int(action))
         history.append(state_repetition_key(state))
         moves.append(
