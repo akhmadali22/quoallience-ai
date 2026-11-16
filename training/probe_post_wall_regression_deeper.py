@@ -21,7 +21,7 @@ import torch
 import ijson
 
 from quoridor.engine import state_repetition_key
-from quoridor.neural_ai.encoder import apply_action_index, encode_state
+from quoridor.neural_ai.encoder import apply_action_index, encode_state, legal_action_indices
 from quoridor.neural_ai.mcts import MCTS
 from training.audit_post_wall_pawn_regression import (
     load_model,
@@ -150,6 +150,153 @@ def evaluate_original_player(model, state, original_player: int, device: str) ->
     )
 
 
+def classify_root_action(action: int, action_stats: dict) -> str:
+    """Classify a legal action from the perspective of the player to move."""
+    from quoridor.neural_ai.encoder import decode_action
+
+    kind, payload = decode_action(action)
+    if kind == "wall":
+        return "wall_horizontal" if payload.orientation == "H" else "wall_vertical"
+    delta = action_stats.get("distance_delta")
+    if delta is None or float(delta) == 0:
+        return "pawn_neutral"
+    return "pawn_progress" if float(delta) > 0 else "pawn_regression"
+
+
+def build_action_diagnostics(root_action_stats: dict, selected_action: int) -> tuple[list[dict], dict]:
+    """Capture every legal root edge, including unvisited and pending-wall edges."""
+    rows = []
+    grouped = defaultdict(list)
+    for raw_action, stats in root_action_stats.items():
+        action = int(raw_action)
+        category = classify_root_action(action, stats)
+        row = {
+            "action": action,
+            "category": category,
+            "prior": float(stats.get("prior", 0.0)),
+            "network_prior": (
+                None if stats.get("network_prior") is None
+                else float(stats["network_prior"])
+            ),
+            "effective_prior": (
+                None if stats.get("effective_prior") is None
+                else float(stats["effective_prior"])
+            ),
+            "selection_prior": (
+                None if stats.get("selection_prior") is None
+                else float(stats["selection_prior"])
+            ),
+            # Every root edge is newly created for this search. Before the
+            # first simulation its Q and N are exactly zero.
+            "initial_q": 0.0,
+            "initial_visits": 0,
+            "final_q": float(stats.get("q", 0.0)),
+            "raw_visits": int(stats.get("visits", 0)),
+            "active": bool(stats.get("active", False)),
+            "selected": action == selected_action,
+            "distance_before": stats.get("distance_before"),
+            "distance_after": stats.get("distance_after"),
+            "distance_delta": stats.get("distance_delta"),
+            "repetition_blocked": bool(stats.get("repetition_blocked", False)),
+        }
+        rows.append(row)
+        grouped[category].append(row)
+
+    summary = {}
+    for category, items in sorted(grouped.items()):
+        visits = sum(item["raw_visits"] for item in items)
+        network_prior = [
+            item["network_prior"] for item in items
+            if item["network_prior"] is not None
+        ]
+        effective_prior = [
+            item["effective_prior"] for item in items
+            if item["effective_prior"] is not None
+        ]
+        visited_q = [item["final_q"] for item in items if item["raw_visits"] > 0]
+        summary[category] = {
+            "legal_actions": len(items),
+            "active_actions": sum(item["active"] for item in items),
+            "selected_actions": sum(item["selected"] for item in items),
+            "total_raw_visits": visits,
+            "visit_share": None,
+            "network_prior_mass": sum(network_prior),
+            "effective_prior_mass": sum(effective_prior),
+            "mean_final_q_all_actions": mean(item["final_q"] for item in items),
+            "mean_final_q_visited_actions": mean(visited_q) if visited_q else None,
+            "median_final_q_visited_actions": median(visited_q) if visited_q else None,
+            "mean_initial_q": 0.0,
+            "mean_network_prior_per_action": mean(network_prior) if network_prior else None,
+            "mean_effective_prior_per_action": mean(effective_prior) if effective_prior else None,
+        }
+    total_visits = sum(item["raw_visits"] for item in rows)
+    for item in summary.values():
+        item["visit_share"] = (
+            item["total_raw_visits"] / total_visits if total_visits else 0.0
+        )
+    return sorted(rows, key=lambda item: item["action"]), summary
+
+
+def build_per_ply_attribution(rows: list[dict]) -> list[dict]:
+    """Pool category diagnostics by checkpoint, condition, branch and ply."""
+    buckets = defaultdict(list)
+    for row in rows:
+        for branch_name in ("regression", "progress"):
+            for move in row[f"{branch_name}_continuation_moves"]:
+                key = (
+                    row["checkpoint_role"],
+                    row["variant"],
+                    branch_name,
+                    int(move["continuation_index"]),
+                )
+                buckets[key].append(move)
+
+    report = []
+    for key, moves in sorted(buckets.items()):
+        agent, variant, branch_name, ply_index = key
+        categories = defaultdict(list)
+        for move in moves:
+            for action in move["root_action_diagnostics"]:
+                categories[action["category"]].append(action)
+        category_summary = {}
+        for category, actions in sorted(categories.items()):
+            visits = sum(item["raw_visits"] for item in actions)
+            network_priors = [
+                item["network_prior"] for item in actions
+                if item["network_prior"] is not None
+            ]
+            effective_priors = [
+                item["effective_prior"] for item in actions
+                if item["effective_prior"] is not None
+            ]
+            visited_q = [
+                item["final_q"] for item in actions
+                if item["raw_visits"] > 0
+            ]
+            category_summary[category] = {
+                "legal_action_observations": len(actions),
+                "mean_legal_actions_per_position": len(actions) / len(moves),
+                "total_raw_visits": visits,
+                "visit_share": visits / (32 * len(moves)),
+                "network_prior_mass_mean_per_position": sum(network_priors) / len(moves),
+                "effective_prior_mass_mean_per_position": sum(effective_priors) / len(moves),
+                "mean_final_q_all_actions": mean(item["final_q"] for item in actions),
+                "mean_final_q_visited_actions": mean(visited_q) if visited_q else None,
+                "median_final_q_visited_actions": median(visited_q) if visited_q else None,
+                "mean_initial_q": 0.0,
+                "selected_action_observations": sum(item["selected"] for item in actions),
+            }
+        report.append({
+            "checkpoint_role": agent,
+            "variant": variant,
+            "starting_branch": branch_name,
+            "continuation_index": ply_index,
+            "positions": len(moves),
+            "categories": category_summary,
+        })
+    return report
+
+
 def continue_branch(
     model,
     root_state,
@@ -229,6 +376,15 @@ def continue_branch(
 
         action = max(root_action_visits, key=root_action_visits.get)
         selected_visits = root_action_visits[action]
+        action_diagnostics, category_summary = build_action_diagnostics(
+            root_action_stats, int(action)
+        )
+        if len(action_diagnostics) != len(legal_action_indices(state)):
+            raise RuntimeError(
+                "Per-action instrumentation did not cover every legal action: "
+                f"ply={state.ply}, diagnostics={len(action_diagnostics)}, "
+                f"legal={len(legal_action_indices(state))}"
+            )
         state = apply_action_index(state, int(action))
         history.append(state_repetition_key(state))
         moves.append(
@@ -243,6 +399,8 @@ def continue_branch(
                     str(action): count
                     for action, count in sorted(root_action_visits.items())
                 },
+                "root_action_diagnostics": action_diagnostics,
+                "category_summary": category_summary,
                 "state_ply_after_move": int(state.ply),
                 "terminal_after_move": state.winner is not None,
             }
@@ -466,8 +624,12 @@ def main() -> int:
         "checkpoint_split": "Candidate-origin roots use candidate checkpoint; incumbent-origin roots use incumbent checkpoint.",
         "root_actions": "Best-visit regression and progress actions recovered from the saved root traces; no root search rerun.",
         "visit_instrumentation": {
-            "version": 2,
-            "source": "MCTS.last_search_stats.root_action_stats[*].visits",
+            "version": 3,
+            "source": "MCTS.last_search_stats.root_action_stats[*] (prior, network_prior, effective_prior, q, visits, active, distance_delta)",
+            "coverage": "Every legal root action is recorded, including unvisited pawn actions and pending/inactive wall actions.",
+            "initial_q": "Every root edge is newly allocated for each continuation search; initial_q=0.0 and initial_visits=0 before the first simulation.",
+            "final_q": "Final edge q after all requested simulations; Q is from the perspective of the player to move at that continuation ply.",
+            "action_categories": "Pawn regression/progress/neutral are classified using shortest-distance change for the current player to move; wall orientations are separate categories.",
             "root_visit_total_validation": "Every completed continuation search must sum to the requested simulation budget.",
             "historical_report_warning": "Visit fields in post_wall_pawn_regression_deeper_4ply.json and its CSV are invalid because they summed normalized policy probabilities; final values and move choices remain usable.",
         },
@@ -485,6 +647,7 @@ def main() -> int:
         "policy_prior_or_heuristic_changes": False,
         "by_checkpoint_role_and_variant": grouped,
         "interpretation": "Multi-ply fixed-budget MCTS continuation diagnostic, not exhaustive minimax or proof of optimal play.",
+        "per_ply_attribution": build_per_ply_attribution(output_rows),
         "rows": output_rows,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
