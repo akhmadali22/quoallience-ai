@@ -270,12 +270,12 @@ def main() -> int:
     with args.audit_json.open("rb") as audit_handle:
         audit_runs_iter = ijson.items(audit_handle, "runs.item")
         for run in audit_runs_iter:
-        source = run.get("source") or {}
-        key = (
-            str(source.get("source_agent")),
-            int(source.get("source_game_index", -1)),
-            int(source.get("ply", -1)),
-        )
+            source = run.get("source") or {}
+            key = (
+                str(source.get("source_agent")),
+                int(source.get("source_game_index", -1)),
+                int(source.get("ply", -1)),
+            )
             if key in expected_keys:
                 if key in audit_runs:
                     raise ValueError(f"Duplicate audit root for {key}")
