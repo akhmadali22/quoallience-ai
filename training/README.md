@@ -944,8 +944,8 @@ python -m training.probe_post_wall_regression_deeper \
   data/diagnostics/paired_match_repetition_avoidance_stage1.json \
   data/diagnostics/post_wall_pawn_regression_response_probes_100.json \
   --continuation-plies 4 \
-  --output data/diagnostics/post_wall_pawn_regression_deeper_4ply.json \
-  --csv data/diagnostics/post_wall_pawn_regression_deeper_4ply.csv
+  --output data/diagnostics/post_wall_pawn_regression_deeper_4ply_visitfix.json \
+  --csv data/diagnostics/post_wall_pawn_regression_deeper_4ply_visitfix.csv
 ```
 
 The reference probe report fixes the exact same 100 unique roots as the previous
@@ -973,7 +973,7 @@ the selected edge count, total root visits, requested simulations, and complete
 per-action root visit counts.
 
 **Historical result warning:** the visit fields in
-`post_wall_pawn_regression_deeper_4ply.json` and its CSV are invalid. The earlier
+`post_wall_pawn_regression_deeper_4ply_visitfix.json` and its CSV are invalid. The earlier
 runner incorrectly summed normalized policy probabilities and truncated the
 selected probability to an integer. Its final value evaluations and selected
 moves remain usable; do not use its visit statistics. Rerun with the
