@@ -965,6 +965,20 @@ continuation ply using the reconstructed chronological history. The final
 position is evaluated by the unchanged matching checkpoint from the original
 root player's perspective; terminal wins/losses use exact values.
 
+Continuation visit instrumentation reads raw edge counts from
+`MCTS.last_search_stats["root_action_stats"][action]["visits"]`, not from the
+normalized policy returned by `MCTS.search()`. Every continuation verifies that
+the sum of root edge visits equals the requested simulation budget, and records
+the selected edge count, total root visits, requested simulations, and complete
+per-action root visit counts.
+
+**Historical result warning:** the visit fields in
+`post_wall_pawn_regression_deeper_4ply.json` and its CSV are invalid. The earlier
+runner incorrectly summed normalized policy probabilities and truncated the
+selected probability to an integer. Its final value evaluations and selected
+moves remain usable; do not use its visit statistics. Rerun with the
+`_visitfix` output paths above for corrected visit data.
+
 This produces 200 paired comparisons (100 roots × 2 root-search conditions),
 or up to 1,600 continuation MCTS searches (200 comparisons × 2 move branches
 × 4 continuation plies). Regression and progress branches use the same root,
