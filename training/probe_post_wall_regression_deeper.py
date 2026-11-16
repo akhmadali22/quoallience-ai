@@ -17,6 +17,7 @@ from pathlib import Path
 from statistics import mean, median
 
 import torch
+import ijson
 
 from quoridor.engine import state_repetition_key
 from quoridor.neural_ai.encoder import apply_action_index, encode_state
@@ -265,29 +266,30 @@ def main() -> int:
     source_evaluation = json.loads(args.source_evaluation.read_text(encoding="utf-8"))
     history_map = build_history_map(source_evaluation, expected_keys)
 
-    audit = json.loads(args.audit_json.read_text(encoding="utf-8"))
     audit_runs = {}
-    for run in audit.get("runs", []):
+    with args.audit_json.open("rb") as audit_handle:
+        audit_runs_iter = ijson.items(audit_handle, "runs.item")
+        for run in audit_runs_iter:
         source = run.get("source") or {}
         key = (
             str(source.get("source_agent")),
             int(source.get("source_game_index", -1)),
             int(source.get("ply", -1)),
         )
-        if key in expected_keys:
-            if key in audit_runs:
-                raise ValueError(f"Duplicate audit root for {key}")
-            audit_runs[key] = run
+            if key in expected_keys:
+                if key in audit_runs:
+                    raise ValueError(f"Duplicate audit root for {key}")
+                audit_runs[key] = run
     missing_audit = expected_keys - set(audit_runs)
     if missing_audit:
         raise ValueError(f"Audit is missing {len(missing_audit)} sampled roots.")
 
     budget = args.simulations
     if budget is None:
-        budget = int(audit.get("simulations", 32))
+        budget = int(reference.get("root_search_budget_reused", 32))
     if budget < 1:
         parser.error("--simulations must be positive")
-    c_puct = float(audit.get("c_puct", 1.5))
+    c_puct = float(reference.get("c_puct", 1.5))
 
     models = {
         "candidate": load_model(args.candidate_checkpoint, device=args.device),
@@ -317,10 +319,17 @@ def main() -> int:
                 raise ValueError(f"Missing regression/progress root action for {key}, {variant_name}")
             avoid = variant_name == "with_repetition_avoidance"
             results = {}
+            pair_seed = (
+                args.seed
+                + (0 if agent == "candidate" else 1_000_000)
+                + game_index * 10_000
+                + ply * 10
+                + (0 if variant_name == "vanilla_puct" else 1)
+            )
             for category in ("regression", "progress"):
                 branch_count += 1
                 root_action = actions[category]["action"]
-                branch_seed = args.seed + branch_count
+                branch_seed = pair_seed
                 print(
                     f"[{branch_count}/{total_branches}] agent={agent} game={game_index} "
                     f"ply={ply} variant={variant_name} branch={category}",
