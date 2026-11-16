@@ -973,7 +973,7 @@ the selected edge count, total root visits, requested simulations, and complete
 per-action root visit counts.
 
 **Historical result warning:** the visit fields in
-`post_wall_pawn_regression_deeper_4ply_visitfix.json` and its CSV are invalid. The earlier
+`post_wall_pawn_regression_deeper_4ply.json` and its CSV are invalid. The earlier
 runner incorrectly summed normalized policy probabilities and truncated the
 selected probability to an integer. Its final value evaluations and selected
 moves remain usable; do not use its visit statistics. Rerun with the
