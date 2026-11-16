@@ -151,9 +151,9 @@ simulation budget, and sampling temperature. The runner executes them sequential
 and writes one JSON report per configuration:
 
 ```bash
-python -m training.run_ablation models/checkpoints/neural_v1.pt \\
-  --games 20 --simulations 128 --seed 2026 \\
-  --opponent heuristic --device cpu \\
+python -m training.run_ablation models/checkpoints/neural_v1.pt \
+  --games 20 --simulations 128 --seed 2026 \
+  --opponent heuristic --device cpu \
   --output-dir data/ablation
 ```
 
@@ -204,10 +204,10 @@ selection. Do not use that value as a default. With repetition avoidance enabled
 sweep smaller values using identical seeds and settings:
 
 ```bash
-python -m training.run_progress_sweep models/checkpoints/neural_v1.pt \\
-  --games 50 --simulations 128 --seed 3026 \\
-  --repetition-penalty 0.75 --progress-values 0 0.01 0.02 0.05 \\
-  --opponent heuristic --device cpu \\
+python -m training.run_progress_sweep models/checkpoints/neural_v1.pt \
+  --games 50 --simulations 128 --seed 3026 \
+  --repetition-penalty 0.75 --progress-values 0 0.01 0.02 0.05 \
+  --opponent heuristic --device cpu \
   --output-dir data/progress_sweep
 ```
 
@@ -281,9 +281,9 @@ the same initial position and use the same seed.
 Example: compare 64 simulations against 128:
 
 ```bash
-python -m training.evaluate_mcts_scaling models/checkpoints/neural_v1.pt \\
-  --low-simulations 64 --high-simulations 128 \\
-  --pairs 20 --seed 20261109 --device cpu \\
+python -m training.evaluate_mcts_scaling models/checkpoints/neural_v1.pt \
+  --low-simulations 64 --high-simulations 128 \
+  --pairs 20 --seed 20261109 --device cpu \
   --output data/mcts_scaling/eval_64_vs_128.json
 ```
 
@@ -608,8 +608,8 @@ does not run indefinitely.
 Audit a self-play replay before using it for training:
 
 ```bash
-python -m training.audit_policy_targets \\
-  data/diagnostics/selfplay/replay.jsonl \\
+python -m training.audit_policy_targets \
+  data/diagnostics/selfplay/replay.jsonl \
   --output data/diagnostics/selfplay/policy_target_audit.json
 ```
 
@@ -644,7 +644,7 @@ After the audit, compare all three vanilla PUCT budgets against the same
 checkpoint and paired seed set:
 
 ```bash
-MCTS_PAIRS=10 MCTS_SEED=20261112 MCTS_MAX_PLIES=200 \\
+MCTS_PAIRS=10 MCTS_SEED=20261112 MCTS_MAX_PLIES=200 \
   bash training/run_mcts_budget_matrix.sh models/checkpoints/neural_v1.pt
 ```
 
@@ -936,17 +936,17 @@ The response value remains a one-ply tactical proxy, not a minimax result.
 To test whether the one-ply regression/progress response-probe difference persists
 after several alternating moves, run the deeper continuation audit:
 
-\`\`\`bash
-python -m training.probe_post_wall_regression_deeper \\
-  models/checkpoints/exp_001r_vonly_strict.pt \\
-  models/checkpoints/neural_v1.pt \\
-  data/diagnostics/post_wall_pawn_regression_audit.json \\
-  data/diagnostics/paired_match_repetition_avoidance_stage1.json \\
-  data/diagnostics/post_wall_pawn_regression_response_probes_100.json \\
-  --continuation-plies 4 \\
-  --output data/diagnostics/post_wall_pawn_regression_deeper_4ply.json \\
+```bash
+python -m training.probe_post_wall_regression_deeper \
+  models/checkpoints/exp_001r_vonly_strict.pt \
+  models/checkpoints/neural_v1.pt \
+  data/diagnostics/post_wall_pawn_regression_audit.json \
+  data/diagnostics/paired_match_repetition_avoidance_stage1.json \
+  data/diagnostics/post_wall_pawn_regression_response_probes_100.json \
+  --continuation-plies 4 \
+  --output data/diagnostics/post_wall_pawn_regression_deeper_4ply.json \
   --csv data/diagnostics/post_wall_pawn_regression_deeper_4ply.csv
-\`\`\`
+```
 
 The reference probe report fixes the exact same 100 unique roots as the previous
 expanded response-probe experiment (50 candidate-origin and 50 incumbent-origin).
