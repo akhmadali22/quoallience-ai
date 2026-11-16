@@ -70,16 +70,27 @@ def final_candidate_map(variant):
 
 
 def visit_totals(variant):
-    categories = final_candidate_map(variant)
-    visits = variant.get("root_visits") or {}
+    """Sum actual edge visits from the final root trace snapshot.
+
+    The audit runner's historical `root_visits` field contains the probability
+    distribution returned by MCTS.search(), not integer visit counts. The trace
+    records each candidate's visits_after_backup, which is the correct source.
+    """
+    trace = variant.get("selection_trace") or []
+    rows = candidate_rows(trace[-1]) if trace else []
     totals = {"regression": 0, "progress": 0}
-    for action, count in visits.items():
-        category = categories.get(str(action))
-        if category in totals:
-            try:
-                totals[category] += int(count)
-            except (TypeError, ValueError):
-                pass
+    for row in rows:
+        delta = number(row.get("distance_delta"))
+        if delta is None:
+            continue
+        category = "regression" if delta < 0 else "progress" if delta > 0 else None
+        if category is None:
+            continue
+        count = row.get("visits_after_backup", row.get("visits", 0))
+        try:
+            totals[category] += int(count or 0)
+        except (TypeError, ValueError, OverflowError):
+            pass
     return totals
 
 
