@@ -808,3 +808,48 @@ exploration experiment, not a training or architecture change. Do not promote
 a mix value based only on increased pawn visits: inspect action quality and
 then run a separate paired playing-strength evaluation with the same settings.
 
+
+
+## Post-wall pawn regression selection audit
+
+To isolate why a pawn regresses while a non-repeating progress move exists, replay
+the exact post-wall roots reconstructed from a paired-evaluation report:
+
+```bash
+python -m training.audit_post_wall_pawn_regression \
+  models/checkpoints/exp_001r_vonly_strict.pt \
+  models/checkpoints/neural_v1.pt \
+  data/diagnostics/paired_match_repetition_avoidance_stage1.json \
+  --simulations 32 --response-probe-limit 20 \
+  --output data/diagnostics/post_wall_pawn_regression_audit.json
+```
+
+The first checkpoint is used for source actions made by the candidate; the
+second is used for source actions made by the incumbent. Each exact root is
+then replayed twice with its corresponding checkpoint and identical simulation
+budget: vanilla PUCT, and vanilla PUCT with full-state repetition avoidance.
+The script reconstructs both pawn positions, wall layout, wall inventory,
+side to move, ply, and chronological repetition history from the source game
+action trace.
+
+When tracing is enabled, MCTS records every eligible root pawn candidate at
+every root simulation: destination, shortest-path distance delta, normalized
+prior, Q, U, PUCT score, and visits before selection. After backup, it records
+Q and visits for every candidate again. This is observational instrumentation
+only and does not alter priors, values, action scores, legal moves, or tie
+breaking. The trace distinguishes a prior-led first-selection advantage from
+a later PUCT crossover and from a final visit-count choice that disagrees with
+the final PUCT snapshot.
+
+The optional response probe (first 20 positions by default) compares the
+highest-visit regression and progress moves. After each move, the opponent gets
+the same vanilla PUCT response budget; the resulting state is evaluated by the
+unchanged network from the original player's perspective. This is a one-ply
+tactical diagnostic, not a minimax proof. Full states and opponent responses
+are preserved in the JSON report. Set `--response-probe-limit 0` to disable
+this extra work, or `--max-positions N` for a bounded smoke test.
+
+Keep the source evaluation, both checkpoints, simulation budget, and output
+path fixed for reproducibility. Do not interpret shortest-path regression by
+itself as a bad move: the opponent pawn and jump rules can make geometric
+distance an incomplete measure of move quality.
