@@ -277,7 +277,7 @@ def build_per_ply_attribution(rows: list[dict]) -> list[dict]:
                 "legal_action_observations": len(actions),
                 "mean_legal_actions_per_position": len(actions) / len(moves),
                 "total_raw_visits": visits,
-                "visit_share": visits / (32 * len(moves)),
+                "visit_share": visits / sum(int(move["root_visit_total"]) for move in moves),
                 "network_prior_mass_mean_per_position": sum(network_priors) / len(moves),
                 "effective_prior_mass_mean_per_position": sum(effective_priors) / len(moves),
                 "mean_final_q_all_actions": mean(item["final_q"] for item in actions),
