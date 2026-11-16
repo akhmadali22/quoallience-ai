@@ -6,6 +6,7 @@ searches and checkpoints are reused unchanged. Each regression/progress branch
 then receives a fixed number of alternating MCTS moves, using the matching
 vanilla or repetition-avoidance condition at every continuation ply.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -54,7 +55,11 @@ def action_by_category(variant: dict) -> dict:
             delta = row.get("distance_delta")
             if action is None or delta is None:
                 continue
-            category = "regression" if float(delta) < 0 else "progress" if float(delta) > 0 else None
+            category = (
+                "regression"
+                if float(delta) < 0
+                else "progress" if float(delta) > 0 else None
+            )
             if category is None:
                 continue
             visits = row.get("visits_after_backup")
@@ -75,7 +80,10 @@ def action_by_category(variant: dict) -> dict:
     for row in latest.values():
         category = row["category"]
         current = best.get(category)
-        if current is None or (row["visits"], row["prior"]) > (current["visits"], current["prior"]):
+        if current is None or (row["visits"], row["prior"]) > (
+            current["visits"],
+            current["prior"],
+        ):
             best[category] = row
     return best
 
@@ -91,15 +99,21 @@ def selected_root_keys(reference: dict) -> set[tuple[str, int, int]]:
         for row in rows
     }
     if len(keys) != 100:
-        raise ValueError(f"Reference probe must identify exactly 100 unique roots; found {len(keys)}.")
+        raise ValueError(
+            f"Reference probe must identify exactly 100 unique roots; found {len(keys)}."
+        )
     for agent in AGENTS:
         count = sum(key[0] == agent for key in keys)
         if count != 50:
-            raise ValueError(f"Reference sample must contain 50 {agent} roots; found {count}.")
+            raise ValueError(
+                f"Reference sample must contain 50 {agent} roots; found {count}."
+            )
     for variant in VARIANTS:
         count = sum(row.get("variant") == variant for row in rows)
         if count != 100:
-            raise ValueError(f"Reference report must contain 100 rows for {variant}; found {count}.")
+            raise ValueError(
+                f"Reference report must contain 100 rows for {variant}; found {count}."
+            )
     return keys
 
 
@@ -114,7 +128,9 @@ def build_history_map(source_evaluation: dict, expected_keys: set) -> dict:
     missing = expected_keys - set(histories)
     if missing:
         preview = sorted(missing)[:5]
-        raise ValueError(f"Could not reconstruct history for {len(missing)} sampled roots; examples={preview}")
+        raise ValueError(
+            f"Could not reconstruct history for {len(missing)} sampled roots; examples={preview}"
+        )
     return histories
 
 
@@ -127,7 +143,11 @@ def evaluate_original_player(model, state, original_player: int, device: str) ->
     with torch.inference_mode():
         _policy, value = model(tensor)
     current_player_value = float(value[0].item())
-    return current_player_value if state.current_player == original_player else -current_player_value
+    return (
+        current_player_value
+        if state.current_player == original_player
+        else -current_player_value
+    )
 
 
 def continue_branch(
@@ -211,20 +231,22 @@ def continue_branch(
         selected_visits = root_action_visits[action]
         state = apply_action_index(state, int(action))
         history.append(state_repetition_key(state))
-        moves.append({
-            "continuation_index": offset + 1,
-            "player": player,
-            "action": int(action),
-            "selected_action_visits": selected_visits,
-            "root_visit_total": root_visit_total,
-            "root_simulations_requested": int(search_stats["simulations"]),
-            "root_action_visit_counts": {
-                str(action): count
-                for action, count in sorted(root_action_visits.items())
-            },
-            "state_ply_after_move": int(state.ply),
-            "terminal_after_move": state.winner is not None,
-        })
+        moves.append(
+            {
+                "continuation_index": offset + 1,
+                "player": player,
+                "action": int(action),
+                "selected_action_visits": selected_visits,
+                "root_visit_total": root_visit_total,
+                "root_simulations_requested": int(search_stats["simulations"]),
+                "root_action_visit_counts": {
+                    str(action): count
+                    for action, count in sorted(root_action_visits.items())
+                },
+                "state_ply_after_move": int(state.ply),
+                "terminal_after_move": state.winner is not None,
+            }
+        )
     final_value = evaluate_original_player(model, state, original_player, device)
     return {
         "initial_action": int(initial_action),
@@ -246,14 +268,16 @@ def summarize(rows: list[dict]) -> dict:
         "progress_better_count": sum(value < -1e-12 for value in deltas),
         "equal_count": sum(abs(value) <= 1e-12 for value in deltas),
         "regression_better_percent": (
-            100.0 * sum(value > 1e-12 for value in deltas) / len(deltas) if deltas else None
+            100.0 * sum(value > 1e-12 for value in deltas) / len(deltas)
+            if deltas
+            else None
         ),
-        "mean_regression_final_value": mean(
-            row["regression_final_value"] for row in rows
-        ) if rows else None,
-        "mean_progress_final_value": mean(
-            row["progress_final_value"] for row in rows
-        ) if rows else None,
+        "mean_regression_final_value": (
+            mean(row["regression_final_value"] for row in rows) if rows else None
+        ),
+        "mean_progress_final_value": (
+            mean(row["progress_final_value"] for row in rows) if rows else None
+        ),
         "mean_regression_minus_progress": mean(deltas) if deltas else None,
         "median_regression_minus_progress": median(deltas) if deltas else None,
     }
@@ -266,10 +290,18 @@ def main() -> int:
     parser.add_argument("audit_json", type=Path)
     parser.add_argument("source_evaluation", type=Path)
     parser.add_argument("reference_probes_json", type=Path)
-    parser.add_argument("--continuation-plies", type=int, default=4,
-                        help="Additional alternating MCTS moves after the saved root action.")
-    parser.add_argument("--simulations", type=int, default=None,
-                        help="MCTS simulations per continuation ply; defaults to audit budget.")
+    parser.add_argument(
+        "--continuation-plies",
+        type=int,
+        default=4,
+        help="Additional alternating MCTS moves after the saved root action.",
+    )
+    parser.add_argument(
+        "--simulations",
+        type=int,
+        default=None,
+        help="MCTS simulations per continuation ply; defaults to audit budget.",
+    )
     parser.add_argument("--seed", type=int, default=20261117)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--threads", type=int, default=1)
@@ -337,14 +369,18 @@ def main() -> int:
         position = history_map[key]
         history = [tuple_key(item) for item in position["recent_state_keys"]]
         if not history or history[-1] != state_repetition_key(state):
-            raise ValueError(f"Reconstructed repetition history does not end at audit root: {key}")
+            raise ValueError(
+                f"Reconstructed repetition history does not end at audit root: {key}"
+            )
         model = models[agent]
         original_player = int(state.current_player)
         for variant_name in VARIANTS:
             variant = (run.get("variants") or {}).get(variant_name) or {}
             actions = action_by_category(variant)
             if "regression" not in actions or "progress" not in actions:
-                raise ValueError(f"Missing regression/progress root action for {key}, {variant_name}")
+                raise ValueError(
+                    f"Missing regression/progress root action for {key}, {variant_name}"
+                )
             avoid = variant_name == "with_repetition_avoidance"
             results = {}
             pair_seed = (
@@ -378,33 +414,42 @@ def main() -> int:
                 )
             reg_value = results["regression"]["final_value_for_original_player"]
             prog_value = results["progress"]["final_value_for_original_player"]
-            output_rows.append({
-                "source_agent": agent,
-                "checkpoint_role": agent,
-                "source_game_index": game_index,
-                "source_seed": source.get("source_seed"),
-                "ply": ply,
-                "variant": variant_name,
-                "regression_action": actions["regression"]["action"],
-                "regression_root_visits": actions["regression"]["visits"],
-                "progress_action": actions["progress"]["action"],
-                "progress_root_visits": actions["progress"]["visits"],
-                "continuation_plies_requested": args.continuation_plies,
-                "regression_final_value": reg_value,
-                "progress_final_value": prog_value,
-                "regression_minus_progress": reg_value - prog_value,
-                "regression_terminal": results["regression"]["terminal"],
-                "progress_terminal": results["progress"]["terminal"],
-                "regression_continuation_moves": results["regression"]["continuation_moves"],
-                "progress_continuation_moves": results["progress"]["continuation_moves"],
-            })
+            output_rows.append(
+                {
+                    "source_agent": agent,
+                    "checkpoint_role": agent,
+                    "source_game_index": game_index,
+                    "source_seed": source.get("source_seed"),
+                    "ply": ply,
+                    "variant": variant_name,
+                    "regression_action": actions["regression"]["action"],
+                    "regression_root_visits": actions["regression"]["visits"],
+                    "progress_action": actions["progress"]["action"],
+                    "progress_root_visits": actions["progress"]["visits"],
+                    "continuation_plies_requested": args.continuation_plies,
+                    "regression_final_value": reg_value,
+                    "progress_final_value": prog_value,
+                    "regression_minus_progress": reg_value - prog_value,
+                    "regression_terminal": results["regression"]["terminal"],
+                    "progress_terminal": results["progress"]["terminal"],
+                    "regression_continuation_moves": results["regression"][
+                        "continuation_moves"
+                    ],
+                    "progress_continuation_moves": results["progress"][
+                        "continuation_moves"
+                    ],
+                }
+            )
 
     grouped = {
         agent: {
-            variant: summarize([
-                row for row in output_rows
-                if row["checkpoint_role"] == agent and row["variant"] == variant
-            ])
+            variant: summarize(
+                [
+                    row
+                    for row in output_rows
+                    if row["checkpoint_role"] == agent and row["variant"] == variant
+                ]
+            )
             for variant in VARIANTS
         }
         for agent in AGENTS
@@ -420,7 +465,13 @@ def main() -> int:
         "sample_identity": "Exactly the 100 unique roots listed in the prior representative response-probe report.",
         "checkpoint_split": "Candidate-origin roots use candidate checkpoint; incumbent-origin roots use incumbent checkpoint.",
         "root_actions": "Best-visit regression and progress actions recovered from the saved root traces; no root search rerun.",
-        "visit_instrumentation": {\n            "version": 2,\n            "source": "MCTS.last_search_stats.root_action_stats[*].visits",\n            "root_visit_total_validation": "Every completed continuation search must sum to the requested simulation budget.",\n            "historical_report_warning": "Visit fields in post_wall_pawn_regression_deeper_4ply.json and its CSV are invalid because they summed normalized policy probabilities; final values and move choices remain usable.",\n        },\n        "continuation": {
+        "visit_instrumentation": {
+            "version": 2,
+            "source": "MCTS.last_search_stats.root_action_stats[*].visits",
+            "root_visit_total_validation": "Every completed continuation search must sum to the requested simulation budget.",
+            "historical_report_warning": "Visit fields in post_wall_pawn_regression_deeper_4ply.json and its CSV are invalid because they summed normalized policy probabilities; final values and move choices remain usable.",
+        },
+        "continuation": {
             "additional_plies_after_root_action": args.continuation_plies,
             "simulations_per_continuation_ply": budget,
             "c_puct": c_puct,
@@ -437,22 +488,41 @@ def main() -> int:
         "rows": output_rows,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    args.output.write_text(
+        json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+    )
     args.csv.parent.mkdir(parents=True, exist_ok=True)
     columns = [
-        "source_agent", "checkpoint_role", "source_game_index", "source_seed", "ply",
-        "variant", "regression_action", "regression_root_visits", "progress_action",
-        "progress_root_visits", "continuation_plies_requested", "regression_final_value",
-        "progress_final_value", "regression_minus_progress", "regression_terminal",
-        "progress_terminal", "regression_continuation_moves", "progress_continuation_moves",
+        "source_agent",
+        "checkpoint_role",
+        "source_game_index",
+        "source_seed",
+        "ply",
+        "variant",
+        "regression_action",
+        "regression_root_visits",
+        "progress_action",
+        "progress_root_visits",
+        "continuation_plies_requested",
+        "regression_final_value",
+        "progress_final_value",
+        "regression_minus_progress",
+        "regression_terminal",
+        "progress_terminal",
+        "regression_continuation_moves",
+        "progress_continuation_moves",
     ]
     with args.csv.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=columns)
         writer.writeheader()
         for row in output_rows:
             flattened = dict(row)
-            flattened["regression_continuation_moves"] = json.dumps(row["regression_continuation_moves"])
-            flattened["progress_continuation_moves"] = json.dumps(row["progress_continuation_moves"])
+            flattened["regression_continuation_moves"] = json.dumps(
+                row["regression_continuation_moves"]
+            )
+            flattened["progress_continuation_moves"] = json.dumps(
+                row["progress_continuation_moves"]
+            )
             writer.writerow(flattened)
     print(f"Deeper tactical report: {args.output}")
     print(f"Deeper tactical CSV: {args.csv}")
