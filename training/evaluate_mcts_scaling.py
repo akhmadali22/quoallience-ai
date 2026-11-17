@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 from pathlib import Path
@@ -21,6 +22,7 @@ def play_game(
     seed: int,
     low_simulations: int,
     high_simulations: int,
+    c_puct: float,
     low_player: int,
     max_plies: int,
     device: str,
@@ -42,6 +44,7 @@ def play_game(
         player: MCTS(
             model,
             simulations=budgets[player_agents[player]],
+            c_puct=c_puct,
             device=device,
             category_exploration=category_exploration,
             repetition_penalty=repetition_penalty,
@@ -171,6 +174,7 @@ def main() -> int:
     parser.add_argument("--pairs", type=int, default=20,
                         help="Number of paired seeds; each pair plays two games with seats swapped.")
     parser.add_argument("--max-plies", type=int, default=200)
+    parser.add_argument("--c-puct", type=float, default=1.5)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--seed", type=int, default=20261109)
     parser.add_argument("--category-exploration", type=float, default=0.0)
@@ -180,6 +184,8 @@ def main() -> int:
         "--disable-progressive-widening", action="store_true",
         help="Disable progressive widening for a matched vanilla-PUCT comparison.",
     )
+    parser.add_argument("--omit-action-trace", action="store_true",
+                        help="Store outcomes and aggregate telemetry without per-ply action traces.")
     parser.add_argument("--output", type=Path,
                         default=Path("data/mcts_scaling/eval_64_vs_128.json"))
     args = parser.parse_args()
@@ -188,6 +194,8 @@ def main() -> int:
         parser.error("simulation budgets must satisfy 1 <= low < high")
     if args.pairs < 1 or args.max_plies < 1:
         parser.error("--pairs and --max-plies must be positive")
+    if args.c_puct < 0:
+        parser.error("--c-puct must be non-negative")
     if (args.category_exploration < 0 or args.repetition_penalty < 0
             or args.pawn_progress_bonus < 0):
         parser.error("exploration and preference values must be non-negative")
@@ -218,6 +226,7 @@ def main() -> int:
                 seed=pair_seed,
                 low_simulations=args.low_simulations,
                 high_simulations=args.high_simulations,
+                c_puct=args.c_puct,
                 low_player=low_player,
                 max_plies=args.max_plies,
                 device=args.device,
@@ -226,6 +235,8 @@ def main() -> int:
                 pawn_progress_bonus=args.pawn_progress_bonus,
                 progressive_widening=not args.disable_progressive_widening,
             )
+            if args.omit_action_trace:
+                result.pop("action_trace", None)
             games.append(result)
             pair_games.append(result)
             print(
@@ -258,7 +269,8 @@ def main() -> int:
     low_points = low_wins + 0.5 * draws
     report = {
         "checkpoint": str(args.checkpoint),
-        "protocol": "same checkpoint, MCTS-vs-MCTS, paired seed, swapped seats, deterministic max-visit selection",
+        "checkpoint_sha256": hashlib.sha256(args.checkpoint.read_bytes()).hexdigest(),
+        "protocol": "same checkpoint, MCTS-vs-MCTS, paired seed, swapped seats, deterministic max-visit selection; vanilla PUCT without progressive widening",
         "config": {
             "pairs": args.pairs,
             "games": len(games),
@@ -267,11 +279,14 @@ def main() -> int:
             "max_plies": args.max_plies,
             "device": args.device,
             "base_seed": args.seed,
+            "c_puct": args.c_puct,
+            "selection_temperature": 0.0,
             "category_exploration": args.category_exploration,
             "repetition_penalty": args.repetition_penalty,
             "pawn_progress_bonus": args.pawn_progress_bonus,
             "progressive_widening": not args.disable_progressive_widening,
-            "selection_temperature": 0.0,
+            "root_noise": False,
+            "randomize_selection_ties": False,
             "wall_distance_weight": 0.0,
             "wall_route_weight": 0.0,
         },
