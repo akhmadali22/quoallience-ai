@@ -153,7 +153,7 @@ def replay_one(model, position: dict, budget: int, avoid_repetition: bool,
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prior-q-report", type=Path, required=True,
-                        help="Validated prior_q_conflict_validation JSON containing 40 reconstructed positions.")
+                        help="Validated prior_q_conflict_validation JSON containing 40 source records and 31 unique positions.")
     parser.add_argument("--candidate-checkpoint", type=Path, required=True)
     parser.add_argument("--incumbent-checkpoint", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -167,11 +167,59 @@ def main() -> int:
         raise ValueError("Input is not prior_q_conflict_validation")
     positions = source.get("reconstructed_positions") or []
     results_source = source.get("results") or []
-    ids = [str(p["position_id"]) for p in positions]
-    if len(positions) != 40 or len(set(ids)) != 40:
-        raise ValueError(f"Expected exactly 40 unique reconstructed positions; got {len(positions)}")
+    if len(positions) != 40:
+        raise ValueError(f"Expected 40 source position records; got {len(positions)}")
     if len(results_source) != 160:
         raise ValueError(f"Expected 160 validated prior-Q replay rows; got {len(results_source)}")
+
+    # position_id hashes the full state plus chronological repetition history.
+    # Multiple source strata can therefore legitimately point to the same exact
+    # search position. Deduplicate those positions without discarding provenance.
+    grouped = {}
+    for record in positions:
+        pid = str(record["position_id"])
+        grouped.setdefault(pid, []).append(record)
+
+    unique_positions = []
+    for pid, records in sorted(grouped.items()):
+        canonical = records[0]
+        identity = json.dumps(
+            [canonical["state"], canonical["recent_state_keys"]],
+            sort_keys=True, separators=(",", ":"),
+        )
+        for duplicate in records[1:]:
+            duplicate_identity = json.dumps(
+                [duplicate["state"], duplicate["recent_state_keys"]],
+                sort_keys=True, separators=(",", ":"),
+            )
+            if duplicate_identity != identity:
+                raise ValueError(f"Position ID collision with different state/history: {pid}")
+            if duplicate.get("checkpoint_role") != canonical.get("checkpoint_role"):
+                raise ValueError(
+                    f"Duplicate position has conflicting checkpoint roles: {pid}: "
+                    f"{canonical.get('checkpoint_role')} vs {duplicate.get('checkpoint_role')}"
+                )
+        unique = dict(canonical)
+        unique["source_records"] = [
+            {
+                "source_variant": row.get("source_variant"),
+                "source_branch": row.get("source_branch"),
+                "source_game_index": row.get("source_game_index"),
+                "source_root_ply": row.get("source_root_ply"),
+                "position_ply": row.get("position_ply"),
+                "continuation_index": row.get("continuation_index"),
+            }
+            for row in records
+        ]
+        unique_positions.append(unique)
+
+    ids = [str(p["position_id"]) for p in positions]
+    unique_ids = [str(p["position_id"]) for p in unique_positions]
+    if len(unique_positions) != 31:
+        raise ValueError(
+            f"Expected 31 unique full position identities from 40 source records; "
+            f"got {len(unique_positions)}"
+        )
 
     model_paths = {
         "candidate": args.candidate_checkpoint,
@@ -189,7 +237,7 @@ def main() -> int:
 
     output_rows = []
     engine_cache = {}
-    total = len(positions) * len(REPLAY_VARIANTS) * len(BUDGETS)
+    total = len(unique_positions) * len(REPLAY_VARIANTS) * len(BUDGETS)
     done = 0
     for position in positions:
         position_id = str(position["position_id"])
@@ -217,12 +265,7 @@ def main() -> int:
                     "position_id": position_id,
                     "checkpoint_role": role,
                     "checkpoint_sha256": checkpoint_hashes[role],
-                    "source_variant": position.get("source_variant"),
-                    "source_branch": position.get("source_branch"),
-                    "source_game_index": position.get("source_game_index"),
-                    "source_root_ply": position.get("source_root_ply"),
-                    "position_ply": position.get("position_ply"),
-                    "continuation_index": position.get("continuation_index"),
+                    "source_records": position["source_records"],
                     "seed": seed,
                     "replay_variant": variant,
                     "budget": budget,
@@ -239,7 +282,7 @@ def main() -> int:
             "budgets": list(BUDGETS),
             "replay_conditions": list(REPLAY_VARIANTS),
             "positions_source": "reconstructed_positions from validated prior_q_conflict_validation JSON",
-            "position_count": len(positions),
+            "source_record_count": len(positions),\n            "position_count": len(unique_positions),
             "expected_replay_count": total,
             "checkpoint_mapping": {k: str(v) for k, v in model_paths.items()},
             "checkpoint_sha256": checkpoint_hashes,
@@ -272,10 +315,12 @@ def main() -> int:
         },
         "source_validation": {
             "source_experiment": source.get("experiment"),
-            "source_position_count": len(positions),
+            "source_position_record_count": len(positions),
             "source_result_count": len(results_source),
-            "unique_position_ids": len(set(ids)),
-            "position_ids": ids,
+            "unique_position_count": len(unique_positions),
+            "duplicate_source_records": len(positions) - len(unique_positions),
+            "source_position_ids": ids,
+            "unique_position_ids": unique_ids,
         },
         "engine_evaluations": engine_cache,
         "results": output_rows,
@@ -284,9 +329,8 @@ def main() -> int:
     args.output.write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
 
     columns = [
-        "position_id", "checkpoint_role", "source_variant", "source_branch",
-        "source_game_index", "source_root_ply", "position_ply",
-        "continuation_index", "seed", "replay_variant", "budget",
+        "position_id", "checkpoint_role", "source_records",
+        "seed", "replay_variant", "budget",
         "selected_action", "selected_visits", "selected_prior", "selected_q",
         "selected_prior_rank_visited", "selected_q_rank_visited",
         "selected_engine_path_score", "best_engine_path_score", "engine_regret",
@@ -301,6 +345,7 @@ def main() -> int:
             for action in row["actions"]:
                 writer.writerow({
                     **{k: row[k] for k in columns if k in row},
+                    "source_records": json.dumps(row["source_records"], separators=(",", ":")),
                     **action,
                     "engine_regret": row["best_engine_path_score"] - action["engine_path_score"],
                 })
