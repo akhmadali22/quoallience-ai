@@ -244,7 +244,7 @@ def main() -> int:
     engine_cache = {}
     total = len(unique_positions) * len(REPLAY_VARIANTS) * len(BUDGETS)
     done = 0
-    for position in positions:
+    for position in unique_positions:
         position_id = str(position["position_id"])
         role = str(position["checkpoint_role"])
         if role not in models:
