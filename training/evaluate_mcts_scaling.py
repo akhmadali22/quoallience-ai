@@ -184,6 +184,8 @@ def main() -> int:
         "--disable-progressive-widening", action="store_true",
         help="Disable progressive widening for a matched vanilla-PUCT comparison.",
     )
+    parser.add_argument("--omit-action-trace", action="store_true",
+                        help="Store outcomes and aggregate telemetry without per-ply action traces.")
     parser.add_argument("--output", type=Path,
                         default=Path("data/mcts_scaling/eval_64_vs_128.json"))
     args = parser.parse_args()
@@ -192,6 +194,8 @@ def main() -> int:
         parser.error("simulation budgets must satisfy 1 <= low < high")
     if args.pairs < 1 or args.max_plies < 1:
         parser.error("--pairs and --max-plies must be positive")
+    if args.c_puct < 0:
+        parser.error("--c-puct must be non-negative")
     if (args.category_exploration < 0 or args.repetition_penalty < 0
             or args.pawn_progress_bonus < 0):
         parser.error("exploration and preference values must be non-negative")
@@ -231,6 +235,8 @@ def main() -> int:
                 pawn_progress_bonus=args.pawn_progress_bonus,
                 progressive_widening=not args.disable_progressive_widening,
             )
+            if args.omit_action_trace:
+                result.pop("action_trace", None)
             games.append(result)
             pair_games.append(result)
             print(
