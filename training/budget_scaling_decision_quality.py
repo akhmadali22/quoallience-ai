@@ -153,7 +153,7 @@ def replay_one(model, position: dict, budget: int, avoid_repetition: bool,
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prior-q-report", type=Path, required=True,
-                        help="Validated prior_q_conflict_validation JSON containing 40 source records and 31 unique positions.")
+                        help="Validated prior_q_conflict_validation JSON containing 40 source records, 31 unique states, and 32 position-checkpoint-role pairs.")
     parser.add_argument("--candidate-checkpoint", type=Path, required=True)
     parser.add_argument("--incumbent-checkpoint", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -172,53 +172,58 @@ def main() -> int:
     if len(results_source) != 160:
         raise ValueError(f"Expected 160 validated prior-Q replay rows; got {len(results_source)}")
 
-    # position_id hashes the full state plus chronological repetition history.
-    # Multiple source strata can therefore legitimately point to the same exact
-    # search position. Deduplicate those positions without discarding provenance.
-    grouped = {}
+    # position_id identifies the state plus repetition history, but a state can
+    # legitimately occur in source strata assigned to different checkpoints.
+    # The experimental unit is therefore (position_id, checkpoint_role), not
+    # position_id alone. Validate state/history identity across all roles first.
+    by_position = {}
     for record in positions:
         pid = str(record["position_id"])
-        grouped.setdefault(pid, []).append(record)
+        by_position.setdefault(pid, []).append(record)
 
     unique_positions = []
-    for pid, records in sorted(grouped.items()):
-        canonical = records[0]
-        identity = json.dumps(
-            [canonical["state"], canonical["recent_state_keys"]],
+    for pid, records in sorted(by_position.items()):
+        canonical_identity = json.dumps(
+            [records[0]["state"], records[0]["recent_state_keys"]],
             sort_keys=True, separators=(",", ":"),
         )
-        for duplicate in records[1:]:
-            duplicate_identity = json.dumps(
-                [duplicate["state"], duplicate["recent_state_keys"]],
+        for record in records[1:]:
+            identity = json.dumps(
+                [record["state"], record["recent_state_keys"]],
                 sort_keys=True, separators=(",", ":"),
             )
-            if duplicate_identity != identity:
+            if identity != canonical_identity:
                 raise ValueError(f"Position ID collision with different state/history: {pid}")
-            if duplicate.get("checkpoint_role") != canonical.get("checkpoint_role"):
-                raise ValueError(
-                    f"Duplicate position has conflicting checkpoint roles: {pid}: "
-                    f"{canonical.get('checkpoint_role')} vs {duplicate.get('checkpoint_role')}"
-                )
-        unique = dict(canonical)
-        unique["source_records"] = [
-            {
-                "source_variant": row.get("source_variant"),
-                "source_branch": row.get("source_branch"),
-                "source_game_index": row.get("source_game_index"),
-                "source_root_ply": row.get("source_root_ply"),
-                "position_ply": row.get("position_ply"),
-                "continuation_index": row.get("continuation_index"),
-            }
-            for row in records
-        ]
-        unique_positions.append(unique)
+
+        by_role = {}
+        for record in records:
+            role = str(record["checkpoint_role"])
+            by_role.setdefault(role, []).append(record)
+
+        for role, role_records in sorted(by_role.items()):
+            canonical = role_records[0]
+            unique = dict(canonical)
+            unique["source_records"] = [
+                {
+                    "checkpoint_role": row.get("checkpoint_role"),
+                    "source_variant": row.get("source_variant"),
+                    "source_branch": row.get("source_branch"),
+                    "source_game_index": row.get("source_game_index"),
+                    "source_root_ply": row.get("source_root_ply"),
+                    "position_ply": row.get("position_ply"),
+                    "continuation_index": row.get("continuation_index"),
+                }
+                for row in role_records
+            ]
+            unique_positions.append(unique)
 
     ids = [str(p["position_id"]) for p in positions]
-    unique_ids = [str(p["position_id"]) for p in unique_positions]
-    if len(unique_positions) != 31:
+    unique_ids = sorted(by_position)
+    if len(by_position) != 31 or len(unique_positions) != 32:
         raise ValueError(
-            f"Expected 31 unique full position identities from 40 source records; "
-            f"got {len(unique_positions)}"
+            "Expected 31 unique state/history identities and 32 "
+            f"position-checkpoint-role pairs; got {len(by_position)} states "
+            f"and {len(unique_positions)} pairs"
         )
 
     model_paths = {
@@ -283,7 +288,8 @@ def main() -> int:
             "replay_conditions": list(REPLAY_VARIANTS),
             "positions_source": "reconstructed_positions from validated prior_q_conflict_validation JSON",
             "source_record_count": len(positions),
-            "position_count": len(unique_positions),
+            "unique_state_count": len(by_position),
+            "position_checkpoint_role_pair_count": len(unique_positions),
             "expected_replay_count": total,
             "checkpoint_mapping": {k: str(v) for k, v in model_paths.items()},
             "checkpoint_sha256": checkpoint_hashes,
@@ -318,10 +324,11 @@ def main() -> int:
             "source_experiment": source.get("experiment"),
             "source_position_record_count": len(positions),
             "source_result_count": len(results_source),
-            "unique_position_count": len(unique_positions),
-            "duplicate_source_records": len(positions) - len(unique_positions),
+            "unique_state_count": len(by_position),
+            "unique_position_checkpoint_role_pair_count": len(unique_positions),
+            "duplicate_source_records_within_role": len(positions) - len(unique_positions),
             "source_position_ids": ids,
-            "unique_position_ids": unique_ids,
+            "unique_state_position_ids": unique_ids,
         },
         "engine_evaluations": engine_cache,
         "results": output_rows,
