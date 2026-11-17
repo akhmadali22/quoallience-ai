@@ -39,6 +39,7 @@ run_matchup() {
         --repetition-penalty 0.0 \
         --pawn-progress-bonus 0.0 \
         --disable-progressive-widening \
+        --omit-action-trace \
         --output "$output"
 }
 
