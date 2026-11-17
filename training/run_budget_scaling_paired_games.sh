@@ -50,4 +50,9 @@ for spec in "32 128" "128 256" "32 256"; do
     run_matchup "$INCUMBENT" incumbent "$low" "$high"
 done
 
-echo "All paired-game evaluations completed: $OUT"
+"$PYTHON" -m training.summarize_budget_scaling_paired_games \
+    --input-dir "$OUT" \
+    --output "data/diagnostics/budget_scaling_paired_games_20261118_summary.json" \
+    --csv "data/diagnostics/budget_scaling_paired_games_20261118_summary.csv"
+
+echo "All paired-game evaluations and summary completed: $OUT"
