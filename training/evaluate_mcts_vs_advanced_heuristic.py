@@ -57,7 +57,7 @@ def action_effect(state: GameState, index: int) -> dict:
     }
 
 
-def play_game(model, *, checkpoint: Path, budget: int, seed: int,
+def compact_root_actions(root_stats: dict, selected_index: int) -> dict:\n    """Keep selected action plus top visit-ranked alternatives, not every legal edge."""\n    rows = root_stats.get("root_action_stats", {})\n    ranked = sorted(rows.items(), key=lambda item: (item[1].get("visits", 0), item[1].get("q", 0.0)), reverse=True)\n    keep = {str(selected_index)}\n    keep.update(key for key, _ in ranked[:8])\n    keep.update(key for key, row in ranked if row.get("category") == "wall" and row.get("visits", 0) > 0)\n    return {key: rows[key] for key in keep if key in rows}\n\n\ndef play_game(model, *, checkpoint: Path, budget: int, seed: int,
               mcts_player: int, max_plies: int, device: str,
               heuristic_time_limit: float, heuristic_max_depth: int) -> dict:
     rng = random.Random(seed)
@@ -98,7 +98,7 @@ def play_game(model, *, checkpoint: Path, budget: int, seed: int,
                 "mean_leaf_depth": stats.get("average_leaf_depth"),
                 "pawn_visit_ratio": stats.get("root_pawn_visit_ratio"),
                 "wall_visit_ratio": stats.get("root_wall_visit_ratio"),
-                "root_action_stats": stats.get("root_action_stats", {}),
+                "root_action_stats": compact_root_actions(stats, action),
                 **effect,
             }
         else:
@@ -156,7 +156,7 @@ def summarize(games: list[dict]) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("checkpoint", type=Path)
-    parser.add_argument("--budget", type=int, choices=(32, 128, 256), required=True)
+    parser.add_argument("--budget", type=int, choices=(32, 128, 256), required=True)\n    parser.add_argument("--label", default="candidate")
     parser.add_argument("--pairs", type=int, default=4)
     parser.add_argument("--seed", type=int, default=20261119)
     parser.add_argument("--max-plies", type=int, default=200)
@@ -205,7 +205,7 @@ def main() -> int:
             ),
         })
     report = {
-        "experiment": "mcts_vs_advanced_heuristic",
+        "experiment": "mcts_vs_advanced_heuristic",\n        "agent_label": args.label,
         "checkpoint": str(args.checkpoint),
         "checkpoint_sha256": hashlib.sha256(args.checkpoint.read_bytes()).hexdigest(),
         "config": {
