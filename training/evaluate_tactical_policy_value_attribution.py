@@ -114,7 +114,9 @@ def diversity_bucket(state: GameState) -> str:
 
 
 def state_fingerprint(state: GameState) -> str:
+    # Ply is history metadata, not part of the tactical board position.
     payload = state.to_dict()
+    payload.pop("ply", None)
     return json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
 
