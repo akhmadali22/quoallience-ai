@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import math
 from collections import defaultdict
 from pathlib import Path
 from statistics import mean, median
@@ -18,7 +17,7 @@ from quoridor.engine import (
     GameState, Wall, apply_move, validate_state, legal_pawn_moves,
 )
 from quoridor.neural_ai.encoder import (
-    ACTION_SIZE, apply_action_index, decode_action, encode_state,
+    apply_action_index, decode_action, encode_state,
     encode_action, legal_action_indices,
 )
 from quoridor.neural_ai.policy import load_model
@@ -114,6 +113,7 @@ def main() -> int:
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--threads", type=int, default=1)
+    parser.add_argument("--expected-checkpoint-sha256", default="d58d9e47090e7ca0cbf3b4cfa02b7ab6a2a56ded16ce7c4090dcac202b72f098")
     parser.add_argument(
         "--output-dir", type=Path,
         default=Path("data/diagnostics/forced_outcome_value_consistency/run_001"),
@@ -149,6 +149,8 @@ def main() -> int:
     model = load_model(args.checkpoint, device=args.device)
     model.eval()
     checkpoint_sha = hashlib.sha256(args.checkpoint.read_bytes()).hexdigest()
+    if args.expected_checkpoint_sha256 and checkpoint_sha != args.expected_checkpoint_sha256:
+        parser.error(f"Checkpoint SHA-256 mismatch: expected {args.expected_checkpoint_sha256}, got {checkpoint_sha}")
 
     records = []
     tasks: list[tuple[str, GameState]] = []
