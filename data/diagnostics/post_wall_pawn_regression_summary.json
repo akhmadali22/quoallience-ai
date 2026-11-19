@@ -1,0 +1,111 @@
+{
+  "experiment": "post_wall_pawn_regression_audit_summary",
+  "source_report": "data/diagnostics/post_wall_pawn_regression_audit.json",
+  "positions_processed": 1338,
+  "aggregation_notes": {
+    "prior_and_q": "Per-root comparison uses the highest-PUCT regression action and highest-PUCT progress action at the final root snapshot; first-selection priors use the highest-PUCT action in each category in the first snapshot.",
+    "visit_ratio": "Aggregate visit ratio sums visits across all regression pawn actions and all progress pawn actions using the final trace's distance_delta labels.",
+    "response_probe": "Only positions with both regression and progress response probes are compared. This report's probe count may be limited by the audit's --response-probe-limit.",
+    "scope": "Metrics are reported separately for vanilla PUCT and PUCT with repetition avoidance."
+  },
+  "variants": {
+    "vanilla_puct": {
+      "positions": 1338,
+      "first_selection": {
+        "comparable_positions": 1338,
+        "regression_ahead_count": 1201,
+        "regression_ahead_percent": 89.76083707025411,
+        "mean_best_prior": {
+          "regression": 0.4828473734403841,
+          "progress": 0.2639550332604999
+        }
+      },
+      "final_search": {
+        "comparable_positions": 1338,
+        "mean_best_prior": {
+          "regression": 0.4430124270235521,
+          "progress": 0.25274880656752224,
+          "difference_regression_minus_progress": 0.19026362045602985
+        },
+        "mean_best_q": {
+          "regression": 0.015097053064641793,
+          "progress": -0.012581290110933886,
+          "difference_regression_minus_progress": 0.027678343175575677
+        },
+        "regression_q_better_count": 910,
+        "regression_q_better_percent": 68.01195814648729,
+        "mean_best_action_visits": {
+          "regression": 14.710762331838565,
+          "progress": 7.641255605381166
+        }
+      },
+      "aggregate_pawn_visit_totals": {
+        "regression": 0,
+        "progress": 0,
+        "regression_to_progress_ratio": null,
+        "regression_visit_share_percent": null,
+        "mean_per_position_ratio": null
+      },
+      "response_probe": {
+        "comparable_positions": 20,
+        "mean_regression_value": -0.35490421403665096,
+        "mean_progress_value": -0.2371320698177442,
+        "mean_value_difference_regression_minus_progress": -0.11777214421890676,
+        "regression_better_count": 6,
+        "progress_better_count": 14,
+        "equal_count": 0,
+        "regression_better_percent": 30.0,
+        "interpretation": "One-ply opponent MCTS response plus unchanged neural value; diagnostic proxy, not minimax proof."
+      }
+    },
+    "with_repetition_avoidance": {
+      "positions": 1338,
+      "first_selection": {
+        "comparable_positions": 1338,
+        "regression_ahead_count": 1198,
+        "regression_ahead_percent": 89.53662182361734,
+        "mean_best_prior": {
+          "regression": 0.4638739324183306,
+          "progress": 0.25605678312322744
+        }
+      },
+      "final_search": {
+        "comparable_positions": 1338,
+        "mean_best_prior": {
+          "regression": 0.43985767609068094,
+          "progress": 0.247642678269119,
+          "difference_regression_minus_progress": 0.19221499782156196
+        },
+        "mean_best_q": {
+          "regression": 0.012376635699726333,
+          "progress": -0.022415794238620893,
+          "difference_regression_minus_progress": 0.034792429938347226
+        },
+        "regression_q_better_count": 882,
+        "regression_q_better_percent": 65.91928251121077,
+        "mean_best_action_visits": {
+          "regression": 12.627802690582959,
+          "progress": 7.671150971599402
+        }
+      },
+      "aggregate_pawn_visit_totals": {
+        "regression": 0,
+        "progress": 0,
+        "regression_to_progress_ratio": null,
+        "regression_visit_share_percent": null,
+        "mean_per_position_ratio": null
+      },
+      "response_probe": {
+        "comparable_positions": 20,
+        "mean_regression_value": -0.36715060838032515,
+        "mean_progress_value": -0.2386245384812355,
+        "mean_value_difference_regression_minus_progress": -0.12852606989908963,
+        "regression_better_count": 5,
+        "progress_better_count": 15,
+        "equal_count": 0,
+        "regression_better_percent": 25.0,
+        "interpretation": "One-ply opponent MCTS response plus unchanged neural value; diagnostic proxy, not minimax proof."
+      }
+    }
+  }
+}

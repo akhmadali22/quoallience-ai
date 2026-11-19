@@ -1,0 +1,79 @@
+{
+  "checkpoint": "models/checkpoints/neural_v1.pt",
+  "replay": "data/diagnostics/selfplay/replay.jsonl",
+  "samples": 120,
+  "action_space": {
+    "total": 209,
+    "pawn": 81,
+    "wall": 128
+  },
+  "value_loss_weight": 1.0,
+  "loss": {
+    "policy_cross_entropy": 2.0311233890553315,
+    "pawn_policy_contribution": 0.6569396654764811,
+    "wall_policy_contribution": 1.3741837253173192,
+    "value_mse": 0.09070988125890646,
+    "total_objective": 2.121833270314238
+  },
+  "target_mass": {
+    "pawn": 0.65,
+    "wall": 0.35
+  },
+  "phase_buckets_by_ply": {
+    "0-9": {
+      "samples": 20,
+      "policy_loss": 4.196370959281921,
+      "pawn_policy_loss": 0.29855233132839204,
+      "wall_policy_loss": 3.897818624973297,
+      "value_loss": 0.051373051339760424,
+      "pawn_target_mass": 0.05625,
+      "wall_target_mass": 0.94375
+    },
+    "10-19": {
+      "samples": 20,
+      "policy_loss": 3.8098548412323,
+      "pawn_policy_loss": 0.033866089582443235,
+      "wall_policy_loss": 3.775988757610321,
+      "value_loss": 0.04889878684198266,
+      "pawn_target_mass": 0.00625,
+      "wall_target_mass": 0.99375
+    },
+    "20-29": {
+      "samples": 20,
+      "policy_loss": 1.5499411076307297,
+      "pawn_policy_loss": 0.978646145761013,
+      "wall_policy_loss": 0.5712949693202972,
+      "value_loss": 0.10361227826168715,
+      "pawn_target_mass": 0.8375,
+      "wall_target_mass": 0.1625
+    },
+    "30-39": {
+      "samples": 20,
+      "policy_loss": 0.8817130714654923,
+      "pawn_policy_loss": 0.8817130714654923,
+      "wall_policy_loss": 0.0,
+      "value_loss": 0.10978609456224149,
+      "pawn_target_mass": 1.0,
+      "wall_target_mass": 0.0
+    },
+    "40-49": {
+      "samples": 20,
+      "policy_loss": 0.8703370407223702,
+      "pawn_policy_loss": 0.8703370407223702,
+      "wall_policy_loss": 0.0,
+      "value_loss": 0.116573877245537,
+      "pawn_target_mass": 1.0,
+      "wall_target_mass": 0.0
+    },
+    "50-59": {
+      "samples": 20,
+      "policy_loss": 0.878523313999176,
+      "pawn_policy_loss": 0.878523313999176,
+      "wall_policy_loss": 0.0,
+      "value_loss": 0.11401519930223003,
+      "pawn_target_mass": 1.0,
+      "wall_target_mass": 0.0
+    }
+  },
+  "note": "Evaluation only. No optimizer step or checkpoint modification is performed. Pawn and wall loss values are additive contributions to the existing policy cross-entropy; no category reweighting is applied."
+}

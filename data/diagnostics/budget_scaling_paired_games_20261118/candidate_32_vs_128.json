@@ -1,0 +1,2231 @@
+{
+  "checkpoint": "models/checkpoints/exp_001r_vonly_strict.pt",
+  "checkpoint_sha256": "d58d9e47090e7ca0cbf3b4cfa02b7ab6a2a56ded16ce7c4090dcac202b72f098",
+  "protocol": "same checkpoint, MCTS-vs-MCTS, paired seed, swapped seats, deterministic max-visit selection; vanilla PUCT without progressive widening",
+  "config": {
+    "pairs": 30,
+    "games": 60,
+    "low_simulations": 32,
+    "high_simulations": 128,
+    "max_plies": 200,
+    "device": "cpu",
+    "base_seed": 20261118,
+    "c_puct": 1.5,
+    "selection_temperature": 0.0,
+    "category_exploration": 0.0,
+    "repetition_penalty": 0.0,
+    "pawn_progress_bonus": 0.0,
+    "progressive_widening": false,
+    "root_noise": false,
+    "randomize_selection_ties": false,
+    "wall_distance_weight": 0.0,
+    "wall_route_weight": 0.0
+  },
+  "low_agent": {
+    "wins": 0,
+    "losses": 0,
+    "draws": 60,
+    "score_rate": 0.5
+  },
+  "high_agent": {
+    "wins": 0,
+    "losses": 0,
+    "draws": 60,
+    "score_rate": 0.5
+  },
+  "paired_seed_results": [
+    {
+      "pair": 1,
+      "seed": 20261118,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 2,
+      "seed": 20261119,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 3,
+      "seed": 20261120,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 4,
+      "seed": 20261121,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 5,
+      "seed": 20261122,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 6,
+      "seed": 20261123,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 7,
+      "seed": 20261124,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 8,
+      "seed": 20261125,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 9,
+      "seed": 20261126,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 10,
+      "seed": 20261127,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 11,
+      "seed": 20261128,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 12,
+      "seed": 20261129,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 13,
+      "seed": 20261130,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 14,
+      "seed": 20261131,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 15,
+      "seed": 20261132,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 16,
+      "seed": 20261133,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 17,
+      "seed": 20261134,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 18,
+      "seed": 20261135,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 19,
+      "seed": 20261136,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 20,
+      "seed": 20261137,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 21,
+      "seed": 20261138,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 22,
+      "seed": 20261139,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 23,
+      "seed": 20261140,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 24,
+      "seed": 20261141,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 25,
+      "seed": 20261142,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 26,
+      "seed": 20261143,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 27,
+      "seed": 20261144,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 28,
+      "seed": 20261145,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 29,
+      "seed": 20261146,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    },
+    {
+      "pair": 30,
+      "seed": 20261147,
+      "low_points": 1.0,
+      "high_points": 1.0,
+      "pair_result_for_low": "draw"
+    }
+  ],
+  "games": [
+    {
+      "pair": 1,
+      "seed": 20261118,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.3978125,
+          "mean_root_policy_entropy": 1.109098687554744,
+          "mean_root_pawn_visit_ratio": 0.9009375,
+          "mean_root_wall_visit_ratio": 0.0990625,
+          "mean_selected_q": -0.23761068673365118,
+          "mean_selected_visits": 16.73
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 5.644140625,
+          "mean_root_policy_entropy": 0.6041477958460896,
+          "mean_root_pawn_visit_ratio": 0.900390625,
+          "mean_root_wall_visit_ratio": 0.099609375,
+          "mean_selected_q": 0.2343589272761431,
+          "mean_selected_visits": 102.95
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "seed": 20261118,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.9103125,
+          "mean_root_policy_entropy": 0.9256479455154978,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.15226176400266722,
+          "mean_selected_visits": 17.25
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.028046875,
+          "mean_root_policy_entropy": 1.3822487779133574,
+          "mean_root_pawn_visit_ratio": 0.901640625,
+          "mean_root_wall_visit_ratio": 0.098359375,
+          "mean_selected_q": -0.14329351245653224,
+          "mean_selected_visits": 55.91
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "seed": 20261119,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.4096875,
+          "mean_root_policy_entropy": 0.8372420123875668,
+          "mean_root_pawn_visit_ratio": 0.9021875,
+          "mean_root_wall_visit_ratio": 0.0978125,
+          "mean_selected_q": -0.1544020162755373,
+          "mean_selected_visits": 18.5
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 5.022890625,
+          "mean_root_policy_entropy": 1.0736903104577509,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.16019811982767823,
+          "mean_selected_visits": 64.15
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "seed": 20261119,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.065625,
+          "mean_root_policy_entropy": 0.938303520173128,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.2941503554094077,
+          "mean_selected_visits": 16.91
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.371953125,
+          "mean_root_policy_entropy": 1.1546076330753114,
+          "mean_root_pawn_visit_ratio": 0.902109375,
+          "mean_root_wall_visit_ratio": 0.097890625,
+          "mean_selected_q": -0.2854264630217803,
+          "mean_selected_visits": 63.5
+        }
+      }
+    },
+    {
+      "pair": 3,
+      "seed": 20261120,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.6596875,
+          "mean_root_policy_entropy": 1.2929056166983746,
+          "mean_root_pawn_visit_ratio": 0.9015625,
+          "mean_root_wall_visit_ratio": 0.0984375,
+          "mean_selected_q": -0.24622686125889529,
+          "mean_selected_visits": 13.46
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.149140625,
+          "mean_root_policy_entropy": 0.9788183686820108,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.2502970028986723,
+          "mean_selected_visits": 74.08
+        }
+      }
+    },
+    {
+      "pair": 3,
+      "seed": 20261120,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.3521875,
+          "mean_root_policy_entropy": 0.8921307989053936,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.19850908677882995,
+          "mean_selected_visits": 17.25
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.99046875,
+          "mean_root_policy_entropy": 0.9613842585538017,
+          "mean_root_pawn_visit_ratio": 0.901875,
+          "mean_root_wall_visit_ratio": 0.098125,
+          "mean_selected_q": -0.19761299113401623,
+          "mean_selected_visits": 80.35
+        }
+      }
+    },
+    {
+      "pair": 4,
+      "seed": 20261121,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.1084375,
+          "mean_root_policy_entropy": 1.0756896196152068,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": -0.24940020651541406,
+          "mean_selected_visits": 16.1
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.851015625,
+          "mean_root_policy_entropy": 0.9213595864967121,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": 0.2517369742825524,
+          "mean_selected_visits": 78.79
+        }
+      }
+    },
+    {
+      "pair": 4,
+      "seed": 20261121,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.8465625,
+          "mean_root_policy_entropy": 0.9948615905166687,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.16643129148068309,
+          "mean_selected_visits": 16.37
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.984296875,
+          "mean_root_policy_entropy": 1.349870329639659,
+          "mean_root_pawn_visit_ratio": 0.901015625,
+          "mean_root_wall_visit_ratio": 0.098984375,
+          "mean_selected_q": -0.15504561687301885,
+          "mean_selected_visits": 58.51
+        }
+      }
+    },
+    {
+      "pair": 5,
+      "seed": 20261122,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.546875,
+          "mean_root_policy_entropy": 0.8377991626882464,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": -0.3055954095240414,
+          "mean_selected_visits": 19.45
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 5.36125,
+          "mean_root_policy_entropy": 0.8589890177715594,
+          "mean_root_pawn_visit_ratio": 0.90046875,
+          "mean_root_wall_visit_ratio": 0.09953125,
+          "mean_selected_q": 0.3100672891165949,
+          "mean_selected_visits": 80.04
+        }
+      }
+    },
+    {
+      "pair": 5,
+      "seed": 20261122,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.995625,
+          "mean_root_policy_entropy": 0.7961007612269555,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.09702489839430116,
+          "mean_selected_visits": 20.23
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.994609375,
+          "mean_root_policy_entropy": 1.449479767429691,
+          "mean_root_pawn_visit_ratio": 0.9015625,
+          "mean_root_wall_visit_ratio": 0.0984375,
+          "mean_selected_q": -0.11266811698383664,
+          "mean_selected_visits": 53.46
+        }
+      }
+    },
+    {
+      "pair": 6,
+      "seed": 20261123,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.7234375,
+          "mean_root_policy_entropy": 1.2481846485374053,
+          "mean_root_pawn_visit_ratio": 0.9015625,
+          "mean_root_wall_visit_ratio": 0.0984375,
+          "mean_selected_q": -0.2769895100160744,
+          "mean_selected_visits": 14.43
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.103046875,
+          "mean_root_policy_entropy": 1.1029638307027794,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.2718055648082985,
+          "mean_selected_visits": 65.92
+        }
+      }
+    },
+    {
+      "pair": 6,
+      "seed": 20261123,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.905625,
+          "mean_root_policy_entropy": 0.8583976345534122,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.17503309428016076,
+          "mean_selected_visits": 17.78
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.927265625,
+          "mean_root_policy_entropy": 1.3685381838179926,
+          "mean_root_pawn_visit_ratio": 0.902265625,
+          "mean_root_wall_visit_ratio": 0.097734375,
+          "mean_selected_q": -0.15982946119987848,
+          "mean_selected_visits": 61.5
+        }
+      }
+    },
+    {
+      "pair": 7,
+      "seed": 20261124,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.633125,
+          "mean_root_policy_entropy": 1.2945310829659549,
+          "mean_root_pawn_visit_ratio": 0.90125,
+          "mean_root_wall_visit_ratio": 0.09875,
+          "mean_selected_q": -0.22270632962389886,
+          "mean_selected_visits": 13.49
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.15734375,
+          "mean_root_policy_entropy": 1.0252427728379354,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.20179802082036816,
+          "mean_selected_visits": 70.47
+        }
+      }
+    },
+    {
+      "pair": 7,
+      "seed": 20261124,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.7828125,
+          "mean_root_policy_entropy": 0.9389844735652151,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.29800927534952404,
+          "mean_selected_visits": 16.98
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.758359375,
+          "mean_root_policy_entropy": 1.4325235479113516,
+          "mean_root_pawn_visit_ratio": 0.901875,
+          "mean_root_wall_visit_ratio": 0.098125,
+          "mean_selected_q": -0.27989803549354136,
+          "mean_selected_visits": 53.27
+        }
+      }
+    },
+    {
+      "pair": 8,
+      "seed": 20261125,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.4909375,
+          "mean_root_policy_entropy": 0.7869702556447213,
+          "mean_root_pawn_visit_ratio": 0.9015625,
+          "mean_root_wall_visit_ratio": 0.0984375,
+          "mean_selected_q": -0.31789646211266576,
+          "mean_selected_visits": 20
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 5.21734375,
+          "mean_root_policy_entropy": 0.9993828912182301,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.31770185001705215,
+          "mean_selected_visits": 70.31
+        }
+      }
+    },
+    {
+      "pair": 8,
+      "seed": 20261125,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.8065625,
+          "mean_root_policy_entropy": 0.9779009128786205,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.14290762235645807,
+          "mean_selected_visits": 17.2
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.947578125,
+          "mean_root_policy_entropy": 1.3896140947810185,
+          "mean_root_pawn_visit_ratio": 0.901171875,
+          "mean_root_wall_visit_ratio": 0.098828125,
+          "mean_selected_q": -0.11518916667857515,
+          "mean_selected_visits": 60.59
+        }
+      }
+    },
+    {
+      "pair": 9,
+      "seed": 20261126,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.2959375,
+          "mean_root_policy_entropy": 0.8232447352450717,
+          "mean_root_pawn_visit_ratio": 0.9015625,
+          "mean_root_wall_visit_ratio": 0.0984375,
+          "mean_selected_q": -0.21299774428858226,
+          "mean_selected_visits": 18.68
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.715,
+          "mean_root_policy_entropy": 1.1386936865020927,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.2136319992041605,
+          "mean_selected_visits": 63.75
+        }
+      }
+    },
+    {
+      "pair": 9,
+      "seed": 20261126,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.9171875,
+          "mean_root_policy_entropy": 0.8615845050099366,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.3174352703608537,
+          "mean_selected_visits": 17.92
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.9009375,
+          "mean_root_policy_entropy": 1.3935827148975295,
+          "mean_root_pawn_visit_ratio": 0.901796875,
+          "mean_root_wall_visit_ratio": 0.098203125,
+          "mean_selected_q": -0.29536334100864037,
+          "mean_selected_visits": 55.5
+        }
+      }
+    },
+    {
+      "pair": 10,
+      "seed": 20261127,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.3634375,
+          "mean_root_policy_entropy": 0.8458469466789799,
+          "mean_root_pawn_visit_ratio": 0.901875,
+          "mean_root_wall_visit_ratio": 0.098125,
+          "mean_selected_q": -0.23952143685817145,
+          "mean_selected_visits": 18.44
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.83640625,
+          "mean_root_policy_entropy": 1.1337729875952662,
+          "mean_root_pawn_visit_ratio": 0.9009375,
+          "mean_root_wall_visit_ratio": 0.0990625,
+          "mean_selected_q": 0.22696633915876066,
+          "mean_selected_visits": 62.12
+        }
+      }
+    },
+    {
+      "pair": 10,
+      "seed": 20261127,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.8621875,
+          "mean_root_policy_entropy": 0.9202536788377718,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.1547047795285563,
+          "mean_selected_visits": 17.19
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.852421875,
+          "mean_root_policy_entropy": 1.4266638312054158,
+          "mean_root_pawn_visit_ratio": 0.89296875,
+          "mean_root_wall_visit_ratio": 0.10703125,
+          "mean_selected_q": -0.14163453308964083,
+          "mean_selected_visits": 57.25
+        }
+      }
+    },
+    {
+      "pair": 11,
+      "seed": 20261128,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.0171875,
+          "mean_root_policy_entropy": 1.035856146599153,
+          "mean_root_pawn_visit_ratio": 0.9009375,
+          "mean_root_wall_visit_ratio": 0.0990625,
+          "mean_selected_q": -0.201476306194467,
+          "mean_selected_visits": 16.12
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.444453125,
+          "mean_root_policy_entropy": 1.0611230136965832,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.19508463055854272,
+          "mean_selected_visits": 70.26
+        }
+      }
+    },
+    {
+      "pair": 11,
+      "seed": 20261128,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.03625,
+          "mean_root_policy_entropy": 0.7873125940895572,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.2791343433594581,
+          "mean_selected_visits": 20.5
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.21140625,
+          "mean_root_policy_entropy": 1.4016939500246728,
+          "mean_root_pawn_visit_ratio": 0.900859375,
+          "mean_root_wall_visit_ratio": 0.099140625,
+          "mean_selected_q": -0.2850093905125536,
+          "mean_selected_visits": 57.81
+        }
+      }
+    },
+    {
+      "pair": 12,
+      "seed": 20261129,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.72125,
+          "mean_root_policy_entropy": 1.277071527248604,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": -0.21037495724835478,
+          "mean_selected_visits": 14.38
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.3253125,
+          "mean_root_policy_entropy": 0.9277005529341079,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.2121586689511276,
+          "mean_selected_visits": 75.24
+        }
+      }
+    },
+    {
+      "pair": 12,
+      "seed": 20261129,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.8715625,
+          "mean_root_policy_entropy": 0.9118294297994249,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.20621400843070456,
+          "mean_selected_visits": 17.53
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.9821875,
+          "mean_root_policy_entropy": 1.399306723875088,
+          "mean_root_pawn_visit_ratio": 0.902265625,
+          "mean_root_wall_visit_ratio": 0.097734375,
+          "mean_selected_q": -0.19359266730026695,
+          "mean_selected_visits": 58.39
+        }
+      }
+    },
+    {
+      "pair": 13,
+      "seed": 20261130,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.88875,
+          "mean_root_policy_entropy": 1.105296189357125,
+          "mean_root_pawn_visit_ratio": 0.9015625,
+          "mean_root_wall_visit_ratio": 0.0984375,
+          "mean_selected_q": -0.2348314941420038,
+          "mean_selected_visits": 14.57
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.3540625,
+          "mean_root_policy_entropy": 1.0464006619044044,
+          "mean_root_pawn_visit_ratio": 0.900390625,
+          "mean_root_wall_visit_ratio": 0.099609375,
+          "mean_selected_q": 0.21989174079927026,
+          "mean_selected_visits": 70.5
+        }
+      }
+    },
+    {
+      "pair": 13,
+      "seed": 20261130,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.0228125,
+          "mean_root_policy_entropy": 0.937163750770212,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.1303723211029557,
+          "mean_selected_visits": 17.89
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.2903125,
+          "mean_root_policy_entropy": 1.2099722690729677,
+          "mean_root_pawn_visit_ratio": 0.90171875,
+          "mean_root_wall_visit_ratio": 0.09828125,
+          "mean_selected_q": -0.12227229278041,
+          "mean_selected_visits": 63.81
+        }
+      }
+    },
+    {
+      "pair": 14,
+      "seed": 20261131,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.6446875,
+          "mean_root_policy_entropy": 1.2629433422933924,
+          "mean_root_pawn_visit_ratio": 0.90125,
+          "mean_root_wall_visit_ratio": 0.09875,
+          "mean_selected_q": -0.23406502555403239,
+          "mean_selected_visits": 13.49
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.003828125,
+          "mean_root_policy_entropy": 1.0801168159564576,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.23503750720550354,
+          "mean_selected_visits": 69.1
+        }
+      }
+    },
+    {
+      "pair": 14,
+      "seed": 20261131,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.775,
+          "mean_root_policy_entropy": 0.9850879460218894,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.016637463643453438,
+          "mean_selected_visits": 17.29
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.867109375,
+          "mean_root_policy_entropy": 1.4247945616802278,
+          "mean_root_pawn_visit_ratio": 0.901875,
+          "mean_root_wall_visit_ratio": 0.098125,
+          "mean_selected_q": -0.0006812352037456461,
+          "mean_selected_visits": 56.68
+        }
+      }
+    },
+    {
+      "pair": 15,
+      "seed": 20261132,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.864375,
+          "mean_root_policy_entropy": 1.1787761592848,
+          "mean_root_pawn_visit_ratio": 0.9009375,
+          "mean_root_wall_visit_ratio": 0.0990625,
+          "mean_selected_q": -0.30630900583609927,
+          "mean_selected_visits": 15.18
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.341484375,
+          "mean_root_policy_entropy": 1.0091742422068835,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.3107207398249974,
+          "mean_selected_visits": 72.73
+        }
+      }
+    },
+    {
+      "pair": 15,
+      "seed": 20261132,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 4.603125,
+          "mean_root_policy_entropy": 0.5011240163494383,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.24859067467702314,
+          "mean_selected_visits": 25.64
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 6.67578125,
+          "mean_root_policy_entropy": 0.8139243349779774,
+          "mean_root_pawn_visit_ratio": 0.90140625,
+          "mean_root_wall_visit_ratio": 0.09859375,
+          "mean_selected_q": -0.22602360940565716,
+          "mean_selected_visits": 87.01
+        }
+      }
+    },
+    {
+      "pair": 16,
+      "seed": 20261133,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.96125,
+          "mean_root_policy_entropy": 1.1318565276262456,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": -0.2658765147683211,
+          "mean_selected_visits": 15.72
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.473671875,
+          "mean_root_policy_entropy": 0.9969265899985748,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.27478534918730696,
+          "mean_selected_visits": 72.88
+        }
+      }
+    },
+    {
+      "pair": 16,
+      "seed": 20261133,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.9965625,
+          "mean_root_policy_entropy": 0.8408886518040776,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.14395314599697442,
+          "mean_selected_visits": 18.77
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.16484375,
+          "mean_root_policy_entropy": 1.3389025571138553,
+          "mean_root_pawn_visit_ratio": 0.901953125,
+          "mean_root_wall_visit_ratio": 0.098046875,
+          "mean_selected_q": -0.12365203331947021,
+          "mean_selected_visits": 61.78
+        }
+      }
+    },
+    {
+      "pair": 17,
+      "seed": 20261134,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.7159375,
+          "mean_root_policy_entropy": 1.2848465628902235,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": -0.16822762301587263,
+          "mean_selected_visits": 13.27
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.24125,
+          "mean_root_policy_entropy": 0.8892702477330863,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.15479788403911918,
+          "mean_selected_visits": 76.94
+        }
+      }
+    },
+    {
+      "pair": 17,
+      "seed": 20261134,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.241875,
+          "mean_root_policy_entropy": 0.832775320514181,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.141865221048276,
+          "mean_selected_visits": 19.08
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.45484375,
+          "mean_root_policy_entropy": 1.150385382764852,
+          "mean_root_pawn_visit_ratio": 0.89234375,
+          "mean_root_wall_visit_ratio": 0.10765625,
+          "mean_selected_q": -0.14311667397698952,
+          "mean_selected_visits": 74.07
+        }
+      }
+    },
+    {
+      "pair": 18,
+      "seed": 20261135,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.9353125,
+          "mean_root_policy_entropy": 1.1725343496983145,
+          "mean_root_pawn_visit_ratio": 0.901875,
+          "mean_root_wall_visit_ratio": 0.098125,
+          "mean_selected_q": -0.23409497382808508,
+          "mean_selected_visits": 15.34
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.398359375,
+          "mean_root_policy_entropy": 0.9969593588427825,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.23051806781912212,
+          "mean_selected_visits": 68.34
+        }
+      }
+    },
+    {
+      "pair": 18,
+      "seed": 20261135,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.178125,
+          "mean_root_policy_entropy": 0.8634564692556371,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.3613160507499944,
+          "mean_selected_visits": 18.02
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.455390625,
+          "mean_root_policy_entropy": 1.1626263167817839,
+          "mean_root_pawn_visit_ratio": 0.902109375,
+          "mean_root_wall_visit_ratio": 0.097890625,
+          "mean_selected_q": -0.35799565010233914,
+          "mean_selected_visits": 67.38
+        }
+      }
+    },
+    {
+      "pair": 19,
+      "seed": 20261136,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.108125,
+          "mean_root_policy_entropy": 1.0268651631953987,
+          "mean_root_pawn_visit_ratio": 0.90125,
+          "mean_root_wall_visit_ratio": 0.09875,
+          "mean_selected_q": -0.14863696370259843,
+          "mean_selected_visits": 16.71
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.700703125,
+          "mean_root_policy_entropy": 1.0316704368722114,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.15446860248069624,
+          "mean_selected_visits": 66.34
+        }
+      }
+    },
+    {
+      "pair": 19,
+      "seed": 20261136,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.1259375,
+          "mean_root_policy_entropy": 0.9368369609778391,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.22375954088886307,
+          "mean_selected_visits": 16.78
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.51265625,
+          "mean_root_policy_entropy": 1.0493755168566306,
+          "mean_root_pawn_visit_ratio": 0.902265625,
+          "mean_root_wall_visit_ratio": 0.097734375,
+          "mean_selected_q": -0.21098587081483472,
+          "mean_selected_visits": 81.29
+        }
+      }
+    },
+    {
+      "pair": 20,
+      "seed": 20261137,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.115,
+          "mean_root_policy_entropy": 0.994706300258584,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": -0.21278040937456244,
+          "mean_selected_visits": 18.26
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.564609375,
+          "mean_root_policy_entropy": 1.0370227177254026,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.23170233933091613,
+          "mean_selected_visits": 71.04
+        }
+      }
+    },
+    {
+      "pair": 20,
+      "seed": 20261137,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.0765625,
+          "mean_root_policy_entropy": 0.9516793767429421,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.22586524203201636,
+          "mean_selected_visits": 16.78
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.35796875,
+          "mean_root_policy_entropy": 1.1586804786035918,
+          "mean_root_pawn_visit_ratio": 0.901640625,
+          "mean_root_wall_visit_ratio": 0.098359375,
+          "mean_selected_q": -0.22802536869786091,
+          "mean_selected_visits": 71.57
+        }
+      }
+    },
+    {
+      "pair": 21,
+      "seed": 20261138,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.7578125,
+          "mean_root_policy_entropy": 1.2990886478355594,
+          "mean_root_pawn_visit_ratio": 0.901875,
+          "mean_root_wall_visit_ratio": 0.098125,
+          "mean_selected_q": -0.2872117431885287,
+          "mean_selected_visits": 13.93
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.319140625,
+          "mean_root_policy_entropy": 0.9367369974574504,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": 0.28857074423613654,
+          "mean_selected_visits": 75.06
+        }
+      }
+    },
+    {
+      "pair": 21,
+      "seed": 20261138,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.92625,
+          "mean_root_policy_entropy": 0.9363335888334934,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.27774767997517175,
+          "mean_selected_visits": 16.86
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.0109375,
+          "mean_root_policy_entropy": 1.3630719808219005,
+          "mean_root_pawn_visit_ratio": 0.90203125,
+          "mean_root_wall_visit_ratio": 0.09796875,
+          "mean_selected_q": -0.26774754455657374,
+          "mean_selected_visits": 58.08
+        }
+      }
+    },
+    {
+      "pair": 22,
+      "seed": 20261139,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.901875,
+          "mean_root_policy_entropy": 1.2348409645158265,
+          "mean_root_pawn_visit_ratio": 0.90125,
+          "mean_root_wall_visit_ratio": 0.09875,
+          "mean_selected_q": -0.3752195862849993,
+          "mean_selected_visits": 13.38
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.48328125,
+          "mean_root_policy_entropy": 0.9289992664184604,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.3699824992810099,
+          "mean_selected_visits": 78.34
+        }
+      }
+    },
+    {
+      "pair": 22,
+      "seed": 20261139,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.905,
+          "mean_root_policy_entropy": 0.9151448886803542,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.2861808771068094,
+          "mean_selected_visits": 17.58
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.9065625,
+          "mean_root_policy_entropy": 1.3798737509332,
+          "mean_root_pawn_visit_ratio": 0.90203125,
+          "mean_root_wall_visit_ratio": 0.09796875,
+          "mean_selected_q": -0.25767833006423896,
+          "mean_selected_visits": 59.91
+        }
+      }
+    },
+    {
+      "pair": 23,
+      "seed": 20261140,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.7278125,
+          "mean_root_policy_entropy": 1.2398982162201442,
+          "mean_root_pawn_visit_ratio": 0.9015625,
+          "mean_root_wall_visit_ratio": 0.0984375,
+          "mean_selected_q": -0.2147733766940861,
+          "mean_selected_visits": 14.24
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.13703125,
+          "mean_root_policy_entropy": 1.068688662421282,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.20775450177050206,
+          "mean_selected_visits": 66.88
+        }
+      }
+    },
+    {
+      "pair": 23,
+      "seed": 20261140,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.3434375,
+          "mean_root_policy_entropy": 0.4282186620137421,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.2525858870150628,
+          "mean_selected_visits": 24.31
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.4278125,
+          "mean_root_policy_entropy": 1.4350705638751828,
+          "mean_root_pawn_visit_ratio": 0.9015625,
+          "mean_root_wall_visit_ratio": 0.0984375,
+          "mean_selected_q": -0.277745607088412,
+          "mean_selected_visits": 55.84
+        }
+      }
+    },
+    {
+      "pair": 24,
+      "seed": 20261141,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.7071875,
+          "mean_root_policy_entropy": 1.2738912236828972,
+          "mean_root_pawn_visit_ratio": 0.9021875,
+          "mean_root_wall_visit_ratio": 0.0978125,
+          "mean_selected_q": -0.3495041580856331,
+          "mean_selected_visits": 13.73
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.192109375,
+          "mean_root_policy_entropy": 0.9662722601637119,
+          "mean_root_pawn_visit_ratio": 0.900390625,
+          "mean_root_wall_visit_ratio": 0.099609375,
+          "mean_selected_q": 0.34292051654046457,
+          "mean_selected_visits": 73.42
+        }
+      }
+    },
+    {
+      "pair": 24,
+      "seed": 20261141,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.9784375,
+          "mean_root_policy_entropy": 0.8947226604407138,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.27218859782700294,
+          "mean_selected_visits": 17.78
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.137421875,
+          "mean_root_policy_entropy": 1.3126240350270162,
+          "mean_root_pawn_visit_ratio": 0.901484375,
+          "mean_root_wall_visit_ratio": 0.098515625,
+          "mean_selected_q": -0.2618667038628964,
+          "mean_selected_visits": 62.79
+        }
+      }
+    },
+    {
+      "pair": 25,
+      "seed": 20261142,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.82375,
+          "mean_root_policy_entropy": 1.1941673937793047,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": -0.21531376614863618,
+          "mean_selected_visits": 14.15
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.369921875,
+          "mean_root_policy_entropy": 0.8746030894036256,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.22360386985090308,
+          "mean_selected_visits": 78.26
+        }
+      }
+    },
+    {
+      "pair": 25,
+      "seed": 20261142,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.985,
+          "mean_root_policy_entropy": 0.9492713671834941,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.1956813265990573,
+          "mean_selected_visits": 17.36
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.22265625,
+          "mean_root_policy_entropy": 1.2465939206732948,
+          "mean_root_pawn_visit_ratio": 0.90171875,
+          "mean_root_wall_visit_ratio": 0.09828125,
+          "mean_selected_q": -0.17284124114891863,
+          "mean_selected_visits": 63.06
+        }
+      }
+    },
+    {
+      "pair": 26,
+      "seed": 20261143,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.76625,
+          "mean_root_policy_entropy": 1.2777682487287847,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": -0.27811454739363817,
+          "mean_selected_visits": 13.13
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.40859375,
+          "mean_root_policy_entropy": 0.8806313845759908,
+          "mean_root_pawn_visit_ratio": 0.90046875,
+          "mean_root_wall_visit_ratio": 0.09953125,
+          "mean_selected_q": 0.27997509343014604,
+          "mean_selected_visits": 79.94
+        }
+      }
+    },
+    {
+      "pair": 26,
+      "seed": 20261143,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.3453125,
+          "mean_root_policy_entropy": 0.947268121449117,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.3706051537560763,
+          "mean_selected_visits": 17.41
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 5.04953125,
+          "mean_root_policy_entropy": 0.9133953523291966,
+          "mean_root_pawn_visit_ratio": 0.901796875,
+          "mean_root_wall_visit_ratio": 0.098203125,
+          "mean_selected_q": -0.3518055794384916,
+          "mean_selected_visits": 77.11
+        }
+      }
+    },
+    {
+      "pair": 27,
+      "seed": 20261144,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.9503125,
+          "mean_root_policy_entropy": 1.1586166263142375,
+          "mean_root_pawn_visit_ratio": 0.901875,
+          "mean_root_wall_visit_ratio": 0.098125,
+          "mean_selected_q": -0.296043037442489,
+          "mean_selected_visits": 15.86
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.3978125,
+          "mean_root_policy_entropy": 0.9994820322176429,
+          "mean_root_pawn_visit_ratio": 0.90015625,
+          "mean_root_wall_visit_ratio": 0.09984375,
+          "mean_selected_q": 0.3053760258833335,
+          "mean_selected_visits": 72.04
+        }
+      }
+    },
+    {
+      "pair": 27,
+      "seed": 20261144,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.9375,
+          "mean_root_policy_entropy": 0.8891426204366102,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.07081388982198117,
+          "mean_selected_visits": 18.15
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.100078125,
+          "mean_root_policy_entropy": 1.352927750521196,
+          "mean_root_pawn_visit_ratio": 0.90125,
+          "mean_root_wall_visit_ratio": 0.09875,
+          "mean_selected_q": -0.047407125163471335,
+          "mean_selected_visits": 61.67
+        }
+      }
+    },
+    {
+      "pair": 28,
+      "seed": 20261145,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.92625,
+          "mean_root_policy_entropy": 1.0842785895353397,
+          "mean_root_pawn_visit_ratio": 0.9015625,
+          "mean_root_wall_visit_ratio": 0.0984375,
+          "mean_selected_q": -0.2575232703121533,
+          "mean_selected_visits": 14.65
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.282109375,
+          "mean_root_policy_entropy": 1.0812926983458846,
+          "mean_root_pawn_visit_ratio": 0.9003125,
+          "mean_root_wall_visit_ratio": 0.0996875,
+          "mean_selected_q": 0.24937255393984317,
+          "mean_selected_visits": 67.59
+        }
+      }
+    },
+    {
+      "pair": 28,
+      "seed": 20261145,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.079375,
+          "mean_root_policy_entropy": 0.757514093707493,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.03923979607409512,
+          "mean_selected_visits": 20.56
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.303515625,
+          "mean_root_policy_entropy": 1.4137673212198,
+          "mean_root_pawn_visit_ratio": 0.902109375,
+          "mean_root_wall_visit_ratio": 0.097890625,
+          "mean_selected_q": -0.04462245519137793,
+          "mean_selected_visits": 54.58
+        }
+      }
+    },
+    {
+      "pair": 29,
+      "seed": 20261146,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.8428125,
+          "mean_root_policy_entropy": 1.1632608800680082,
+          "mean_root_pawn_visit_ratio": 0.901875,
+          "mean_root_wall_visit_ratio": 0.098125,
+          "mean_selected_q": -0.26028970422470776,
+          "mean_selected_visits": 15.4
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.263125,
+          "mean_root_policy_entropy": 1.0293631232678755,
+          "mean_root_pawn_visit_ratio": 0.900390625,
+          "mean_root_wall_visit_ratio": 0.099609375,
+          "mean_selected_q": 0.24281084125532312,
+          "mean_selected_visits": 68.24
+        }
+      }
+    },
+    {
+      "pair": 29,
+      "seed": 20261146,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 3.068125,
+          "mean_root_policy_entropy": 0.9246313230023887,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.147072067145068,
+          "mean_selected_visits": 17.4
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.47453125,
+          "mean_root_policy_entropy": 1.047993292184352,
+          "mean_root_pawn_visit_ratio": 0.901875,
+          "mean_root_wall_visit_ratio": 0.098125,
+          "mean_selected_q": -0.12438711718321403,
+          "mean_selected_visits": 80.54
+        }
+      }
+    },
+    {
+      "pair": 30,
+      "seed": 20261147,
+      "low_player": 0,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.783125,
+          "mean_root_policy_entropy": 1.1475703192458342,
+          "mean_root_pawn_visit_ratio": 0.901875,
+          "mean_root_wall_visit_ratio": 0.098125,
+          "mean_selected_q": -0.18007128285246776,
+          "mean_selected_visits": 15.73
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 4.2271875,
+          "mean_root_policy_entropy": 1.0791807392788364,
+          "mean_root_pawn_visit_ratio": 0.900390625,
+          "mean_root_wall_visit_ratio": 0.099609375,
+          "mean_selected_q": 0.18078587283998432,
+          "mean_selected_visits": 68.66
+        }
+      }
+    },
+    {
+      "pair": 30,
+      "seed": 20261147,
+      "low_player": 1,
+      "winner": null,
+      "winner_agent": null,
+      "result_for_low": "draw",
+      "plies": 200,
+      "agent_metrics": {
+        "low": {
+          "turns": 100,
+          "mean_expanded_nodes": 33.0,
+          "mean_nn_evaluations": 33.0,
+          "mean_leaf_depth": 2.7278125,
+          "mean_root_policy_entropy": 1.0567777253099637,
+          "mean_root_pawn_visit_ratio": 0.9,
+          "mean_root_wall_visit_ratio": 0.1,
+          "mean_selected_q": 0.12184902528170598,
+          "mean_selected_visits": 15.67
+        },
+        "high": {
+          "turns": 100,
+          "mean_expanded_nodes": 129.0,
+          "mean_nn_evaluations": 129.0,
+          "mean_leaf_depth": 3.776953125,
+          "mean_root_policy_entropy": 1.626041978755912,
+          "mean_root_pawn_visit_ratio": 0.8228125,
+          "mean_root_wall_visit_ratio": 0.1771875,
+          "mean_selected_q": -0.11511323776213213,
+          "mean_selected_visits": 54.57
+        }
+      }
+    }
+  ],
+  "interpretation": "This isolates the effect of MCTS simulation budget while holding checkpoint and vanilla PUCT settings constant. Progressive widening is matched between agents and can be disabled for a control run. It does not by itself prove that the policy/value network is well trained."
+}

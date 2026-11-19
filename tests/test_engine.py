@@ -10,6 +10,7 @@ from quoridor.engine import (
     is_legal_wall,
     legal_pawn_moves,
     shortest_distance,
+    shortest_path_metrics,
     shortest_path,
     validate_state,
 )
@@ -67,6 +68,44 @@ def test_wall_overlap():
     assert not is_legal_wall(state, Wall("H", 3, 2), 0)
     assert not is_legal_wall(state, Wall("V", 2, 2), 0)
     assert is_legal_wall(state, Wall("H", 4, 2), 0)
+
+
+def test_identical_wall_is_illegal():
+    wall = Wall("V", 7, 2)
+    state = replace(
+        GameState.initial(),
+        walls=frozenset({wall}),
+        walls_remaining=(9, 10),
+    )
+
+    assert not is_legal_wall(state, wall, 0)
+
+
+def test_applying_duplicate_wall_is_rejected_without_consuming_wall():
+    wall = Wall("V", 7, 2)
+    state = replace(
+        GameState.initial(),
+        walls=frozenset({wall}),
+        walls_remaining=(9, 10),
+    )
+
+    with pytest.raises(ValueError, match="Illegal wall placement"):
+        apply_wall(state, wall)
+
+    assert state.walls == frozenset({wall})
+    assert state.walls_remaining == (9, 10)
+    assert state.current_player == 0
+    assert state.ply == 0
+
+
+def test_new_wall_remains_legal_when_not_duplicated():
+    state = GameState.initial()
+    wall = Wall("V", 7, 2)
+
+    assert is_legal_wall(state, wall, 0)
+    updated = apply_wall(state, wall)
+    assert updated.walls == frozenset({wall})
+    assert updated.walls_remaining == (9, 10)
 
 
 def test_wall_must_preserve_paths():
@@ -136,3 +175,14 @@ def test_serialization():
     assert data["current_player"] == 0
     assert data["walls_remaining"] == [10, 10]
     assert data["pawns"][0] == {"x": 4, "y": 8}
+
+
+def test_shortest_path_metrics_initial_state():
+    state = GameState.initial()
+    assert shortest_path_metrics(state, 0) == (8, 1)
+    assert shortest_path_metrics(state, 1) == (8, 1)
+
+
+def test_shortest_path_metrics_rejects_invalid_count_cap():
+    with pytest.raises(ValueError):
+        shortest_path_metrics(GameState.initial(), 0, count_cap=0)
