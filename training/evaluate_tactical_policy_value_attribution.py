@@ -137,7 +137,7 @@ def collect_positions(
                 break
 
             opponent = 1 - state.current_player
-            if has_immediate_winning_move(state, opponent):
+            if game_threats < 3 and has_immediate_winning_move(state, opponent):
                 total_threat_states += 1
                 legal = legal_action_indices(state)
                 defenses = defensive_actions(state, legal)
