@@ -32,13 +32,13 @@ from quoridor.neural_ai.policy import load_model
 
 
 def build_threat_position(player0_x: int) -> tuple[GameState, list[int]]:
-    """Build a reproducible legal position: opponent is two steps from goal."""
+    """Build a reproducible legal position: opponent can win on the next reply."""
     if player0_x not in (3, 5):
         raise ValueError("player0_x must be 3 or 5")
     state = GameState.initial()
     sequence: list[int] = []
-    p0_targets = [(player0_x, y) for y in range(8, 2, -1)]
-    p1_targets = [(4, y) for y in range(1, 7)]
+    p0_targets = [(player0_x, y) for y in range(8, 1, -1)]
+    p1_targets = [(4, y) for y in range(1, 8)]
     for p0_target, p1_target in zip(p0_targets, p1_targets):
         for target in (p0_target, p1_target):
             action = target[1] * 9 + target[0]
@@ -47,8 +47,10 @@ def build_threat_position(player0_x: int) -> tuple[GameState, list[int]]:
     validate_state(state)
     if state.current_player != 0:
         raise RuntimeError("Scripted position must leave player 0 to move")
-    if shortest_distance(state, 1 - state.current_player) != 2:
-        raise RuntimeError("Scripted opponent threat is not exactly two steps")
+    if shortest_distance(state, 1 - state.current_player) != 1:
+        raise RuntimeError("Scripted opponent threat is not exactly one step")
+    if not has_immediate_winning_move(state, 1 - state.current_player):
+        raise RuntimeError("Opponent does not have a legal immediate winning move")
     return state, sequence
 
 
@@ -287,8 +289,7 @@ def summarize(positions: list[dict]) -> dict:
             "highest_value": best_value["child_value_head_root_perspective"],
             "highest_Q_action": best_q["action"],
             "highest_Q": best_q["forced_root_search_Q"],
-            "prior_value_spearman_not_computed": True,
-        }
+                    }
     return result
 
 
