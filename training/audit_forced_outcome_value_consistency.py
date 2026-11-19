@@ -154,10 +154,8 @@ def main() -> int:
 
     records = []
     tasks: list[tuple[str, GameState]] = []
-    task_meta: dict[str, tuple[str, str]] = {}
-    state_by_id: dict[str, GameState] = {}
     transition_checks = {"actions_checked": 0, "mirror_transition_mismatches": 0,
-                         "mirror_legal_set_mismatches": 0, "invalid_mirrored_states": 0,
+                         "mirror_legal_set_mismatches": 0,
                          "reply_terminal_semantics_mismatches": 0}
 
     for pos_index, item in enumerate(selected):
@@ -166,13 +164,10 @@ def main() -> int:
         root = state.current_player
         validate_state(state)
         mirrored = mirror_state(state)
-        state_by_id[position_id] = state
 
         root_key = f"{position_id}:root"
         root_mirror_key = f"{position_id}:root_mirror"
         tasks.extend([(root_key, state), (root_mirror_key, mirrored)])
-        task_meta[root_key] = (position_id, "root")
-        task_meta[root_mirror_key] = (position_id, "root_mirror")
 
         legal = legal_action_indices(state)
         mirrored_legal = set(legal_action_indices(mirrored))
@@ -213,8 +208,6 @@ def main() -> int:
             child_key = f"{position_id}:action:{action}:child"
             child_mirror_key = f"{position_id}:action:{action}:child_mirror"
             tasks.extend([(child_key, child), (child_mirror_key, mirrored_child)])
-            task_meta[child_key] = (position_id, f"action_{action}_child")
-            task_meta[child_mirror_key] = (position_id, f"action_{action}_child_mirror")
 
             opponent = child.current_player
             winning_replies = []
