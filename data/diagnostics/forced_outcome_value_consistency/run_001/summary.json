@@ -1,0 +1,221 @@
+{
+  "experiment": "forced_outcome_value_consistency_audit",
+  "checkpoint": "models/checkpoints/exp_001r_vonly_strict.pt",
+  "checkpoint_sha256": "d58d9e47090e7ca0cbf3b4cfa02b7ab6a2a56ded16ce7c4090dcac202b72f098",
+  "source_json": "data/diagnostics/tactical_action_value_separation/run_001/tactical_action_value_separation.json",
+  "source_json_sha256": "9e85e7c9e9b74209a719b554d245eab5544efd335b958d53c137423c7761c6ce",
+  "source_experiment": "tactical_action_preference_and_value_separation",
+  "source_position_count": 140,
+  "selected_position_count": 60,
+  "evaluation_contract": {
+    "network_value_semantics": "QuoridorNet value head is tanh scalar; encoder input is side-to-move perspective",
+    "root_value": "raw network output is current root player's perspective",
+    "child_value": "after root action, opponent is side-to-move; raw network output is opponent perspective; root perspective is its negation",
+    "terminal_states": "not sent through network; exact engine winner determines +/-1",
+    "mcts_or_puct_used": false,
+    "training_performed": false,
+    "checkpoint_modified": false,
+    "architecture_modified": false
+  },
+  "engine_semantics_check": {
+    "fixture": {
+      "pawns": [
+        {
+          "x": 4,
+          "y": 1
+        },
+        {
+          "x": 4,
+          "y": 7
+        }
+      ],
+      "walls": [],
+      "walls_remaining": [
+        10,
+        10
+      ],
+      "current_player": 0,
+      "winner": null,
+      "ply": 0
+    },
+    "winning_move": [
+      4,
+      0
+    ],
+    "terminal_state": {
+      "pawns": [
+        {
+          "x": 4,
+          "y": 0
+        },
+        {
+          "x": 4,
+          "y": 7
+        }
+      ],
+      "walls": [],
+      "walls_remaining": [
+        10,
+        10
+      ],
+      "current_player": 1,
+      "winner": 0,
+      "ply": 1
+    },
+    "winner": 0,
+    "current_player_after_terminal_move": 1,
+    "legal_moves_after_terminal": [],
+    "expected_winner": 0,
+    "expected_current_player_after_terminal_move": 1,
+    "passed": true,
+    "terminal_root_perspective_value_for_player_0": 1.0,
+    "terminal_root_perspective_value_for_player_1": -1.0,
+    "note": "Terminal outcome is exact engine adjudication; neural output is not queried on terminal states."
+  },
+  "horizontal_symmetry_checks": {
+    "actions_checked": 4514,
+    "mirror_transition_mismatches": 0,
+    "mirror_legal_set_mismatches": 0,
+    "reply_terminal_semantics_mismatches": 0
+  },
+  "forced_loss_summary": {
+    "forced_loss_position_count": 19,
+    "root_value_side_to_move": {
+      "count": 19,
+      "mean": 0.08904756279662251,
+      "median": 0.1885824054479599,
+      "min": -0.7941001057624817,
+      "max": 0.7469916343688965,
+      "positive_count": 12,
+      "negative_count": 7,
+      "zero_count": 0,
+      "positive_pct": 63.1578947368421
+    },
+    "child_value_side_to_move_opponent": {
+      "count": 474,
+      "mean": -0.45654245600387267,
+      "median": -0.4411415010690689,
+      "min": -0.8120982050895691,
+      "max": 0.0582817941904068,
+      "positive_count": 6,
+      "negative_count": 468,
+      "zero_count": 0,
+      "positive_pct": 1.2658227848101267
+    },
+    "child_value_converted_to_root_perspective": {
+      "count": 474,
+      "mean": 0.45654245600387267,
+      "median": 0.4411415010690689,
+      "min": -0.0582817941904068,
+      "max": 0.8120982050895691,
+      "positive_count": 468,
+      "negative_count": 6,
+      "zero_count": 0,
+      "positive_pct": 98.73417721518987
+    },
+    "root_horizontal_mirror_abs_difference": {
+      "count": 19,
+      "mean": 0.20953113105344146,
+      "median": 0.17356246709823608,
+      "min": 0.002613753080368042,
+      "max": 0.7153122276067734,
+      "positive_count": 19,
+      "negative_count": 0,
+      "zero_count": 0,
+      "positive_pct": 100.0
+    },
+    "child_horizontal_mirror_abs_difference": {
+      "count": 474,
+      "mean": 0.12004093175831561,
+      "median": 0.1079082190990448,
+      "min": 0.0002835988998413086,
+      "max": 0.4492834359407425,
+      "positive_count": 474,
+      "negative_count": 0,
+      "zero_count": 0,
+      "positive_pct": 100.0
+    },
+    "interpretation_sign_expectations": {
+      "forced_loss_root_value": "negative",
+      "after_root_action_child_value_for_opponent_to_move": "positive when opponent has an immediate winning reply",
+      "same_child_value_from_root_perspective": "negative",
+      "terminal_after_opponent_winning_reply": "exactly -1 from original root perspective"
+    }
+  },
+  "cohort_summary": {
+    "no_threat": {
+      "position_count": 30,
+      "forced_loss_count": 0,
+      "root_value_side_to_move": {
+        "count": 30,
+        "mean": -0.013468155039784808,
+        "median": -0.02369445562362671,
+        "min": -0.45711666345596313,
+        "max": 0.47173190116882324,
+        "positive_count": 14,
+        "negative_count": 16,
+        "zero_count": 0,
+        "positive_pct": 46.666666666666664
+      },
+      "root_horizontal_mirror_abs_difference": {
+        "count": 30,
+        "mean": 0.07945883698606243,
+        "median": 0.0412994921207428,
+        "min": 0.0,
+        "max": 0.29573415219783783,
+        "positive_count": 27,
+        "negative_count": 0,
+        "zero_count": 3,
+        "positive_pct": 90.0
+      },
+      "child_value_side_to_move": {
+        "count": 3617,
+        "mean": -0.03371509718935763,
+        "median": -0.03947080299258232,
+        "min": -0.6187781095504761,
+        "max": 0.5562349557876587,
+        "positive_count": 1486,
+        "negative_count": 2131,
+        "zero_count": 0,
+        "positive_pct": 41.08377108100636
+      }
+    },
+    "threat_no_defense": {
+      "position_count": 30,
+      "forced_loss_count": 19,
+      "root_value_side_to_move": {
+        "count": 30,
+        "mean": 0.13475220965531964,
+        "median": 0.20521996170282364,
+        "min": -0.7941001057624817,
+        "max": 0.7469916343688965,
+        "positive_count": 20,
+        "negative_count": 10,
+        "zero_count": 0,
+        "positive_pct": 66.66666666666667
+      },
+      "root_horizontal_mirror_abs_difference": {
+        "count": 30,
+        "mean": 0.1782977863525351,
+        "median": 0.13672423362731934,
+        "min": 0.0001818537712097168,
+        "max": 0.7153122276067734,
+        "positive_count": 30,
+        "negative_count": 0,
+        "zero_count": 0,
+        "positive_pct": 100.0
+      },
+      "child_value_side_to_move": {
+        "count": 885,
+        "mean": -0.386448613519512,
+        "median": -0.38630902767181396,
+        "min": -0.8120982050895691,
+        "max": 0.28562912344932556,
+        "positive_count": 11,
+        "negative_count": 874,
+        "zero_count": 0,
+        "positive_pct": 1.2429378531073447
+      }
+    }
+  }
+}
