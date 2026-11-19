@@ -157,7 +157,8 @@ def main() -> int:
     task_meta: dict[str, tuple[str, str]] = {}
     state_by_id: dict[str, GameState] = {}
     transition_checks = {"actions_checked": 0, "mirror_transition_mismatches": 0,
-                         "mirror_legal_set_mismatches": 0, "invalid_mirrored_states": 0}
+                         "mirror_legal_set_mismatches": 0, "invalid_mirrored_states": 0,
+                         "reply_terminal_semantics_mismatches": 0}
 
     for pos_index, item in enumerate(selected):
         position_id = item.get("position_id", f"source_{pos_index:03d}")
@@ -220,10 +221,15 @@ def main() -> int:
             for destination in legal_pawn_moves(child, opponent):
                 terminal = apply_move(child, destination, opponent)
                 if terminal.winner == opponent:
+                    terminal_ok = (terminal.current_player == root and legal_pawn_moves(terminal) == [])
+                    if not terminal_ok:
+                        transition_checks["reply_terminal_semantics_mismatches"] += 1
                     winning_replies.append({
                         "move": list(destination),
                         "winner": terminal.winner,
                         "terminal_current_player": terminal.current_player,
+                        "terminal_has_no_legal_pawn_moves": legal_pawn_moves(terminal) == [],
+                        "terminal_semantics_passed": terminal_ok,
                         "exact_terminal_value_root_perspective": -1.0,
                         "exact_terminal_value_winner_perspective": 1.0,
                     })
@@ -238,9 +244,6 @@ def main() -> int:
                 "child_mirror_value_task": child_mirror_key,
             })
 
-        is_forced_loss = bool(pre_threat and not root_winning_actions and action_rows
-                              and all(r.get("opponent_has_immediate_winning_reply", False)
-                                      for r in action_rows if not r.get("child_terminal", False)))
         # A forced-loss label requires every legal root action to be nonterminal
         # and leave at least one immediate winning reply for the opponent.
         is_forced_loss = bool(
