@@ -1,0 +1,83 @@
+{
+  "experiment": "per_action_counterfactual_evaluation",
+  "checkpoint_sha256": "d58d9e47090e7ca0cbf3b4cfa02b7ab6a2a56ded16ce7c4090dcac202b72f098",
+  "settings": {
+    "budget_per_forced_root_action": 32,
+    "c_puct": 1.5,
+    "device": "cpu",
+    "threads": 1,
+    "progressive_widening": false,
+    "root_noise": false,
+    "category_balanced_prior": false,
+    "root_category_prior_mix": 0.0,
+    "opening_goal_directed_prior": false,
+    "category_exploration": 0.0,
+    "repetition_penalty": 0.0,
+    "pawn_progress_bonus": 0.0,
+    "wall_distance_weight": 0.0,
+    "wall_route_weight": 0.0,
+    "tie_breaking": "deterministic",
+    "forced_root_action": "fixed for every simulation; vanilla PUCT below root"
+  },
+  "positions": {
+    "opponent_threat_left_flank": {
+      "legal_actions": 132,
+      "pawn_actions": 4,
+      "wall_actions": 128,
+      "prior_mass": 0.9999999370484147,
+      "actions_preventing_immediate_win": 2,
+      "actions_delaying_opponent_threat": 2,
+      "highest_prior_action": {
+        "type": "wall",
+        "orientation": "H",
+        "x": 4,
+        "y": 5
+      },
+      "highest_prior_P": 0.026303954422473907,
+      "highest_value_action": {
+        "type": "wall",
+        "orientation": "V",
+        "x": 3,
+        "y": 2
+      },
+      "highest_value": 0.21895770728588104,
+      "highest_Q_action": {
+        "type": "wall",
+        "orientation": "H",
+        "x": 4,
+        "y": 1
+      },
+      "highest_Q": 0.1971091036684811
+    },
+    "opponent_threat_right_flank": {
+      "legal_actions": 132,
+      "pawn_actions": 4,
+      "wall_actions": 128,
+      "prior_mass": 0.9999999149877112,
+      "actions_preventing_immediate_win": 2,
+      "actions_delaying_opponent_threat": 2,
+      "highest_prior_action": {
+        "type": "wall",
+        "orientation": "H",
+        "x": 5,
+        "y": 7
+      },
+      "highest_prior_P": 0.025846637785434723,
+      "highest_value_action": {
+        "type": "wall",
+        "orientation": "H",
+        "x": 1,
+        "y": 0
+      },
+      "highest_value": 0.20331868529319763,
+      "highest_Q_action": {
+        "type": "wall",
+        "orientation": "H",
+        "x": 0,
+        "y": 1
+      },
+      "highest_Q": 0.1053808195865713
+    }
+  },
+  "total_legal_action_rows": 264
+}
