@@ -8,6 +8,7 @@ penalties, and pawn-progress bonuses are explicitly disabled.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from statistics import mean
@@ -332,6 +333,7 @@ def main() -> int:
 
     report = {
         "checkpoint": str(args.checkpoint),
+        "checkpoint_sha256": hashlib.sha256(args.checkpoint.read_bytes()).hexdigest(),
         "replay": str(args.replay),
         "positions": len(samples),
         "ply_range": [0, args.max_ply],
