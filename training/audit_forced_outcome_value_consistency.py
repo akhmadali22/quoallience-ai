@@ -226,6 +226,7 @@ def main() -> int:
                         transition_checks["reply_terminal_semantics_mismatches"] += 1
                     winning_replies.append({
                         "move": list(destination),
+                        "terminal_state": terminal.to_dict(),
                         "winner": terminal.winner,
                         "terminal_current_player": terminal.current_player,
                         "terminal_has_no_legal_pawn_moves": legal_pawn_moves(terminal) == [],
