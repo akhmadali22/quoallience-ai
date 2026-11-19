@@ -8,6 +8,7 @@ penalties, and pawn-progress bonuses are explicitly disabled.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from statistics import mean
@@ -17,6 +18,7 @@ from quoridor.neural_ai.encoder import (
     ACTION_SIZE,
     MOVE_ACTIONS,
     decode_action,
+    encode_state,
     legal_action_indices,
 )
 from quoridor.neural_ai.mcts import MCTS
@@ -193,6 +195,7 @@ def run_position(model, sample: dict, *, budget: int, c_puct: float, device: str
             "seed": sample.get("seed"),
             "ply": state.ply,
             "player": state.current_player,
+            "label": sample.get("_audit_label", "replay"),
             "pawns": [list(position) for position in state.pawns],
             "walls_remaining": list(state.walls_remaining),
             "wall_count": len(state.walls),
@@ -232,7 +235,9 @@ def main() -> int:
                         help="Exclude root actions recreating one of the previous full states, when alternatives exist.")
     parser.add_argument("--root-category-prior-mixes", type=float, nargs="+", default=[0.0, 0.25, 0.5],
                         help="Compare vanilla prior (0) with root-only mixing toward 50:50 pawn/wall category mass.")
-    parser.add_argument("--max-ply", type=int, default=19)
+    parser.add_argument("--max-ply", type=int, default=30)
+    parser.add_argument("--include-initial", action="store_true",
+                        help="Add the standard initial board as a synthetic audit position.")
     parser.add_argument("--c-puct", type=float, default=1.5)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--threads", type=int, default=1)
@@ -261,7 +266,18 @@ def main() -> int:
         sample for sample in all_samples
         if 0 <= int(sample.get("ply", -1)) <= args.max_ply
     ]
+    if args.include_initial:
+        initial = GameState.initial()
+        samples.append({
+            "game_id": -1,
+            "seed": None,
+            "ply": initial.ply,
+            "player": initial.current_player,
+            "state": encode_state(initial),
+            "_audit_label": "standard_initial_position",
+        })
     samples.sort(key=lambda sample: (
+        0 if sample.get("_audit_label") == "standard_initial_position" else 1,
         int(sample.get("game_id", 0)),
         int(sample.get("ply", 0)),
         int(sample.get("player", 0)),
@@ -317,9 +333,11 @@ def main() -> int:
 
     report = {
         "checkpoint": str(args.checkpoint),
+        "checkpoint_sha256": hashlib.sha256(args.checkpoint.read_bytes()).hexdigest(),
         "replay": str(args.replay),
         "positions": len(samples),
         "ply_range": [0, args.max_ply],
+        "includes_standard_initial_position": args.include_initial,
         "budgets": args.budgets,
         "root_category_prior_mixes": args.root_category_prior_mixes,
         "c_puct": args.c_puct,
