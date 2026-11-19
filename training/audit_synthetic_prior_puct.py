@@ -121,6 +121,21 @@ def add_unique(bucket: list[dict], sample: dict, seen: set[tuple],
         bucket.append(sample)
 
 
+def build_scripted_position(player0_targets: list[tuple[int, int]],
+                            player1_targets: list[tuple[int, int]]) -> tuple[GameState, list[dict]]:
+    """Build a reproducible midgame position from alternating legal pawn moves."""
+    if len(player0_targets) != len(player1_targets):
+        raise ValueError("Both scripted players must have the same number of moves")
+    state = GameState.initial()
+    sequence: list[dict] = []
+    for p0_target, p1_target in zip(player0_targets, player1_targets):
+        for target in (p0_target, p1_target):
+            action = target[1] * 9 + target[0]
+            state = apply_recorded_action(state, action)
+            sequence.append(action_record(action))
+    return state, sequence
+
+
 def generate_positions(*, seed_start: int, seed_count: int, max_game_plies: int,
                        continuation_plies: list[int], per_category: int) -> list[dict]:
     initial = GameState.initial()
@@ -212,6 +227,82 @@ def generate_positions(*, seed_start: int, seed_count: int, max_game_plies: int,
             state = apply_recorded_action(state, chosen)
             if state.winner is not None:
                 break
+
+    # Do not depend on random trajectories to stumble into rare tactical states.
+    # These positions are reached through explicit, alternating legal pawn moves
+    # from the standard initial board, so every position has a replayable sequence.
+    scripted_urgent = [
+        (
+            [(3, y) for y in range(8, 2, -1)],
+            [(4, y) for y in range(1, 7)],
+        ),
+        (
+            [(5, y) for y in range(8, 2, -1)],
+            [(4, y) for y in range(1, 7)],
+        ),
+    ]
+    for offset, (p0_moves, p1_moves) in enumerate(scripted_urgent):
+        if len(urgent_blocks) >= per_category:
+            break
+        state, sequence = build_scripted_position(p0_moves, p1_moves)
+        legal = legal_action_indices(state)
+        opponent_distance = shortest_distance(state, 1 - state.current_player)
+        best_wall = inspect_wall_opportunities(state, legal)
+        if (opponent_distance is not None and opponent_distance <= 2
+                and best_wall is not None
+                and best_wall["opponent_distance_delay"] >= 1
+                and best_wall["own_distance_cost"] <= 1):
+            add_unique(
+                urgent_blocks,
+                make_sample(
+                    state, label="tactical_opponent_winning_threat",
+                    seed=seed_start + seed_count + 100 + offset,
+                    sequence=sequence,
+                    tactical={
+                        "opponent_distance": opponent_distance,
+                        "best_blocking_wall": best_wall,
+                        "criterion": "opponent distance <= 2; legal wall delays opponent by >= 1; own path cost <= 1",
+                        "construction": "scripted alternating legal pawn moves from initial state",
+                    },
+                ),
+                seen_urgent, per_category,
+            )
+
+    scripted_strategic = [
+        (
+            [(3, y) for y in range(8, 3, -1)],
+            [(4, y) for y in range(1, 6)],
+        ),
+        (
+            [(5, y) for y in range(8, 3, -1)],
+            [(4, y) for y in range(1, 6)],
+        ),
+    ]
+    for offset, (p0_moves, p1_moves) in enumerate(scripted_strategic):
+        if len(strategic_walls) >= per_category:
+            break
+        state, sequence = build_scripted_position(p0_moves, p1_moves)
+        legal = legal_action_indices(state)
+        opponent_distance = shortest_distance(state, 1 - state.current_player)
+        best_wall = inspect_wall_opportunities(state, legal)
+        if (opponent_distance is not None and opponent_distance >= 3
+                and best_wall is not None
+                and best_wall["delay_minus_own_cost"] >= 1):
+            add_unique(
+                strategic_walls,
+                make_sample(
+                    state, label="tactical_strategic_wall_opportunity",
+                    seed=seed_start + seed_count + 200 + offset,
+                    sequence=sequence,
+                    tactical={
+                        "opponent_distance": opponent_distance,
+                        "best_strategic_wall": best_wall,
+                        "criterion": "legal wall delay minus own path cost >= 1",
+                        "construction": "scripted alternating legal pawn moves from initial state",
+                    },
+                ),
+                seen_strategic, per_category,
+            )
 
     if len(continuation) < per_category:
         raise RuntimeError(
@@ -310,7 +401,7 @@ def main() -> int:
         "checkpoint": str(args.checkpoint),
         "checkpoint_sha256": hashlib.sha256(args.checkpoint.read_bytes()).hexdigest(),
         "generation": {
-            "method": "seeded legal random trajectories from GameState.initial()",
+            "method": "seeded legal random trajectories for continuations; explicit scripted legal pawn sequences as fallback for tactical positions",
             "seed_start": args.seed_start,
             "seed_count": args.seed_count,
             "max_game_plies": args.max_game_plies,
