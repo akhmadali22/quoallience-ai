@@ -4,8 +4,8 @@ from __future__ import annotations
 import argparse, hashlib, json, math
 from pathlib import Path
 from statistics import mean, median, pstdev
-from quoridor.engine import GameState, apply_action_index, validate_state
-from quoridor.neural_ai.encoder import ACTION_SIZE, decode_action, encode_state, legal_action_indices
+from quoridor.engine import validate_state
+from quoridor.neural_ai.encoder import ACTION_SIZE, apply_action_index, decode_action, encode_state, legal_action_indices
 from quoridor.neural_ai.policy import load_model
 from training.audit_tactical_label_head_calibration import independent_immediate_win, restore_state, sample_controls
 
