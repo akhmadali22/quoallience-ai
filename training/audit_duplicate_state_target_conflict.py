@@ -158,19 +158,19 @@ def main() -> int:
         row["cohort"] = label["cohort"]
         row["forced_loss"] = bool(label["forced_loss"])
         states.append(state)
-    for fp, members in groups.items():
-        cohort_counts = Counter(r["cohort"] for r in members)
-        forced_count = sum(r["forced_loss"] for r in members)
-        for item in group_summaries:
-            if item["fingerprint"] == fp:
-                item["cohort_counts"] = dict(cohort_counts)
-                item["forced_loss_record_count"] = forced_count
-                break
+    # Cohort labels are now populated for every row; aggregate conflicts only
+    # after this point so the cohort breakdown cannot silently remain empty.
+    group_by_fp = {item["fingerprint"]: item for item in group_summaries}
     conflict_by_cohort = defaultdict(Counter)
-    for group in conflict_groups:
-        for cohort, count in group["cohort_counts"].items():
-            conflict_by_cohort[cohort]["conflict_state_groups"] += 1
-            conflict_by_cohort[cohort]["records"] += count
+    for fp, members in groups.items():
+        item = group_by_fp[fp]
+        cohort_counts = Counter(r["cohort"] for r in members)
+        item["cohort_counts"] = dict(cohort_counts)
+        item["forced_loss_record_count"] = sum(r["forced_loss"] for r in members)
+        if item["target_conflict"]:
+            for cohort, count in cohort_counts.items():
+                conflict_by_cohort[cohort]["conflict_state_groups"] += 1
+                conflict_by_cohort[cohort]["records"] += count
 
     model = load_model(args.checkpoint, device=args.device)
     model.eval()
@@ -254,6 +254,25 @@ def main() -> int:
             "unique_states": len({r["fingerprint"] for r in selected}),
         }
 
+    state_level_by_split = {}
+    for split in ("train", "validation", "test"):
+        selected_states = [r for r in state_level if r["split"] == split]
+        if selected_states:
+            state_level_by_split[split] = {
+                "unique_states": len(selected_states),
+                "mse_vs_mean_target": mean((r["prediction"] - r["target_mean"]) ** 2 for r in selected_states),
+                "mae_vs_mean_target": mean(abs(r["prediction"] - r["target_mean"]) for r in selected_states),
+                "sign_accuracy_vs_majority_target": mean(
+                    (r["prediction"] >= 0) == (r["majority_target"] > 0)
+                    for r in selected_states
+                ),
+                "conflicting_state_count": sum(r["target_conflict"] for r in selected_states),
+                "cohort_counts": dict(Counter(
+                    cohort for r in selected_states for cohort, count in r["cohort_counts"].items()
+                    for _ in range(count)
+                )),
+            }
+
     report = {
         "experiment": "duplicate_state_target_conflict_audit",
         "dataset": str(args.dataset), "dataset_sha256": dataset_sha,
@@ -291,6 +310,7 @@ def main() -> int:
         },
         "cohort_summary": cohort_summaries,
         "state_level_metrics": {
+            "by_split": state_level_by_split,
             "count": len(state_level),
             "mse_vs_mean_target": mean((r["prediction"] - r["target_mean"]) ** 2 for r in state_level),
             "mae_vs_mean_target": mean(abs(r["prediction"] - r["target_mean"]) for r in state_level),
