@@ -151,7 +151,6 @@ def main() -> int:
         game_meta[row["game_id"]] = meta
 
     # Rebuild every position, then reconstruct each game's chronological turns.
-    states_by_key = {}
     rows_by_game = defaultdict(list)
     groups = defaultdict(list)
     for row in rows:
@@ -164,7 +163,18 @@ def main() -> int:
         row["cohort"] = label_position(state)["cohort"]
         rows_by_game[row["game_id"]].append(row)
         groups[row["fingerprint"]].append(row)
-        states_by_key[(row["game_id"], row["ply"])] = state
+    # Dataset trajectories contain one pre-move state for every ply.
+    for game_id, members in rows_by_game.items():
+        ordered = sorted(members, key=lambda r: r["ply"])
+        expected_plies = list(range(game_meta[game_id][1]))
+        actual_plies = [r["ply"] for r in ordered]
+        if actual_plies != expected_plies:
+            raise ValueError(
+                f"Game {game_id} has incomplete/non-contiguous trajectory: "
+                f"expected {len(expected_plies)} plies, got {len(actual_plies)}"
+            )
+        if any(r["player"] != (r["ply"] % 2) for r in ordered):
+            raise ValueError(f"Game {game_id} has unexpected player/ply alternation")
 
     conflict_groups = {
         fp: members for fp, members in groups.items()
@@ -257,6 +267,14 @@ def main() -> int:
             "positive": sum(r["target"] == 1 for r in conflict_groups[fp]),
             "negative": sum(r["target"] == -1 for r in conflict_groups[fp]),
         }
+        positive_actions = {
+            json.dumps(x["runs"]["actual_short"]["action"], sort_keys=True)
+            for x in members if x["target"] == 1
+        }
+        negative_actions = {
+            json.dumps(x["runs"]["actual_short"]["action"], sort_keys=True)
+            for x in members if x["target"] == -1
+        }
         per_state.append({
             "fingerprint": fp,
             "dataset_occurrences": len(conflict_groups[fp]),
@@ -275,13 +293,12 @@ def main() -> int:
             "short_long_action_change_actual_count": sum(
                 x["comparisons"]["short_vs_long_action_actual_history"] for x in members
             ),
-            "audited_targets_with_different_actual_short_actions": sorted({
-                x["target"] for x in members
-                if x["runs"]["actual_short"]["action"] in {
-                    y["runs"]["actual_short"]["action"] for y in members
-                    if y["target"] != x["target"]
-                }
-            }),
+            "same_actual_short_action_seen_under_both_targets": bool(
+                positive_actions & negative_actions
+            ),
+            "shared_actual_short_action_count_across_targets": len(
+                positive_actions & negative_actions
+            ),
         })
 
     def run_summary(key):
