@@ -158,19 +158,19 @@ def main() -> int:
         row["cohort"] = label["cohort"]
         row["forced_loss"] = bool(label["forced_loss"])
         states.append(state)
-    for fp, members in groups.items():
-        cohort_counts = Counter(r["cohort"] for r in members)
-        forced_count = sum(r["forced_loss"] for r in members)
-        for item in group_summaries:
-            if item["fingerprint"] == fp:
-                item["cohort_counts"] = dict(cohort_counts)
-                item["forced_loss_record_count"] = forced_count
-                break
+    # Cohort labels are now populated for every row; aggregate conflicts only
+    # after this point so the cohort breakdown cannot silently remain empty.
+    group_by_fp = {item["fingerprint"]: item for item in group_summaries}
     conflict_by_cohort = defaultdict(Counter)
-    for group in conflict_groups:
-        for cohort, count in group["cohort_counts"].items():
-            conflict_by_cohort[cohort]["conflict_state_groups"] += 1
-            conflict_by_cohort[cohort]["records"] += count
+    for fp, members in groups.items():
+        item = group_by_fp[fp]
+        cohort_counts = Counter(r["cohort"] for r in members)
+        item["cohort_counts"] = dict(cohort_counts)
+        item["forced_loss_record_count"] = sum(r["forced_loss"] for r in members)
+        if item["target_conflict"]:
+            for cohort, count in cohort_counts.items():
+                conflict_by_cohort[cohort]["conflict_state_groups"] += 1
+                conflict_by_cohort[cohort]["records"] += count
 
     model = load_model(args.checkpoint, device=args.device)
     model.eval()
@@ -219,6 +219,25 @@ def main() -> int:
     for row in rows:
         game_partitions[row["game_id"]].add(row["state_group_split"])
 
+    # The checkpoint was trained on the original train-game partition. A new
+    # random state split is not a held-out evaluation if its validation/test
+    # states already occurred in that original training partition.
+    old_train_fingerprints = {
+        row["fingerprint"] for row in rows
+        if old_gid_to_split[row["game_id"]] == "train"
+    }
+    state_grouped_overlap_with_original_training = {}
+    for split in ("train", "validation", "test"):
+        selected_fps = {
+            fp for fp, assigned_split in fp_split.items() if assigned_split == split
+        }
+        overlap = selected_fps & old_train_fingerprints
+        state_grouped_overlap_with_original_training[split] = {
+            "unique_state_groups": len(selected_fps),
+            "overlap_with_original_training_state_groups": len(overlap),
+            "overlap_pct": 100.0 * len(overlap) / len(selected_fps) if selected_fps else None,
+        }
+
     cohort_summaries = {}
     for cohort in sorted({r["cohort"] for r in rows}):
         selected = [r for r in rows if r["cohort"] == cohort]
@@ -254,6 +273,25 @@ def main() -> int:
             "unique_states": len({r["fingerprint"] for r in selected}),
         }
 
+    state_level_by_split = {}
+    for split in ("train", "validation", "test"):
+        selected_states = [r for r in state_level if r["split"] == split]
+        if selected_states:
+            state_level_by_split[split] = {
+                "unique_states": len(selected_states),
+                "mse_vs_mean_target": mean((r["prediction"] - r["target_mean"]) ** 2 for r in selected_states),
+                "mae_vs_mean_target": mean(abs(r["prediction"] - r["target_mean"]) for r in selected_states),
+                "sign_accuracy_vs_majority_target": mean(
+                    (r["prediction"] >= 0) == (r["majority_target"] > 0)
+                    for r in selected_states
+                ),
+                "conflicting_state_count": sum(r["target_conflict"] for r in selected_states),
+                "cohort_counts": dict(Counter(
+                    cohort for r in selected_states for cohort, count in r["cohort_counts"].items()
+                    for _ in range(count)
+                )),
+            }
+
     report = {
         "experiment": "duplicate_state_target_conflict_audit",
         "dataset": str(args.dataset), "dataset_sha256": dataset_sha,
@@ -282,6 +320,7 @@ def main() -> int:
         },
         "state_grouped_split": {
             "metrics": split_rows,
+            "overlap_with_original_training": state_grouped_overlap_with_original_training,
             "games_spanning_splits": sum(len(v) > 1 for v in game_partitions.values()),
             "game_split_overlap_note": "Games may span partitions; exact encoded states never do. A fully game-disjoint split is impossible when a shared state such as the initial position connects all games.",
             "unique_state_group_count_by_split": {
@@ -291,6 +330,7 @@ def main() -> int:
         },
         "cohort_summary": cohort_summaries,
         "state_level_metrics": {
+            "by_split": state_level_by_split,
             "count": len(state_level),
             "mse_vs_mean_target": mean((r["prediction"] - r["target_mean"]) ** 2 for r in state_level),
             "mae_vs_mean_target": mean(abs(r["prediction"] - r["target_mean"]) for r in state_level),
