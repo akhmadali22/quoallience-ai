@@ -9,6 +9,7 @@ import argparse
 import hashlib
 import json
 import random
+import struct
 from collections import Counter, defaultdict
 from pathlib import Path
 from statistics import mean
@@ -23,8 +24,21 @@ from quoridor.neural_ai.policy import load_model
 
 
 def fingerprint(state: list) -> str:
-    payload = json.dumps(state, separators=(",", ":"), ensure_ascii=True, allow_nan=False)
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    """Hash the exact float32 tensor representation consumed by the network."""
+    digest = hashlib.sha256()
+
+    def visit(node):
+        if isinstance(node, list):
+            for item in node:
+                visit(item)
+        else:
+            value = float(node)
+            if not (-float("inf") < value < float("inf")):
+                raise ValueError("State contains a non-finite value")
+            digest.update(struct.pack("<f", value))
+
+    visit(state)
+    return digest.hexdigest()
 
 
 def metrics(rows: list[dict]) -> dict:
