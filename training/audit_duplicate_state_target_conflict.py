@@ -219,6 +219,25 @@ def main() -> int:
     for row in rows:
         game_partitions[row["game_id"]].add(row["state_group_split"])
 
+    # The checkpoint was trained on the original train-game partition. A new
+    # random state split is not a held-out evaluation if its validation/test
+    # states already occurred in that original training partition.
+    old_train_fingerprints = {
+        row["fingerprint"] for row in rows
+        if old_gid_to_split[row["game_id"]] == "train"
+    }
+    state_grouped_overlap_with_original_training = {}
+    for split in ("train", "validation", "test"):
+        selected_fps = {
+            fp for fp, assigned_split in fp_split.items() if assigned_split == split
+        }
+        overlap = selected_fps & old_train_fingerprints
+        state_grouped_overlap_with_original_training[split] = {
+            "unique_state_groups": len(selected_fps),
+            "overlap_with_original_training_state_groups": len(overlap),
+            "overlap_pct": 100.0 * len(overlap) / len(selected_fps) if selected_fps else None,
+        }
+
     cohort_summaries = {}
     for cohort in sorted({r["cohort"] for r in rows}):
         selected = [r for r in rows if r["cohort"] == cohort]
@@ -301,6 +320,7 @@ def main() -> int:
         },
         "state_grouped_split": {
             "metrics": split_rows,
+            "overlap_with_original_training": state_grouped_overlap_with_original_training,
             "games_spanning_splits": sum(len(v) > 1 for v in game_partitions.values()),
             "game_split_overlap_note": "Games may span partitions; exact encoded states never do. A fully game-disjoint split is impossible when a shared state such as the initial position connects all games.",
             "unique_state_group_count_by_split": {
