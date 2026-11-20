@@ -3293,6 +3293,23 @@
         "games": 50
       }
     },
+    "overlap_with_original_training": {
+      "train": {
+        "unique_state_groups": 765,
+        "overlap_with_original_training_state_groups": 702,
+        "overlap_pct": 91.76470588235294
+      },
+      "validation": {
+        "unique_state_groups": 96,
+        "overlap_with_original_training_state_groups": 87,
+        "overlap_pct": 90.625
+      },
+      "test": {
+        "unique_state_groups": 96,
+        "overlap_with_original_training_state_groups": 87,
+        "overlap_pct": 90.625
+      }
+    },
     "games_spanning_splits": 50,
     "game_split_overlap_note": "Games may span partitions; exact encoded states never do. A fully game-disjoint split is impossible when a shared state such as the initial position connects all games.",
     "unique_state_group_count_by_split": {
@@ -3364,6 +3381,45 @@
     }
   },
   "state_level_metrics": {
+    "by_split": {
+      "train": {
+        "unique_states": 765,
+        "mse_vs_mean_target": 0.4505316135820569,
+        "mae_vs_mean_target": 0.5819228547039557,
+        "sign_accuracy_vs_majority_target": 0.8758169934640523,
+        "conflicting_state_count": 42,
+        "cohort_counts": {
+          "no_threat": 2911,
+          "threat_with_defense": 118,
+          "threat_no_defense": 25,
+          "threat_with_immediate_win": 4
+        }
+      },
+      "validation": {
+        "unique_states": 96,
+        "mse_vs_mean_target": 0.43887434396846775,
+        "mae_vs_mean_target": 0.5694825377524532,
+        "sign_accuracy_vs_majority_target": 0.8958333333333334,
+        "conflicting_state_count": 8,
+        "cohort_counts": {
+          "no_threat": 462,
+          "threat_with_defense": 2,
+          "threat_no_defense": 4
+        }
+      },
+      "test": {
+        "unique_states": 96,
+        "mse_vs_mean_target": 0.49905404107694434,
+        "mae_vs_mean_target": 0.6226062421418638,
+        "sign_accuracy_vs_majority_target": 0.8541666666666666,
+        "conflicting_state_count": 2,
+        "cohort_counts": {
+          "threat_with_defense": 52,
+          "no_threat": 184,
+          "threat_no_defense": 18
+        }
+      }
+    },
     "count": 957,
     "mse_vs_mean_target": 0.4542296858460116,
     "mae_vs_mean_target": 0.584756015379708,
