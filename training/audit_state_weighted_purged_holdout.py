@@ -155,10 +155,10 @@ def loss_metrics(rows: list[dict]) -> dict:
         },
         "within_state_target_variance": {
             "state_weighted_mean": statistics.mean(x["target_variance"] for x in per_state),
-            "record_weighted_mean": statistics.mean(
-                r["target_variance"] for fp in by_fp
-                for r in by_fp[fp]
-            ),
+            "record_weighted_mean": sum(
+                len(by_fp[fp]) * state["target_variance"]
+                for fp, state in zip(by_fp.keys(), per_state)
+            ) / len(rows),
             "mse_decomposition_check": (
                 statistics.mean(x["record_mse"] for x in per_state)
                 - statistics.mean(x["aggregated_mse"] for x in per_state)
