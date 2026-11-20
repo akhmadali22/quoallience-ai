@@ -26,8 +26,8 @@ def main() -> int:
     detail_path = args.raw_dir / "teacher_state_dependence.json"
     if not summary_path.is_file() or not detail_path.is_file():
         parser.error("Raw teacher_state_dependence audit outputs are missing.")
-    if args.output_dir.exists() and any(args.output_dir.iterdir()):
-        parser.error(f"Output directory is not empty: {args.output_dir}")
+    if args.output_dir.exists() and any((args.output_dir / name).exists() for name in ("summary.json", "historical_teacher_replay.json")):
+        parser.error(f"Final output files already exist in: {args.output_dir}")
 
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     detail = json.loads(detail_path.read_text(encoding="utf-8"))
@@ -65,6 +65,10 @@ def main() -> int:
     for row in occurrences:
         by_state[row["fingerprint"]].append(row)
 
+    dataset_occurrence_counts = {
+        row["fingerprint"]: row["dataset_occurrences"]
+        for row in detail["per_state"]
+    }
     per_state = []
     state_lookup = {}
     for fp, members in sorted(by_state.items()):
@@ -96,7 +100,7 @@ def main() -> int:
         same_action_both_targets = bool(positive_actions & negative_actions)
         record = {
             "fingerprint": fp,
-            "dataset_occurrences": members[0].get("dataset_occurrences"),
+            "dataset_occurrences": dataset_occurrence_counts[fp],
             "audited_occurrences": len(members),
             "target_counts_in_audited_occurrences": {
                 "positive": sum(row["target"] == 1 for row in members),
