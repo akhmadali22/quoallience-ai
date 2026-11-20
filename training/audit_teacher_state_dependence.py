@@ -44,7 +44,7 @@ def action_payload(action) -> dict:
     }
 
 
-def sample_evenly(rows: list[dict], limit: int, seed: int) -> list[dict]:
+def sample_evenly(rows: list[dict], limit: int) -> list[dict]:
     ordered = sorted(rows, key=lambda r: (r["game_id"], r["ply"]))
     if limit <= 0 or len(ordered) <= limit:
         return ordered
@@ -348,8 +348,19 @@ def main() -> int:
             x["comparisons"]["long_timeout_actual_history"] for x in occurrences
         ),
     }
+    repo_root = Path(__file__).resolve().parents[1]
+    source_hashes = {}
+    for relative in (
+        "quoridor/advanced_ai.py",
+        "quoridor/engine.py",
+        "training/generate_heuristic_games.py",
+    ):
+        source_path = repo_root / relative
+        source_hashes[relative] = hashlib.sha256(source_path.read_bytes()).hexdigest()
+
     report = {
         "experiment": "teacher_state_dependence_audit",
+        "current_source_sha256": source_hashes,
         "dataset": str(args.dataset),
         "dataset_sha256": dataset_sha,
         "config": {
