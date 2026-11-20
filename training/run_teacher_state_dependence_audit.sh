@@ -15,5 +15,4 @@ test ! -e "$OUTPUT_DIR" || { echo "Output directory already exists: $OUTPUT_DIR"
   --long-time-limit 0.32 \
   --max-depth 2 \
   --max-occurrences-per-state 4 \
-  --seed 20261120 \
   --output-dir "$OUTPUT_DIR"
