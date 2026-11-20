@@ -1,0 +1,340 @@
+{
+  "experiment": "value_training_coverage_audit",
+  "dataset": "data/experiments/exp_001/heuristic_decisive_games.jsonl",
+  "dataset_sha256": "d9e027c3e4537146dcfa7368baee0ccc01be4fbc067bff01f36fc50f859437b9",
+  "checkpoint": "models/checkpoints/exp_001r_vonly_strict.pt",
+  "checkpoint_sha256": "d58d9e47090e7ca0cbf3b4cfa02b7ab6a2a56ded16ce7c4090dcac202b72f098",
+  "provenance": {
+    "training_script": "training/train_value_only_strict.py",
+    "generator": "training/generate_heuristic_games.py",
+    "target_used_by_strict_training": "undiscounted +1 if player_to_move == winner else -1",
+    "stored_dataset_value": "discounted final game outcome; deliberately ignored by strict training",
+    "split_seed": 20261113003,
+    "split_method": "80/10/10 game-level split stratified by winner"
+  },
+  "dataset_integrity": {
+    "record_count": 3780,
+    "game_count": 50,
+    "duplicate_game_id_ply_count": 0,
+    "winner_counts": {
+      "0": 28,
+      "1": 22
+    },
+    "all_encoded_states_round_trip_valid": true,
+    "stored_discounted_value_check_count": 3780,
+    "stored_discounted_value_match_count": 3780,
+    "stored_discounted_value_mismatch_count": 0
+  },
+  "split_summary": {
+    "train": {
+      "records": 3012,
+      "games": 40,
+      "cohort_counts": {
+        "no_threat": 2833,
+        "threat_with_defense": 138,
+        "threat_no_defense": 37,
+        "threat_with_immediate_win": 4
+      },
+      "forced_loss_count": 37
+    },
+    "validation": {
+      "records": 327,
+      "games": 5,
+      "cohort_counts": {
+        "no_threat": 305,
+        "threat_with_defense": 17,
+        "threat_no_defense": 5
+      },
+      "forced_loss_count": 5
+    },
+    "test": {
+      "records": 441,
+      "games": 5,
+      "cohort_counts": {
+        "no_threat": 419,
+        "threat_with_defense": 17,
+        "threat_no_defense": 5
+      },
+      "forced_loss_count": 5
+    }
+  },
+  "cohort_summary": {
+    "no_threat": {
+      "all": {
+        "count": 3557,
+        "game_count": 50,
+        "target_positive_count": 1824,
+        "target_negative_count": 1733,
+        "target_positive_pct": 51.27916783806579,
+        "prediction_mean": 0.043130807660352245,
+        "prediction_median": 0.0274570994079113,
+        "prediction_min": -0.8748013973236084,
+        "prediction_max": 0.9100073575973511,
+        "mse_vs_training_target": 0.6960644704823068,
+        "mae_vs_training_target": 0.7678649361396999,
+        "sign_accuracy_vs_training_target": 0.7458532471183582,
+        "forced_loss_count": 0,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": null
+      },
+      "train": {
+        "count": 2833,
+        "game_count": 40,
+        "target_positive_count": 1452,
+        "target_negative_count": 1381,
+        "target_positive_pct": 51.253088598658664,
+        "prediction_mean": 0.03794983641488027,
+        "prediction_median": 0.015597192570567131,
+        "prediction_min": -0.8748013973236084,
+        "prediction_max": 0.9100073575973511,
+        "mse_vs_training_target": 0.6974206551419609,
+        "mae_vs_training_target": 0.7683587429045,
+        "sign_accuracy_vs_training_target": 0.7398517472643841,
+        "forced_loss_count": 0,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": null
+      },
+      "validation": {
+        "count": 305,
+        "game_count": 5,
+        "target_positive_count": 157,
+        "target_negative_count": 148,
+        "target_positive_pct": 51.47540983606557,
+        "prediction_mean": 0.05722538731490323,
+        "prediction_median": 0.02785584330558777,
+        "prediction_min": -0.7981029152870178,
+        "prediction_max": 0.8998721241950989,
+        "mse_vs_training_target": 0.7794910945075434,
+        "mae_vs_training_target": 0.8274175886651616,
+        "sign_accuracy_vs_training_target": 0.6983606557377049,
+        "forced_loss_count": 0,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": null
+      },
+      "test": {
+        "count": 419,
+        "game_count": 5,
+        "target_positive_count": 215,
+        "target_negative_count": 204,
+        "target_positive_pct": 51.31264916467781,
+        "prediction_mean": 0.06790132017535,
+        "prediction_median": 0.07119125872850418,
+        "prediction_min": -0.8714115023612976,
+        "prediction_max": 0.9077702164649963,
+        "mse_vs_training_target": 0.6261666388152486,
+        "mae_vs_training_target": 0.7211763595646528,
+        "sign_accuracy_vs_training_target": 0.8210023866348448,
+        "forced_loss_count": 0,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": null
+      }
+    },
+    "threat_with_defense": {
+      "all": {
+        "count": 172,
+        "game_count": 50,
+        "target_positive_count": 76,
+        "target_negative_count": 96,
+        "target_positive_pct": 44.18604651162791,
+        "prediction_mean": -0.0026755128272397573,
+        "prediction_median": 0.17838206887245178,
+        "prediction_min": -0.805374026298523,
+        "prediction_max": 0.5584104061126709,
+        "mse_vs_training_target": 0.9037099537218009,
+        "mae_vs_training_target": 0.9206171139944778,
+        "sign_accuracy_vs_training_target": 0.6337209302325582,
+        "forced_loss_count": 0,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": null
+      },
+      "train": {
+        "count": 138,
+        "game_count": 40,
+        "target_positive_count": 61,
+        "target_negative_count": 77,
+        "target_positive_pct": 44.20289855072464,
+        "prediction_mean": -0.004039506522425707,
+        "prediction_median": 0.17838206887245178,
+        "prediction_min": -0.805374026298523,
+        "prediction_max": 0.5584104061126709,
+        "mse_vs_training_target": 0.9096842089492988,
+        "mae_vs_training_target": 0.9225322781535594,
+        "sign_accuracy_vs_training_target": 0.6231884057971014,
+        "forced_loss_count": 0,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": null
+      },
+      "validation": {
+        "count": 17,
+        "game_count": 5,
+        "target_positive_count": 8,
+        "target_negative_count": 9,
+        "target_positive_pct": 47.05882352941177,
+        "prediction_mean": -0.010614694917903227,
+        "prediction_median": 0.17838206887245178,
+        "prediction_min": -0.6444411873817444,
+        "prediction_max": 0.18205669522285461,
+        "mse_vs_training_target": 0.8942684713848594,
+        "mae_vs_training_target": 0.9146501509582295,
+        "sign_accuracy_vs_training_target": 0.6470588235294118,
+        "forced_loss_count": 0,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": null
+      },
+      "test": {
+        "count": 17,
+        "game_count": 5,
+        "target_positive_count": 7,
+        "target_negative_count": 10,
+        "target_positive_pct": 41.1764705882353,
+        "prediction_mean": 0.01633608867140377,
+        "prediction_median": 0.17838206887245178,
+        "prediction_min": -0.3278082013130188,
+        "prediction_max": 0.18205669522285461,
+        "mse_vs_training_target": 0.8646545406825832,
+        "mae_vs_training_target": 0.9110374503275928,
+        "sign_accuracy_vs_training_target": 0.7058823529411765,
+        "forced_loss_count": 0,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": null
+      }
+    },
+    "threat_no_defense": {
+      "all": {
+        "count": 47,
+        "game_count": 47,
+        "target_positive_count": 0,
+        "target_negative_count": 47,
+        "target_positive_pct": 0.0,
+        "prediction_mean": -0.5166040645476352,
+        "prediction_median": -0.6368232369422913,
+        "prediction_min": -0.8033002614974976,
+        "prediction_max": 0.289217084646225,
+        "mse_vs_training_target": 0.31684387290751503,
+        "mae_vs_training_target": 0.48339593545236487,
+        "sign_accuracy_vs_training_target": 0.9574468085106383,
+        "forced_loss_count": 47,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 2,
+        "forced_loss_prediction_mean": -0.5166040645476352
+      },
+      "train": {
+        "count": 37,
+        "game_count": 37,
+        "target_positive_count": 0,
+        "target_negative_count": 37,
+        "target_positive_pct": 0.0,
+        "prediction_mean": -0.5154973303748144,
+        "prediction_median": -0.6368232369422913,
+        "prediction_min": -0.8033002614974976,
+        "prediction_max": 0.289217084646225,
+        "mse_vs_training_target": 0.322148289577304,
+        "mae_vs_training_target": 0.4845026696251856,
+        "sign_accuracy_vs_training_target": 0.9459459459459459,
+        "forced_loss_count": 37,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 2,
+        "forced_loss_prediction_mean": -0.5154973303748144
+      },
+      "validation": {
+        "count": 5,
+        "game_count": 5,
+        "target_positive_count": 0,
+        "target_negative_count": 5,
+        "target_positive_pct": 0.0,
+        "prediction_mean": -0.5144889235496521,
+        "prediction_median": -0.44348278641700745,
+        "prediction_min": -0.8033002614974976,
+        "prediction_max": -0.15224435925483704,
+        "mse_vs_training_target": 0.3005070535035646,
+        "mae_vs_training_target": 0.4855110764503479,
+        "sign_accuracy_vs_training_target": 1,
+        "forced_loss_count": 5,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": -0.5144889235496521
+      },
+      "test": {
+        "count": 5,
+        "game_count": 5,
+        "target_positive_count": 0,
+        "target_negative_count": 5,
+        "target_positive_pct": 0.0,
+        "prediction_mean": -0.5269090384244919,
+        "prediction_median": -0.6368232369422913,
+        "prediction_min": -0.8033002614974976,
+        "prediction_max": -0.12504540383815765,
+        "mse_vs_training_target": 0.29392800895502735,
+        "mae_vs_training_target": 0.4730909615755081,
+        "sign_accuracy_vs_training_target": 1,
+        "forced_loss_count": 5,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": -0.5269090384244919
+      }
+    },
+    "threat_with_immediate_win": {
+      "all": {
+        "count": 4,
+        "game_count": 4,
+        "target_positive_count": 4,
+        "target_negative_count": 0,
+        "target_positive_pct": 100.0,
+        "prediction_mean": 0.2967557800002396,
+        "prediction_median": 0.2649923306889832,
+        "prediction_min": 0.010765262879431248,
+        "prediction_max": 0.6462731957435608,
+        "mse_vs_training_target": 0.5783608422703963,
+        "mae_vs_training_target": 0.7032442199997604,
+        "sign_accuracy_vs_training_target": 1,
+        "forced_loss_count": 0,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": null
+      },
+      "train": {
+        "count": 4,
+        "game_count": 4,
+        "target_positive_count": 4,
+        "target_negative_count": 0,
+        "target_positive_pct": 100.0,
+        "prediction_mean": 0.2967557800002396,
+        "prediction_median": 0.2649923306889832,
+        "prediction_min": 0.010765262879431248,
+        "prediction_max": 0.6462731957435608,
+        "mse_vs_training_target": 0.5783608422703963,
+        "mae_vs_training_target": 0.7032442199997604,
+        "sign_accuracy_vs_training_target": 1,
+        "forced_loss_count": 0,
+        "forced_loss_target_positive_count": 0,
+        "forced_loss_prediction_positive_count": 0,
+        "forced_loss_prediction_mean": null
+      },
+      "validation": {
+        "count": 0
+      },
+      "test": {
+        "count": 0
+      }
+    }
+  },
+  "forced_loss_target_conflicts": {
+    "count": 0,
+    "pct_of_forced_loss_positions": 0.0,
+    "examples": []
+  },
+  "interpretation_notes": [
+    "threat_no_defense may include positions where a root immediate win exists; forced_loss excludes those.",
+    "forced_loss is a one-ply engine proof: every legal root action leaves the opponent an immediate winning reply.",
+    "A positive final-game training target on a forced-loss position indicates the played heuristic trajectory failed to realize an already available opponent win.",
+    "The checkpoint prediction is evaluated from the encoded player-to-move perspective."
+  ]
+}
