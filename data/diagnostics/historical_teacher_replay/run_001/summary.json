@@ -1,0 +1,1279 @@
+{
+  "experiment": "historical_teacher_replay_audit",
+  "current_source_sha256": {
+    "quoridor/advanced_ai.py": "83a4ef15847d3f6307a65890e8be4263035a5871637682bff0595848d90d2db6",
+    "quoridor/engine.py": "5478cdf66537556a5b32c445ea24ddda0aa4c8a52c7b4597af9311f626090e9a",
+    "training/generate_heuristic_games.py": "8f503401dafc4c5c8a4db22449973032e043434a0e851887f2f3d8a53e798c96"
+  },
+  "dataset": "data/experiments/exp_001/heuristic_decisive_games.jsonl",
+  "dataset_sha256": "d9e027c3e4537146dcfa7368baee0ccc01be4fbc067bff01f36fc50f859437b9",
+  "config": {
+    "original_teacher_time_limit_seconds": 0.08,
+    "short_time_limit_seconds": 0.08,
+    "long_time_limit_seconds": 0.32,
+    "max_depth": 2,
+    "original_teacher_max_depth": 2,
+    "max_occurrences_per_conflict_state": 0,
+    "sampling": "deterministic evenly spaced by (game_id, ply) within each conflict state",
+    "history_reconstruction": "same game's prior states on the same player's turns, last 16; matches generator's persistent per-player AI instances",
+    "history_empty_definition": "fresh QuoridorAI; choose_action records current root state itself",
+    "read_only": true
+  },
+  "integrity": {
+    "records": 3780,
+    "games": 50,
+    "unique_states": 957,
+    "conflicting_states": 52,
+    "conflict_occurrences": 1987,
+    "selected_occurrences": 1987,
+    "selected_occurrence_pct": 100.0,
+    "all_states_reconstructed": true,
+    "elapsed_seconds": 443.0708098819996
+  },
+  "run_summary": {
+    "empty_short": {
+      "count": 1987,
+      "timeout_count": 315,
+      "timeout_pct": 15.853044791142425,
+      "mean_completed_depth": 1.8414695520885758,
+      "depth_histogram": {
+        "1": 315,
+        "2": 1672
+      },
+      "mean_elapsed_ms": 53.35449432412007,
+      "mean_nodes": 50.33568193256165
+    },
+    "actual_short": {
+      "count": 1987,
+      "timeout_count": 325,
+      "timeout_pct": 16.356316054353297,
+      "mean_completed_depth": 1.836436839456467,
+      "depth_histogram": {
+        "1": 325,
+        "2": 1662
+      },
+      "mean_elapsed_ms": 54.73957696731867,
+      "mean_nodes": 52.736789129340714
+    },
+    "empty_long": {
+      "count": 1987,
+      "timeout_count": 0,
+      "timeout_pct": 0.0,
+      "mean_completed_depth": 2,
+      "depth_histogram": {
+        "2": 1987
+      },
+      "mean_elapsed_ms": 54.8671630321936,
+      "mean_nodes": 51.36789129340715
+    },
+    "actual_long": {
+      "count": 1987,
+      "timeout_count": 0,
+      "timeout_pct": 0.0,
+      "mean_completed_depth": 2,
+      "depth_histogram": {
+        "2": 1987
+      },
+      "mean_elapsed_ms": 56.64783889635419,
+      "mean_nodes": 53.95923502767992
+    }
+  },
+  "comparisons": {
+    "history_action_change_short_count": 357,
+    "history_action_change_long_count": 344,
+    "history_score_change_short_count": 766,
+    "history_score_change_long_count": 712,
+    "short_long_action_change_empty_count": 115,
+    "short_long_action_change_actual_count": 68,
+    "short_timeout_empty_count": 315,
+    "short_timeout_actual_count": 325,
+    "long_timeout_empty_count": 0,
+    "long_timeout_actual_count": 0
+  },
+  "interpretation_limits": [
+    "The historical Advanced AI, engine, encoder, and generator files were compared byte-for-byte against commit f40a4ce3df337939cd52a16108b281d4b1e6f4d4; the three source hashes recorded by the replay also match the pinned EXP-001 source hashes.",
+    "History-sensitive means the same board can produce a different selected action when reconstructed same-player history is supplied. It does not prove that history alone caused the final winner.",
+    "Deadline-sensitive means the selected action changes between the original 80 ms budget and 320 ms at the same max_depth=2. This is not a deeper-search comparison.",
+    "Same action under opposite targets demonstrates that the observed action and current board alone do not uniquely determine the terminal outcome across these trajectories.",
+    "Classifications are non-exclusive. A state can be history-sensitive, deadline-sensitive, and still have the same action under both target classes."
+  ],
+  "per_state": [
+    {
+      "fingerprint": "0b478ceddc5f55b7d0918d5fcc3d3557487a49c1957458165fca38212a68c537",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 28,
+        "negative": 22
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "14f357603d2490d07791cbb543b4abacf61e1ba741406bb2c1dfb51102e5b70e",
+      "dataset_occurrences": 43,
+      "audited_occurrences": 43,
+      "target_counts_in_audited_occurrences": {
+        "positive": 25,
+        "negative": 18
+      },
+      "history_action_changes_80ms": 43,
+      "history_action_changes_320ms": 43,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "1fc619f86b0c573eaa835db86457f25904eca663d60a737a00978476780e41c2",
+      "dataset_occurrences": 33,
+      "audited_occurrences": 33,
+      "target_counts_in_audited_occurrences": {
+        "positive": 21,
+        "negative": 12
+      },
+      "history_action_changes_80ms": 1,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "282770e1a49ab6a6d237eca217b7ec4f3751ccf9d32757cb748332a58208ecf5",
+      "dataset_occurrences": 26,
+      "audited_occurrences": 26,
+      "target_counts_in_audited_occurrences": {
+        "positive": 19,
+        "negative": 7
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "287502e068296df30e309ad7b10a091386802bc727b8a3f5eb84a6ebd8fc0033",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 28,
+        "negative": 22
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "39144e97b6623843eb850318a8781295503cba586e2594b33c3764779b707d50",
+      "dataset_occurrences": 33,
+      "audited_occurrences": 33,
+      "target_counts_in_audited_occurrences": {
+        "positive": 12,
+        "negative": 21
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 33,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "459c2e27e1e10e3b4a88155c3adea8af79e23660df488cae2ee2542a06c0d3ca",
+      "dataset_occurrences": 48,
+      "audited_occurrences": 48,
+      "target_counts_in_audited_occurrences": {
+        "positive": 21,
+        "negative": 27
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "46aba79ddad75cee9fca89c7cd41217df32bf455d68095b26d259c9f88bc4b5d",
+      "dataset_occurrences": 33,
+      "audited_occurrences": 33,
+      "target_counts_in_audited_occurrences": {
+        "positive": 21,
+        "negative": 12
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "4cc246b7ec36686e266ae138f075c659f2ec9ea142acbb192214dc312a33f7c5",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 28,
+        "negative": 22
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "569274f7d9df8621fb7ee3c74d2be7b77066c50e68c8a50a41bbd64f4e248a08",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 22,
+        "negative": 28
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 50,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "58095a3964984ac98ef2e70f271034afd9664c754df1ac6000db04605b835679",
+      "dataset_occurrences": 2,
+      "audited_occurrences": 2,
+      "target_counts_in_audited_occurrences": {
+        "positive": 1,
+        "negative": 1
+      },
+      "history_action_changes_80ms": 1,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "599d9ec08e57b184d699c458e57e95a8fc7664b8058981dbfa6ec72f182370fc",
+      "dataset_occurrences": 44,
+      "audited_occurrences": 44,
+      "target_counts_in_audited_occurrences": {
+        "positive": 18,
+        "negative": 26
+      },
+      "history_action_changes_80ms": 44,
+      "history_action_changes_320ms": 44,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "5eff448aa6f4509a09d8d53bdda31880f61df26968930ece0fe17749b5a7c953",
+      "dataset_occurrences": 26,
+      "audited_occurrences": 26,
+      "target_counts_in_audited_occurrences": {
+        "positive": 19,
+        "negative": 7
+      },
+      "history_action_changes_80ms": 25,
+      "history_action_changes_320ms": 26,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "616619498016d8166ab408fa9e07173335f0b8c2cd9c12b339d9d0c303b75c39",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 28,
+        "negative": 22
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "649f72f062542052c46f469ac375504ed6e0a96b23ed26a57a6c1fc20bdf62d3",
+      "dataset_occurrences": 49,
+      "audited_occurrences": 49,
+      "target_counts_in_audited_occurrences": {
+        "positive": 27,
+        "negative": 22
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "6789cd03f4d1f7620c6ceb301a7dd0b387b0814fb0ece17ebe77e1390b7bbe80",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 28,
+        "negative": 22
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "686ef6270ecac2a82f1aec1c60515c2923521af96745d246b97c95179b2dcd55",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 28,
+        "negative": 22
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "6b84e461f801065fdb5d6f73179d811e1ff3f952b27de55742a919d847d451dc",
+      "dataset_occurrences": 26,
+      "audited_occurrences": 26,
+      "target_counts_in_audited_occurrences": {
+        "positive": 19,
+        "negative": 7
+      },
+      "history_action_changes_80ms": 1,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "6cf2a89368ad3ef901da9946798590caef014ed53fd530a20916bd01cb8dfe62",
+      "dataset_occurrences": 26,
+      "audited_occurrences": 26,
+      "target_counts_in_audited_occurrences": {
+        "positive": 7,
+        "negative": 19
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "6d4a712c37ccea84feedc4febfc2430f423c85a98542c3d0f2cd5422c41ae4c1",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 22,
+        "negative": 28
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 50,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "713d82f0e19be40e32d08ba2dff4808f5934ec0b1c6879382f775a0fa67974c6",
+      "dataset_occurrences": 28,
+      "audited_occurrences": 28,
+      "target_counts_in_audited_occurrences": {
+        "positive": 7,
+        "negative": 21
+      },
+      "history_action_changes_80ms": 1,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "74f5f0a5f5e2a81bc5f2a0c36399a8fde60814b2725104f4a714e9256e1692d0",
+      "dataset_occurrences": 37,
+      "audited_occurrences": 37,
+      "target_counts_in_audited_occurrences": {
+        "positive": 12,
+        "negative": 25
+      },
+      "history_action_changes_80ms": 1,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "7513e0218021f9f9b899ce4a1db52a7ac5b63e9c52e66d7797a2031303f9bd93",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 28,
+        "negative": 22
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "831cf6fa16d7e08cd29f927144b063e36958f619d79e6f8a91518620e448d520",
+      "dataset_occurrences": 33,
+      "audited_occurrences": 33,
+      "target_counts_in_audited_occurrences": {
+        "positive": 12,
+        "negative": 21
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 33,
+      "budget_action_changes_actual_history": 33,
+      "short_budget_timeout_occurrences": 33,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "85198c7985d1549e4a0d5143c89abaa8c9a212ae17d9300689166cb5354f9b73",
+      "dataset_occurrences": 33,
+      "audited_occurrences": 33,
+      "target_counts_in_audited_occurrences": {
+        "positive": 12,
+        "negative": 21
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 33,
+      "budget_action_changes_empty_history": 33,
+      "budget_action_changes_actual_history": 33,
+      "short_budget_timeout_occurrences": 33,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "85818f8f4f6a2580717e7bfaa06edfe71030e01486d8428676b965faa1df11bd",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 22,
+        "negative": 28
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "85b08c2793ab983279ee4474ddea4694fc84f3effefb7aa62c259c6043792bb0",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 22,
+        "negative": 28
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 50,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "86a5fc2ead6624c7351e8ea2623a0e62e2b42f018f3850a9d3c3bc85b9fb2a12",
+      "dataset_occurrences": 46,
+      "audited_occurrences": 46,
+      "target_counts_in_audited_occurrences": {
+        "positive": 20,
+        "negative": 26
+      },
+      "history_action_changes_80ms": 1,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "8a9eac73e03ab88c8d84ea86c4e1dd8c6d456f4351b1d8ccc51ce3246945c9f9",
+      "dataset_occurrences": 37,
+      "audited_occurrences": 37,
+      "target_counts_in_audited_occurrences": {
+        "positive": 25,
+        "negative": 12
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 37,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "8cf611acd8a190c797cb2c684fad032101cb830f5bb231ff68997902a4d5232c",
+      "dataset_occurrences": 37,
+      "audited_occurrences": 37,
+      "target_counts_in_audited_occurrences": {
+        "positive": 12,
+        "negative": 25
+      },
+      "history_action_changes_80ms": 36,
+      "history_action_changes_320ms": 37,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "9720a8e7f2f6b004a204bd52434ad561fbb5d88dafedeb217b50b46fcd1654a2",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 22,
+        "negative": 28
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "9c4a3fb03a2c0d7e748234f50eeb5a5119d5c5346362158884357df4a3f0bfb7",
+      "dataset_occurrences": 48,
+      "audited_occurrences": 48,
+      "target_counts_in_audited_occurrences": {
+        "positive": 27,
+        "negative": 21
+      },
+      "history_action_changes_80ms": 48,
+      "history_action_changes_320ms": 48,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "9ef94db3f2e97dde90c09fe7f7708ee65dd18f00f479d67a4af8d7123924e03c",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 22,
+        "negative": 28
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 4,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "a373a25782c3ddaf57ccb2a4228cbc1639d4b8710c74ddf5ff5148b7fe8c35a2",
+      "dataset_occurrences": 28,
+      "audited_occurrences": 28,
+      "target_counts_in_audited_occurrences": {
+        "positive": 21,
+        "negative": 7
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "a7af793e2c3b9b4d09b25fc0619306be56d12cf5a9445028518d87db354247c1",
+      "dataset_occurrences": 46,
+      "audited_occurrences": 46,
+      "target_counts_in_audited_occurrences": {
+        "positive": 26,
+        "negative": 20
+      },
+      "history_action_changes_80ms": 1,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "ab0b7d6f4890ebb8cdee758caca41a12aac7b93c36d25e16d636febeca37d5d9",
+      "dataset_occurrences": 33,
+      "audited_occurrences": 33,
+      "target_counts_in_audited_occurrences": {
+        "positive": 12,
+        "negative": 21
+      },
+      "history_action_changes_80ms": 2,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 1,
+      "short_budget_timeout_occurrences": 2,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "aee39179eb03072e2752021334d71da4a3d1f89abd232cb4881159852d2c09a0",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 22,
+        "negative": 28
+      },
+      "history_action_changes_80ms": 50,
+      "history_action_changes_320ms": 50,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "c03714e530afd9c7635578912aa4ea181419da228b26e2e2cc4c3b0e3834b94b",
+      "dataset_occurrences": 33,
+      "audited_occurrences": 33,
+      "target_counts_in_audited_occurrences": {
+        "positive": 12,
+        "negative": 21
+      },
+      "history_action_changes_80ms": 33,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 33,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 33,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "c7d99afcbf41a7a5d19ad979ac017a28692304a80318983a283999427c28936a",
+      "dataset_occurrences": 48,
+      "audited_occurrences": 48,
+      "target_counts_in_audited_occurrences": {
+        "positive": 27,
+        "negative": 21
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "ca42cd74c21fbae0dd6defbad3e5e37169d6e8f20b5adbd248d509f2241e326f",
+      "dataset_occurrences": 33,
+      "audited_occurrences": 33,
+      "target_counts_in_audited_occurrences": {
+        "positive": 21,
+        "negative": 12
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "cdd710d37cae1dd4e99d9e3338aa01c8ea7e8306a467c6f5850bb831f8684ad5",
+      "dataset_occurrences": 26,
+      "audited_occurrences": 26,
+      "target_counts_in_audited_occurrences": {
+        "positive": 7,
+        "negative": 19
+      },
+      "history_action_changes_80ms": 26,
+      "history_action_changes_320ms": 26,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 2,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "d62b6e63b5bcb9d4b74480964c1af2b1f85eae4c3ba76c6515755e142c4a91f6",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 22,
+        "negative": 28
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "da7da8c7a3c0cd32300408ea5f681ed815704e18af4a9a6d7266281235e8dfdd",
+      "dataset_occurrences": 48,
+      "audited_occurrences": 48,
+      "target_counts_in_audited_occurrences": {
+        "positive": 21,
+        "negative": 27
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 0,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "da869338854617a1652543221fd1c69ab3ded4e3130b4b0842ec8e95b5450cf1",
+      "dataset_occurrences": 33,
+      "audited_occurrences": 33,
+      "target_counts_in_audited_occurrences": {
+        "positive": 21,
+        "negative": 12
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 2,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "e20e0cbededb58f43442c9a996fe55809f0ef5db45d4f17bf591c3a060127535",
+      "dataset_occurrences": 23,
+      "audited_occurrences": 23,
+      "target_counts_in_audited_occurrences": {
+        "positive": 19,
+        "negative": 4
+      },
+      "history_action_changes_80ms": 1,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "e4899cf29bf679815509b7c2ac50120fbc2c03d6ddf5e9d9f7074435938e99f5",
+      "dataset_occurrences": 25,
+      "audited_occurrences": 25,
+      "target_counts_in_audited_occurrences": {
+        "positive": 6,
+        "negative": 19
+      },
+      "history_action_changes_80ms": 2,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 2,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 2,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "ed0c56a93c92356cf5bd9ca499ed0aec4da6c0a1de783e06882cc218f710eecd",
+      "dataset_occurrences": 21,
+      "audited_occurrences": 21,
+      "target_counts_in_audited_occurrences": {
+        "positive": 18,
+        "negative": 3
+      },
+      "history_action_changes_80ms": 2,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 1,
+      "short_budget_timeout_occurrences": 2,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "f41646b4acb9b205f45779675f8f37820916196f1e88b113ca8827d2230293ab",
+      "dataset_occurrences": 21,
+      "audited_occurrences": 21,
+      "target_counts_in_audited_occurrences": {
+        "positive": 3,
+        "negative": 18
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "fa1aaf50d1579a73fe780367abc026ee29c1bdb538cec54adc2f025cb2e8f2dc",
+      "dataset_occurrences": 22,
+      "audited_occurrences": 22,
+      "target_counts_in_audited_occurrences": {
+        "positive": 19,
+        "negative": 3
+      },
+      "history_action_changes_80ms": 1,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 1,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": true,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "fb569fd3822fe0a066f305b176ccc2ecab46390b263ab6fae3b09fa826684e06",
+      "dataset_occurrences": 22,
+      "audited_occurrences": 22,
+      "target_counts_in_audited_occurrences": {
+        "positive": 3,
+        "negative": 19
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "ff59287d3c05116fa698a2a439fe254870680cea789c07e9654290b02457aee0",
+      "dataset_occurrences": 50,
+      "audited_occurrences": 50,
+      "target_counts_in_audited_occurrences": {
+        "positive": 28,
+        "negative": 22
+      },
+      "history_action_changes_80ms": 0,
+      "history_action_changes_320ms": 0,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": false,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    },
+    {
+      "fingerprint": "ff7e9b2e551df5479f1dd6bcee946647c4a3220004aecef1f421c1bfcfcd4a9f",
+      "dataset_occurrences": 37,
+      "audited_occurrences": 37,
+      "target_counts_in_audited_occurrences": {
+        "positive": 25,
+        "negative": 12
+      },
+      "history_action_changes_80ms": 37,
+      "history_action_changes_320ms": 37,
+      "budget_action_changes_empty_history": 0,
+      "budget_action_changes_actual_history": 0,
+      "short_budget_timeout_occurrences": 1,
+      "same_actual_80ms_action_seen_under_both_targets": true,
+      "shared_action_count_across_targets": 1,
+      "classification": {
+        "history_influenced": true,
+        "deadline_sensitive": false,
+        "same_action_opposite_outcomes": true,
+        "no_shared_action_across_outcomes": false
+      }
+    }
+  ],
+  "historical_provenance": {
+    "dataset_sha256_matches_exp001": true,
+    "historical_source_hashes_match": true,
+    "historical_generation_commit": "f40a4ce3df337939cd52a16108b281d4b1e6f4d4",
+    "dataset_generation_config": {
+      "games": 50,
+      "time_limit_seconds": 0.08,
+      "max_depth": 2,
+      "max_plies": 300,
+      "discount": 0.99,
+      "seed": 20261113,
+      "decisive_games": 50,
+      "total_samples": 3780
+    }
+  },
+  "exhaustive_classification": {
+    "state_counts": {
+      "total_conflicting_states": 52,
+      "history_influenced": 22,
+      "deadline_sensitive": 18,
+      "same_action_opposite_outcomes": 52,
+      "no_shared_action_across_outcomes": 0
+    },
+    "occurrence_counts": {
+      "total_audited_occurrences": 1987,
+      "history_changes_action_at_80ms": 357,
+      "history_changes_action_at_320ms": 344,
+      "deadline_changes_action_without_history": 115,
+      "deadline_changes_action_with_actual_history": 68,
+      "empty_history_80ms_timeout": 315,
+      "actual_history_80ms_timeout": 325
+    }
+  }
+}
