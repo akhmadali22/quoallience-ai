@@ -50,8 +50,6 @@ def sample_evenly(rows: list[dict], limit: int) -> list[dict]:
         return ordered
     if limit == 1:
         return [ordered[len(ordered) // 2]]
-    # Evenly cover the ordered occurrences. The seed is recorded for provenance;
-    # sampling itself is deliberately deterministic and does not hide edge cases.
     indexes = sorted({round(i * (len(ordered) - 1) / (limit - 1)) for i in range(limit)})
     return [ordered[i] for i in indexes]
 
@@ -110,7 +108,6 @@ def main() -> int:
     parser.add_argument("--max-depth", type=int, default=2)
     parser.add_argument("--max-occurrences-per-state", type=int, default=4,
         help="Evenly sampled occurrences per conflicting state; 0 means all occurrences.")
-    parser.add_argument("--seed", type=int, default=20261120)
     args = parser.parse_args()
 
     if not args.dataset.is_file():
@@ -198,7 +195,7 @@ def main() -> int:
     selected = []
     for fp, members in sorted(conflict_groups.items()):
         selected.extend(sample_evenly(
-            members, args.max_occurrences_per_state, args.seed
+            members, args.max_occurrences_per_state
         ))
     selected.sort(key=lambda r: (r["fingerprint"], r["game_id"], r["ply"]))
 
@@ -370,7 +367,6 @@ def main() -> int:
             "max_depth": args.max_depth,
             "original_teacher_max_depth": 2,
             "max_occurrences_per_conflict_state": args.max_occurrences_per_state,
-            "seed": args.seed,
             "sampling": "deterministic evenly spaced by (game_id, ply) within each conflict state",
             "history_reconstruction": (
                 "same game's prior states on the same player's turns, last 16; "
