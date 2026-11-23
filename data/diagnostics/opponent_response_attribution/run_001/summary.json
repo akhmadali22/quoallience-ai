@@ -1,0 +1,65 @@
+{
+  "experiment": "opponent_response_attribution_audit",
+  "dataset": "data/experiments/exp_001/heuristic_decisive_games.jsonl",
+  "dataset_sha256": "d9e027c3e4537146dcfa7368baee0ccc01be4fbc067bff01f36fc50f859437b9",
+  "integrity": {
+    "games": 50,
+    "records": 3780,
+    "conflicting_states": 52,
+    "conflict_occurrences": 1987,
+    "verified_state_transitions": 3780,
+    "reconstructed_actions": 3780,
+    "all_reconstructed_actions_legal": true,
+    "all_transitions_match_next_state": true,
+    "all_terminal_winners_verified": true,
+    "ambiguous_or_unmatched_transitions": 0
+  },
+  "method": {
+    "root_action": "action at offset 0 from the repeated state",
+    "opponent_response": "action at offset 1, after the common root action",
+    "next_root_player_action": "action at offset 2, after the opponent response",
+    "outcome": "terminal winner from the repeated state's side-to-move perspective",
+    "pairing": "all positive/negative occurrence pairs within each exact encoded state",
+    "read_only": true,
+    "action_source": "uniquely reconstructed from consecutive recorded states; not a stored policy label"
+  },
+  "aggregate_pairwise_comparison": {
+    "cross_outcome_pairs": 19516,
+    "same_root_action_pairs": 18900,
+    "different_root_action_pairs": 616,
+    "same_opponent_response_pairs_given_same_root": 18284,
+    "different_opponent_response_pairs_given_same_root": 616,
+    "same_next_root_player_action_pairs_given_same_root_and_response": 17668,
+    "different_next_root_player_action_pairs_given_same_root_and_response": 616,
+    "missing_next_action_pairs": 0
+  },
+  "opponent_response_kind_by_outcome": [
+    {
+      "outcome": "negative",
+      "response_kind": "move",
+      "count": 743
+    },
+    {
+      "outcome": "negative",
+      "response_kind": "wall",
+      "count": 246
+    },
+    {
+      "outcome": "positive",
+      "response_kind": "move",
+      "count": 787
+    },
+    {
+      "outcome": "positive",
+      "response_kind": "wall",
+      "count": 211
+    }
+  ],
+  "interpretation_limits": [
+    "Observational attribution only; no action was intervened on and no game was re-simulated.",
+    "Opponent response comparisons are conditioned on the same exact root state and same observed root action.",
+    "An association between a response and terminal outcome does not establish causation or response quality.",
+    "The dataset does not store policy/action fields; actions are uniquely reconstructed from state transitions.",
+    "This audit does not modify training, targets, loss, checkpoints, replay, PUCT, or source dataset."
+  ]
+}
