@@ -78,7 +78,7 @@ def reconstruct_observed_action(
         )
         candidate_ids = [action for action, _ in matches]
         raise ValueError(
-            f"Could not uniquely reconstruct action at game {state.ply}: "
+            f"Could not uniquely reconstruct action at state ply {state.ply}: "
             f"expected {location}; matched {len(matches)} legal actions "
             f"{candidate_ids[:10]}"
         )
@@ -258,6 +258,7 @@ def main() -> int:
             "conflicting_states": len(conflict_groups),
             "conflict_occurrences": sum(len(v) for v in conflict_groups.values()),
             "verified_state_transitions": transition_checks,
+            "reconstructed_actions": transition_checks,
             "all_reconstructed_actions_legal": True,
             "all_transitions_match_next_state": True,
             "all_terminal_winners_verified": True,
