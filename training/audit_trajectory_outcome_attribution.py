@@ -48,6 +48,43 @@ def same_state(a, b) -> bool:
             and a.winner == b.winner and a.ply == b.ply)
 
 
+def reconstruct_observed_action(
+    state,
+    *,
+    expected_next=None,
+    expected_winner=None,
+    expected_terminal_ply=None,
+) -> tuple[int, object]:
+    """Infer the unique legal action proven by the next state or terminal metadata."""
+    matches = []
+    for action_index in legal_action_indices(state):
+        child = apply_action_index(state, action_index)
+        if expected_next is not None:
+            matched = same_state(child, expected_next)
+        else:
+            matched = (
+                child.winner == expected_winner
+                and child.ply == expected_terminal_ply
+                and child.winner is not None
+            )
+        if matched:
+            matches.append((action_index, child))
+
+    if len(matches) != 1:
+        location = (
+            f"next ply {expected_next.ply}"
+            if expected_next is not None
+            else f"terminal winner={expected_winner}, ply={expected_terminal_ply}"
+        )
+        candidate_ids = [action for action, _ in matches]
+        raise ValueError(
+            f"Could not uniquely reconstruct action at game {state.ply}: "
+            f"expected {location}; matched {len(matches)} legal actions "
+            f"{candidate_ids[:10]}"
+        )
+    return matches[0]
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--dataset", type=Path,
@@ -73,25 +110,19 @@ def main() -> int:
         if not line.strip():
             continue
         r = json.loads(line)
-        required = {"state", "policy", "game_id", "ply", "player", "winner", "total_plies"}
+        required = {"state", "game_id", "ply", "player", "winner", "total_plies"}
         if required - r.keys():
             raise ValueError(f"Line {line_no}: missing {sorted(required-r.keys())}")
         state = restore_encoded_state({"state": r["state"], "player": r["player"], "ply": r["ply"]})
         if state.current_player != int(r["player"]):
             raise ValueError(f"Line {line_no}: player mismatch")
-        policy = r["policy"]
-        if len(policy) != 1:
-            raise ValueError(f"Line {line_no}: expected one-hot historical action, got {len(policy)}")
-        action = int(next(iter(policy)))
-        if action not in legal_action_indices(state):
-            raise ValueError(f"Line {line_no}: recorded action {action} is illegal")
         games[int(r["game_id"])].append({
             "state": state, "encoded": r["state"], "fp": fingerprint(r["state"]),
             "game_id": int(r["game_id"]), "ply": int(r["ply"]),
             "player": int(r["player"]), "winner": int(r["winner"]),
             "total_plies": int(r["total_plies"]),
             "target": 1 if int(r["player"]) == int(r["winner"]) else -1,
-            "action": action,
+            "action": None,
         })
 
     all_rows = []
@@ -106,15 +137,24 @@ def main() -> int:
         if any(r["winner"] != winner or r["total_plies"] != total for r in rows):
             raise ValueError(f"Game {game_id}: inconsistent game metadata")
         for i, row in enumerate(rows):
-            child = apply_action_index(row["state"], row["action"])
-            transition_checks += 1
             if i + 1 < len(rows):
-                if not same_state(child, rows[i + 1]["state"]):
-                    raise ValueError(
-                        f"Game {game_id} ply {row['ply']}: recorded action does not produce next dataset state"
-                    )
-            elif child.ply != total or child.winner != winner:
-                raise ValueError(f"Game {game_id}: final action does not produce recorded winner/terminal ply")
+                action, child = reconstruct_observed_action(
+                    row["state"], expected_next=rows[i + 1]["state"]
+                )
+            else:
+                action, child = reconstruct_observed_action(
+                    row["state"], expected_winner=winner,
+                    expected_terminal_ply=total,
+                )
+            row["action"] = action
+            transition_checks += 1
+            if i + 1 == len(rows) and (
+                child.ply != total or child.winner != winner
+            ):
+                raise ValueError(
+                    f"Game {game_id}: reconstructed final action does not produce "
+                    "recorded winner/terminal ply"
+                )
         for i, row in enumerate(rows):
             row["trajectory_actions"] = [x["action"] for x in rows[i:]]
             all_rows.append(row)
@@ -218,12 +258,17 @@ def main() -> int:
             "conflicting_states": len(conflict_groups),
             "conflict_occurrences": sum(len(v) for v in conflict_groups.values()),
             "verified_state_transitions": transition_checks,
-            "all_recorded_actions_legal": True,
+            "all_reconstructed_actions_legal": True,
             "all_transitions_match_next_state": True,
             "all_terminal_winners_verified": True,
+            "unique_action_reconstruction_required": True,
+            "ambiguous_or_unmatched_transitions": 0,
         },
         "method": {
-            "observed_action_source": "one-hot policy action stored in each original EXP-001 sample",
+            "observed_action_source": (
+                "uniquely reconstructed from legal state transitions; the pinned JSONL "
+                "does not contain policy or action fields"
+            ),
             "trajectory": "chronological actions from each repeated state occurrence to game end",
             "target": " +1 when side-to-move eventually won, otherwise -1",
             "pairing": "all positive-target occurrences paired with all negative-target occurrences within each exact encoded state",
@@ -239,6 +284,8 @@ def main() -> int:
         "per_state": per_state,
         "interpretation_limits": [
             "This is observational attribution, not a counterfactual intervention: actions were not changed and games were not re-simulated.",
+            "Actions are inferred from the unique legal transition to the next recorded state; the final action is inferred from terminal winner and ply metadata. This is not a direct read of a stored policy action.",
+            "Every reconstructed transition must match exactly one legal action. Zero-match or multi-match transitions abort the audit.",
             "The root action is verified to produce the next recorded state; later action divergence identifies where observed trajectories separate, not which action caused the eventual winner.",
             "A root action associated with both outcomes is not necessarily equally strong; report support and outcome counts and avoid causal claims from small samples.",
             "The value target is terminal winner from the current player's perspective, so all occurrences of an exact state have a fixed side-to-move but may have different eventual winners.",
