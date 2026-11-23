@@ -204,9 +204,13 @@ def main() -> int:
                 )
                 if child.winner != winner or child.ply != total:
                     raise ValueError(f"Game {game_id}: final terminal state mismatch")
-            row.setdefault("actions", []).append(action)
+            row["action"] = action
             transition_count += 1
-        for row in rows:
+        # Each occurrence needs the complete remaining action suffix, not only
+        # the action taken from that row's state. This lets the attribution
+        # compare root action, opponent response, and the next root-player move.
+        for index, row in enumerate(rows):
+            row["actions"] = [item["action"] for item in rows[index:]]
             by_state[row["fp"]].append(row)
 
     conflicts = {
