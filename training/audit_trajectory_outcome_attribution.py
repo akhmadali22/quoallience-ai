@@ -15,7 +15,7 @@ from training.audit_value_training_coverage import restore_encoded_state
 from quoridor.neural_ai.encoder import apply_action_index, decode_action, legal_action_indices
 
 
-EXPECTED_DATASET_SHA256 = "d9e027c3e4537146dcfa7368baee0ccc01be4fbc067ff01f36fc50f859437b9"
+EXPECTED_DATASET_SHA256 = "d9e027c3e4537146dcfa7368baee0ccc01be4fbc067bff01f36fc50f859437b9"
 
 
 def fingerprint(encoded: list) -> str:

@@ -1,0 +1,45 @@
+{
+  "experiment": "trajectory_outcome_attribution_audit",
+  "dataset": "data/experiments/exp_001/heuristic_decisive_games.jsonl",
+  "dataset_sha256": "d9e027c3e4537146dcfa7368baee0ccc01be4fbc067bff01f36fc50f859437b9",
+  "integrity": {
+    "games": 50,
+    "records": 3780,
+    "conflicting_states": 52,
+    "conflict_occurrences": 1987,
+    "verified_state_transitions": 3780,
+    "reconstructed_actions": 3780,
+    "all_reconstructed_actions_legal": true,
+    "all_transitions_match_next_state": true,
+    "all_terminal_winners_verified": true,
+    "unique_action_reconstruction_required": true,
+    "ambiguous_or_unmatched_transitions": 0
+  },
+  "method": {
+    "observed_action_source": "uniquely reconstructed from legal state transitions; the pinned JSONL does not contain policy or action fields",
+    "trajectory": "chronological actions from each repeated state occurrence to game end",
+    "target": " +1 when side-to-move eventually won, otherwise -1",
+    "pairing": "all positive-target occurrences paired with all negative-target occurrences within each exact encoded state",
+    "horizons": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "read_only": true
+  },
+  "cross_outcome_pair_summary": {
+    "total_pairs": 19516,
+    "same_root_action_pairs": 18900,
+    "same_root_action_then_divergent_pairs": 18900
+  },
+  "interpretation_limits": [
+    "This is observational attribution, not a counterfactual intervention: actions were not changed and games were not re-simulated.",
+    "Actions are inferred from the unique legal transition to the next recorded state; the final action is inferred from terminal winner and ply metadata. This is not a direct read of a stored policy action.",
+    "Every reconstructed transition must match exactly one legal action. Zero-match or multi-match transitions abort the audit.",
+    "The root action is verified to produce the next recorded state; later action divergence identifies where observed trajectories separate, not which action caused the eventual winner.",
+    "A root action associated with both outcomes is not necessarily equally strong; report support and outcome counts and avoid causal claims from small samples.",
+    "The value target is terminal winner from the current player's perspective, so all occurrences of an exact state have a fixed side-to-move but may have different eventual winners."
+  ]
+}
