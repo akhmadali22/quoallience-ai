@@ -139,7 +139,8 @@ def evaluate_actions(state, root_player: int, action_indices: set[int]) -> dict[
         # The evaluator is history-free: a fresh AI instance has empty actual history.
     )
     ai = QuoridorAI(config)
-    ai.root_player = root_player
+    actor_player = state.current_player
+    ai.root_player = actor_player
     ai.root_ply = state.ply
     ai.deadline = time.monotonic() + config.time_limit
     results = {}
@@ -153,7 +154,8 @@ def evaluate_actions(state, root_player: int, action_indices: set[int]) -> dict[
                 "audit aborted rather than mixing search depths."
             ) from exc
         results[action_index] = {
-            "score_root_perspective": float(score),
+            "score_root_perspective": float(score if actor_player == root_player else -score),
+            "score_actor_perspective": float(score),
             "action": action_payload(action_index),
             "terminal_after_forced_action": child.winner is not None,
             "nodes_cumulative": ai.nodes,
@@ -308,7 +310,7 @@ def main() -> int:
             "max_wall_candidates_per_node": MAX_WALL_CANDIDATES,
             "transposition_table_limit": TRANSPOSITION_TABLE_LIMIT,
             "history": "empty; a fresh evaluator instance is used per divergence state",
-            "perspective": "original root state's player-to-move perspective for both root-player and opponent divergence actors",
+            "perspective": "minimax searches from the divergence actor perspective, then scores are sign-normalized to the original root player perspective",
             "wall_candidate_policy": "existing deterministic path-based candidate pruning; not exhaustive over all legal walls",
             "timeout_policy": "one-hour safety deadline; any timeout aborts the audit, so no mixed-depth rows are emitted",
             "neural_checkpoint_used": False,
