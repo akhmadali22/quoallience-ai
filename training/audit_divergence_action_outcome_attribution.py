@@ -203,6 +203,8 @@ def main() -> int:
                 })
                 if record["root_player"] != positive["state"].current_player:
                     raise ValueError("Same divergence fingerprint has inconsistent root perspective")
+                if "tactical_context" not in record:
+                    record["tactical_context"] = label_position(state)
                 record["actions"].update((positive_action, negative_action))
                 pair_specs.append({
                     "root_state_fingerprint": root_fp,
