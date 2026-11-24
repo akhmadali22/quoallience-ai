@@ -223,6 +223,7 @@ def main() -> int:
                     ),
                     "positive_action_index": positive_action,
                     "negative_action_index": negative_action,
+                    "tactical_context": state_records[encoded_fp]["tactical_context"],
                 })
 
     if len(pair_specs) != EXPECTED_PAIRS:
@@ -257,10 +258,10 @@ def main() -> int:
 
     comparison_counts = Counter(row["comparison"] for row in pair_specs)
     by_actor = defaultdict(list)
-    by_context = defaultdict(list)
+    by_actor_context = defaultdict(list)
     for row in pair_specs:
         by_actor[row["actor_role"]].append(row)
-        by_context[row["actor_role"]].append(row)
+        by_actor_context[(row["actor_role"], row["tactical_context"]["cohort"])].append(row)
 
     def aggregate(rows):
         if not rows:
@@ -330,8 +331,26 @@ def main() -> int:
         "by_divergence_actor": {
             actor: aggregate(rows) for actor, rows in sorted(by_actor.items())
         },
+        "by_actor_and_tactical_context": [
+            {"actor_role": actor, "cohort": cohort, **aggregate(rows)}
+            for (actor, cohort), rows in sorted(by_actor_context.items())
+        ],
         "unique_state_action_pair_comparison": aggregate(unique_rows),
         "unique_state_action_pair_count": len(unique_rows),
+        "unique_state_action_pairs": [
+            {
+                "divergence_state_fingerprint": row["divergence_state_fingerprint"],
+                "actor_role": row["actor_role"],
+                "tactical_context": row["tactical_context"],
+                "positive_action": row["positive_action"],
+                "negative_action": row["negative_action"],
+                "positive_action_score_root_perspective": row["positive_action_score_root_perspective"],
+                "negative_action_score_root_perspective": row["negative_action_score_root_perspective"],
+                "positive_minus_negative_score": row["positive_minus_negative_score"],
+                "comparison": row["comparison"],
+            }
+            for row in unique_rows
+        ],
         "per_divergence_state_evaluator_stats": evaluator_stats,
         "elapsed_seconds": round(time.perf_counter() - started, 3),
         "interpretation_limits": [
@@ -356,7 +375,9 @@ def main() -> int:
         "evaluator": summary["evaluator"],
         "overall_pair_comparison": summary["overall_pair_comparison"],
         "by_divergence_actor": summary["by_divergence_actor"],
+        "by_actor_and_tactical_context": summary["by_actor_and_tactical_context"],
         "unique_state_action_pair_comparison": summary["unique_state_action_pair_comparison"],
+        "unique_state_action_pair_count": summary["unique_state_action_pair_count"],
         "elapsed_seconds": summary["elapsed_seconds"],
     }, indent=2))
     return 0
