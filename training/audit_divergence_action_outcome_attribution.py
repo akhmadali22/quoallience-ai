@@ -22,7 +22,7 @@ from training.audit_first_divergence_actor_attribution import (
     reconstruct_action,
     same_state,
 )
-from training.audit_value_training_coverage import restore_encoded_state
+from training.audit_value_training_coverage import label_position, restore_encoded_state
 from quoridor.advanced_ai import AIConfig, MATE_SCORE, QuoridorAI, SearchTimeout
 from quoridor.neural_ai.encoder import apply_action_index, encode_state
 
