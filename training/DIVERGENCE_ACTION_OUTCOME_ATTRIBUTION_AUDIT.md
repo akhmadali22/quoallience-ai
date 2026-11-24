@@ -29,12 +29,12 @@ For each unique divergence state:
 1. Collect the distinct positive-trajectory and negative-trajectory actions actually observed at that state.
 2. Apply each distinct action once.
 3. Search the resulting position with deterministic alpha-beta minimax to a fixed depth of **2 additional plies after the forced observed action**.
-4. Use the original root state's player-to-move as the score perspective for every comparison, including states where the opponent is the actor.
+4. Run minimax from the divergence actor's perspective, then sign-normalize the result to the original root state's player-to-move perspective. This keeps the evaluator's root-turn and opponent-reply candidate logic aligned with the actual side to move.
 5. Use a fresh evaluator instance per divergence state. Its actual-game history is empty.
 6. Use the existing deterministic path-based wall candidate generator, capped at 8 wall candidates per node.
 7. Abort if the one-hour safety deadline is reached; do not emit mixed-depth results.
 
-The comparison is:
+The comparison uses normalized root-perspective scores:
 
 `positive_action_score_root_perspective - negative_action_score_root_perspective`
 
