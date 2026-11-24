@@ -42,7 +42,7 @@ The comparison uses normalized root-perspective scores:
 - Negative: the evaluator prefers the negative-trajectory action for the original root player.
 - Zero within numeric tolerance: evaluator tie.
 
-Scores are reused across all trajectory pairs that share the same divergence state and observed action.
+Scores are reused across all trajectory pairs that share the same divergence state and observed action. The summary includes tactical cohort breakdowns and compact unique state/action-pair comparisons, so the full pair-level JSON should not be needed for the first review.
 
 ## Critical limitations
 
@@ -62,8 +62,8 @@ bash training/run_divergence_action_outcome_attribution_audit.sh
 
 Outputs:
 
-- `data/diagnostics/divergence_action_outcome_attribution/run_001/summary.json`
-- `data/diagnostics/divergence_action_outcome_attribution/run_001/divergence_action_outcome_attribution.json`
+- `data/diagnostics/divergence_action_outcome_attribution/run_001/summary.json` (preferred upload for review)
+- `data/diagnostics/divergence_action_outcome_attribution/run_001/divergence_action_outcome_attribution.json` (full 19,516 pair rows)
 
 ## Safety
 
